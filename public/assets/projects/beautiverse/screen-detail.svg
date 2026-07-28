@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600" role="img" aria-labelledby="t2">
+  <title id="t2">Beautiverse detail and form screen preview</title>
+  <defs>
+    <linearGradient id="bg2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFF0F5" />
+      <stop offset="100%" stop-color="#F6DDE7" />
+    </linearGradient>
+  </defs>
+  <rect width="960" height="600" fill="url(#bg2)" />
+  <circle cx="880" cy="60" r="120" fill="#FFFFFF" opacity="0.3" />
+  <rect x="220" y="60" width="520" height="480" rx="28" fill="#FFFFFF" stroke="#A63D68" stroke-opacity="0.22" stroke-width="3" />
+  <rect x="252" y="96" width="220" height="20" rx="10" fill="#A63D68" opacity="0.75" />
+  <rect x="252" y="140" width="456" height="52" rx="14" fill="#F6DDE7" />
+  <rect x="252" y="208" width="456" height="52" rx="14" fill="#F6DDE7" />
+  <rect x="252" y="276" width="456" height="52" rx="14" fill="#F6DDE7" />
+  <rect x="252" y="344" width="220" height="52" rx="14" fill="#F6DDE7" />
+  <rect x="488" y="344" width="220" height="52" rx="14" fill="#F6DDE7" />
+  <rect x="252" y="440" width="220" height="56" rx="16" fill="#A63D68" />
+  <text x="290" y="474" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#FFF9FB">Submit</text>
+  <rect x="488" y="440" width="220" height="56" rx="16" fill="#FFFFFF" stroke="#A63D68" stroke-width="2" />
+  <text x="540" y="474" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#A63D68">Cancel</text>
+</svg>

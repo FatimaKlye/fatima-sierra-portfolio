@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 720" role="img" aria-labelledby="title">
+  <title id="title">ITSO ID Tracker preview</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F6DDE7" />
+      <stop offset="55%" stop-color="#F2CCDC" />
+      <stop offset="100%" stop-color="#C982A2" />
+    </linearGradient>
+    <linearGradient id="card" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#FFF0F5" />
+    </linearGradient>
+  </defs>
+  <rect width="960" height="720" fill="url(#bg)" />
+  <circle cx="120" cy="600" r="170" fill="#A63D68" opacity="0.12" />
+  <circle cx="850" cy="130" r="130" fill="#FFFFFF" opacity="0.35" />
+  <rect x="90" y="140" width="240" height="440" rx="18" fill="url(#card)" stroke="#A63D68" stroke-opacity="0.2" stroke-width="2" />
+  <rect x="118" y="170" width="184" height="16" rx="8" fill="#A63D68" opacity="0.7" />
+  <rect x="118" y="204" width="184" height="46" rx="10" fill="#F6DDE7" />
+  <rect x="118" y="264" width="184" height="46" rx="10" fill="#F6DDE7" />
+  <rect x="118" y="324" width="184" height="46" rx="10" fill="#A63D68" opacity="0.85" />
+  <rect x="118" y="384" width="184" height="46" rx="10" fill="#F6DDE7" />
+  <rect x="360" y="140" width="510" height="440" rx="18" fill="url(#card)" stroke="#A63D68" stroke-opacity="0.25" stroke-width="3" />
+  <rect x="390" y="170" width="220" height="24" rx="8" fill="#A63D68" opacity="0.8" />
+  <rect x="390" y="220" width="450" height="52" rx="12" fill="#F6DDE7" />
+  <rect x="390" y="284" width="450" height="52" rx="12" fill="#F6DDE7" />
+  <rect x="390" y="348" width="450" height="52" rx="12" fill="#F6DDE7" />
+  <rect x="390" y="412" width="450" height="52" rx="12" fill="#F6DDE7" />
+  <circle cx="420" cy="246" r="10" fill="#A63D68" opacity="0.55" />
+  <circle cx="420" cy="310" r="10" fill="#A63D68" opacity="0.55" />
+  <circle cx="420" cy="374" r="10" fill="#A63D68" opacity="0.55" />
+  <circle cx="420" cy="438" r="10" fill="#A63D68" opacity="0.55" />
+</svg>

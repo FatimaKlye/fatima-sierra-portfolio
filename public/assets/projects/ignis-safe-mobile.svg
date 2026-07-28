@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 720" role="img" aria-labelledby="title">
+  <title id="title">IGNIS SAFE mobile application preview</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F6DDE7" />
+      <stop offset="55%" stop-color="#F2CCDC" />
+      <stop offset="100%" stop-color="#C982A2" />
+    </linearGradient>
+    <linearGradient id="card" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#FFF0F5" />
+    </linearGradient>
+  </defs>
+  <rect width="960" height="720" fill="url(#bg)" />
+  <circle cx="120" cy="600" r="180" fill="#A63D68" opacity="0.14" />
+  <circle cx="860" cy="120" r="140" fill="#FFFFFF" opacity="0.35" />
+  <rect x="330" y="120" width="300" height="480" rx="40" fill="url(#card)" stroke="#A63D68" stroke-opacity="0.25" stroke-width="3" />
+  <rect x="360" y="168" width="240" height="150" rx="18" fill="#A63D68" opacity="0.9" />
+  <path d="M480 205 c-24 30 -34 46 -34 66 a34 34 0 0 0 68 0 c0 -20 -10 -36 -34 -66 z" fill="#FFF9FB" />
+  <rect x="360" y="336" width="240" height="18" rx="9" fill="#A63D68" opacity="0.6" />
+  <rect x="360" y="366" width="180" height="14" rx="7" fill="#C982A2" opacity="0.6" />
+  <rect x="360" y="410" width="240" height="60" rx="16" fill="#F6DDE7" />
+  <rect x="360" y="482" width="240" height="60" rx="16" fill="#F6DDE7" />
+  <rect x="382" y="430" width="120" height="12" rx="6" fill="#A63D68" opacity="0.55" />
+  <rect x="382" y="502" width="150" height="12" rx="6" fill="#A63D68" opacity="0.55" />
+</svg>
