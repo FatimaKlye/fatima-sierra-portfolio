@@ -7,7 +7,11 @@ export type Project = {
   technologies: string[];
   image: string;
   imageAlt: string;
-  repoUrl: string;
+  repoUrl?: string;
+  externalUrl?: string;
+  buttonLabel?: string;
+  target?: "_blank";
+  rel?: string;
 };
 
 export const PROJECTS: Project[] = [
@@ -58,5 +62,21 @@ export const PROJECTS: Project[] = [
     image: "/assets/projects/beautiverse.svg",
     imageAlt: "Beautiverse interface preview",
     repoUrl: "https://github.com/andreii2404/Beautiverse-digi",
+  },
+  {
+    id: "focusit",
+    slug: "focusit",
+    category: "Temporary category (unverified)",
+    title: "FOCUSIT",
+    description:
+      "Temporary description (unverified): detailed project information is pending confirmation.",
+    technologies: ["Unverified"],
+    image: "/assets/projects/focusit/focusit-screenshot.png",
+    imageAlt: "FOCUSIT project screenshot exported from Figma",
+    externalUrl:
+      "https://www.figma.com/make/qqKN0sSjlFwNrpX316zFXe/FOCUSIT---FINAL-FINAL?t=vKefT98pNXZhE5ff-6",
+    buttonLabel: "Explore Project",
+    target: "_blank",
+    rel: "noreferrer",
   },
 ];

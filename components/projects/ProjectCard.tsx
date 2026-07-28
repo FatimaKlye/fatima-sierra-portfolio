@@ -9,6 +9,11 @@ const MAX_TILT_DEGREES = 6;
 
 export default function ProjectCard({ project }: { project: Project }) {
   const cardRef = useRef<HTMLElement>(null);
+  const href = project.externalUrl ?? `/projects/${project.slug}`;
+  const buttonLabel = project.buttonLabel ?? "View Project Details";
+  const ariaLabel = project.externalUrl
+    ? `Open project link for ${project.title}`
+    : `View project details for ${project.title}`;
 
   const handleMouseMove = (event: React.MouseEvent<HTMLElement>) => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -70,10 +75,12 @@ export default function ProjectCard({ project }: { project: Project }) {
 
         <Link
           className={styles.projectLink}
-          href={`/projects/${project.slug}`}
-          aria-label={`View project details for ${project.title}`}
+          href={href}
+          aria-label={ariaLabel}
+          target={project.target}
+          rel={project.rel}
         >
-          View Project Details
+          {buttonLabel}
           <span className={styles.linkArrow} aria-hidden="true">
             →
           </span>
