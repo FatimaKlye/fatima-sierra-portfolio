@@ -16,7 +16,6 @@ const NAV_LINKS: NavLink[] = [
   { href: "/about", label: "About Me" },
   { href: "/projects", label: "Projects" },
   { href: "/credentials", label: "Credentials" },
-  { href: "/resume", label: "Resume" },
   { href: "/contact", label: "Contact", isCta: true },
 ];
 
