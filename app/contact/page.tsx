@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import ContactSection from "@/components/contact/ContactSection";
-import PortfolioChatbot from "@/components/chatbot/PortfolioChatbot";
 
 export const metadata: Metadata = {
   title: "Contact | Fatima Sierra",
@@ -12,7 +11,6 @@ export default function ContactPage() {
   return (
     <main>
       <ContactSection />
-      <PortfolioChatbot />
     </main>
   );
 }

@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import { SOCIAL_LINKS } from "./contactData";
+import ContactModal from "./ContactModal";
 import styles from "./ContactSection.module.css";
 
 export default function ContactSection() {
@@ -40,15 +41,7 @@ export default function ContactSection() {
           </div>
 
           <div className={styles.ctaRow}>
-            <a
-              className={styles.primaryButton}
-              href="https://mail.google.com/mail/?view=cm&fs=1&to=fatimaklyesierra081005@gmail.com"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Email Me Directly
-              <span aria-hidden="true">↗</span>
-            </a>
+            <ContactModal />
           </div>
         </header>
 

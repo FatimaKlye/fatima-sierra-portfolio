@@ -1,0 +1,288 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(59, 42, 52, 0.5);
+  backdrop-filter: blur(2px);
+  animation: overlayEnter 160ms ease both;
+}
+
+.dialog {
+  width: min(440px, 100%);
+  max-height: min(88vh, 640px);
+  overflow-y: auto;
+  border-radius: 24px;
+  background: var(--color-white);
+  box-shadow: var(--shadow-soft);
+  animation: dialogEnter 180ms ease both;
+}
+
+.dialogHeader {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 22px 18px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-white);
+}
+
+.dialogTitle {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: 1.2rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.closeButton {
+  display: grid;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  font-size: 1.2rem;
+  line-height: 1;
+  transition: background 160ms ease, transform 160ms ease;
+}
+
+.closeButton:hover {
+  transform: translateY(-1px);
+  background: var(--color-soft-blush);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 22px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  color: var(--color-text-primary);
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.input,
+.textarea {
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  padding: 12px 14px;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 96px;
+}
+
+.input:focus-visible,
+.textarea:focus-visible {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(166, 61, 104, 0.16);
+}
+
+.input:disabled,
+.textarea:disabled {
+  opacity: 0.65;
+}
+
+.fieldError {
+  margin: 0;
+  color: #b3261e;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.formError {
+  margin: 0;
+  padding: 10px 14px;
+  border: 1px solid rgba(179, 38, 30, 0.24);
+  border-radius: 12px;
+  background: rgba(179, 38, 30, 0.06);
+  color: #b3261e;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.cancelButton,
+.sendButton {
+  min-height: 48px;
+  border: 0;
+  border-radius: 14px;
+  cursor: pointer;
+  font-size: 0.92rem;
+  font-weight: 800;
+  transition: transform 160ms ease, background 160ms ease, box-shadow 160ms ease;
+}
+
+.cancelButton {
+  border: 1px solid var(--color-border);
+  background: var(--color-white);
+  color: var(--color-text-primary);
+}
+
+.cancelButton:hover:not(:disabled) {
+  background: var(--color-surface);
+}
+
+.sendButton {
+  background: var(--color-primary);
+  color: var(--color-white);
+  box-shadow: 0 14px 28px rgba(166, 61, 104, 0.26);
+}
+
+.sendButton:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background: var(--color-primary-hover);
+}
+
+.cancelButton:disabled,
+.sendButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.closeButton:focus-visible,
+.input:focus-visible,
+.textarea:focus-visible,
+.cancelButton:focus-visible,
+.sendButton:focus-visible,
+.doneButton:focus-visible {
+  outline: 3px solid rgba(166, 61, 104, 0.32);
+  outline-offset: 3px;
+}
+
+.successState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 40px 28px 34px;
+  text-align: center;
+}
+
+.successIcon {
+  display: grid;
+  width: 56px;
+  height: 56px;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(61, 220, 132, 0.16);
+  color: #1f9d55;
+  font-size: 1.6rem;
+  font-weight: 800;
+}
+
+.successText {
+  margin: 6px 0 0;
+  color: var(--color-text-primary);
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+.successSubtext {
+  margin: 0;
+  max-width: 320px;
+  color: var(--color-text-muted);
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+.doneButton {
+  min-height: 46px;
+  margin-top: 12px;
+  padding: 0 28px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--color-primary);
+  color: var(--color-white);
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 800;
+  box-shadow: 0 14px 28px rgba(166, 61, 104, 0.26);
+  transition: transform 160ms ease, background 160ms ease;
+}
+
+.doneButton:hover {
+  transform: translateY(-1px);
+  background: var(--color-primary-hover);
+}
+
+@keyframes overlayEnter {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes dialogEnter {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 480px) {
+  .actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay,
+  .dialog,
+  .closeButton,
+  .cancelButton,
+  .sendButton,
+  .doneButton {
+    animation: none;
+    transition: none;
+  }
+
+  .closeButton:hover,
+  .cancelButton:hover,
+  .sendButton:hover,
+  .doneButton:hover {
+    transform: none;
+  }
+}
