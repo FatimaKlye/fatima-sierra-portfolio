@@ -25,7 +25,7 @@
 .container {
   width: min(calc(100% - 64px), var(--page-max-width));
   margin: 0 auto;
-  padding: 28px 0 52px;
+  padding: 16px 0 52px;
 }
 
 
@@ -1047,7 +1047,7 @@
 @media (max-width: 560px) {
   .container {
     width: min(calc(100% - 22px), var(--page-max-width));
-    padding-top: 18px;
+    padding-top: 10px;
   }
 
   .projectSelector {
