@@ -165,10 +165,12 @@
 }
 
 .socialGrid {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: stretch;
   gap: 16px;
-  max-width: 980px;
+  max-width: 100%;
   margin: 16px auto 0;
 }
 
@@ -177,21 +179,26 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  flex: 1 1 200px;
+  max-width: 340px;
+  min-width: 0;
   min-height: 68px;
-  padding: 12px 16px;
+  padding: 12px 18px;
   border-radius: 18px;
   border: 1px solid rgba(166, 61, 104, 0.14);
   background: var(--color-white);
   color: var(--color-text-primary);
   box-shadow: var(--shadow-card);
   transition:
-    transform 200ms ease,
-    box-shadow 200ms ease,
-    border-color 200ms ease;
+    transform 220ms ease,
+    box-shadow 220ms ease,
+    border-color 220ms ease,
+    background 220ms ease;
 }
 
-.socialButton:hover {
-  transform: translateY(-4px);
+.socialButton:hover,
+.socialButton:focus-visible {
+  transform: translateY(-4px) scale(1.03);
   border-color: rgba(166, 61, 104, 0.34);
   box-shadow: 0 18px 36px rgba(166, 61, 104, 0.18);
 }
@@ -229,8 +236,9 @@
 .socialLabel {
   display: flex;
   flex-direction: column;
+  justify-content: center;
   min-width: 0;
-  line-height: 1.2;
+  line-height: 1.25;
 }
 
 .socialPlatform {
@@ -240,12 +248,12 @@
 }
 
 .socialHandle {
-  overflow: hidden;
   font-size: 0.72rem;
   font-weight: 600;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   color: var(--color-text-muted);
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .github {
@@ -279,16 +287,12 @@
     width: min(calc(100% - 32px), var(--page-max-width));
   }
 
-  .socialGrid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+  .socialButton {
+    flex-basis: 180px;
   }
 }
 
 @media (max-width: 640px) {
-  .section {
-    padding-bottom: clamp(96px, 24vw, 140px);
-  }
-
   .container {
     width: min(calc(100% - 22px), var(--page-max-width));
   }
@@ -319,15 +323,12 @@
   }
 
   .socialGrid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
   }
 
   .socialButton {
+    flex-basis: 150px;
     padding: 10px 12px;
-  }
-
-  .socialHandle {
-    display: none;
   }
 }
 
@@ -342,6 +343,7 @@
   }
 
   .socialButton:hover,
+  .socialButton:focus-visible,
   .primaryButton:hover {
     transform: none;
   }
