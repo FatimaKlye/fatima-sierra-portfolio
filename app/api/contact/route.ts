@@ -187,18 +187,19 @@ export async function POST(request: Request) {
       },
     });
 
+    const submittedAt = new Date().toLocaleString("en-US", {
+      dateStyle: "long",
+      timeStyle: "short",
+      timeZoneName: "short",
+    });
+
     await transporter.sendMail({
       from: `"Portfolio Contact Form" <${gmailUser}>`,
       to: recipient,
       replyTo: `"${payload.name}" <${payload.email}>`,
-      subject: `New portfolio message from ${payload.name}`,
-      text: `Name: ${payload.name}\nEmail: ${payload.email}\n\nMessage:\n${payload.message}`,
-      html: `
-        <p><strong>Name:</strong> ${escapeHtml(payload.name)}</p>
-        <p><strong>Email:</strong> ${escapeHtml(payload.email)}</p>
-        <p><strong>Message:</strong></p>
-        <p>${escapeHtml(payload.message).replace(/\n/g, "<br />")}</p>
-      `,
+      subject: `New Portfolio Inquiry — ${payload.name}`,
+      text: `New Portfolio Inquiry\n\nName: ${payload.name}\nEmail: ${payload.email}\n\nMessage:\n${payload.message}\n\nSubmitted: ${submittedAt}`,
+      html: buildContactEmailHtml({ ...payload, submittedAt }),
     });
 
     recordSuccessfulSend(clientKey);
@@ -219,4 +220,80 @@ function escapeHtml(value: string) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
+}
+
+function buildContactEmailHtml(payload: ContactPayload & { submittedAt: string }): string {
+  const name = escapeHtml(payload.name);
+  const email = escapeHtml(payload.email);
+  const message = escapeHtml(payload.message).replace(/\n/g, "<br />");
+  const submittedAt = escapeHtml(payload.submittedAt);
+  const replyHref = `mailto:${encodeURIComponent(payload.email)}`;
+
+  return `
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>New Portfolio Inquiry</title>
+  </head>
+  <body style="margin:0; padding:0; background-color:#fff9fb; font-family:Segoe UI, Helvetica, Arial, sans-serif;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#fff9fb; padding:24px 12px;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px; background-color:#ffffff; border-radius:16px; overflow:hidden; border:1px solid #e8d4de;">
+            <tr>
+              <td style="background-color:#a63d68; padding:28px 32px;">
+                <p style="margin:0; color:#f6dde7; font-size:12px; letter-spacing:1px; text-transform:uppercase; font-weight:600;">Sierra Portfolio</p>
+                <h1 style="margin:6px 0 0; color:#ffffff; font-size:20px; font-weight:700;">New Portfolio Inquiry</h1>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:28px 32px 8px;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#fff0f5; border:1px solid #e8d4de; border-radius:12px;">
+                  <tr>
+                    <td style="padding:16px 20px; border-bottom:1px solid #e8d4de;">
+                      <p style="margin:0 0 4px; font-size:11px; text-transform:uppercase; letter-spacing:0.5px; color:#6e5964; font-weight:600;">Name</p>
+                      <p style="margin:0; font-size:15px; color:#3b2a34;">${name}</p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding:16px 20px;">
+                      <p style="margin:0 0 4px; font-size:11px; text-transform:uppercase; letter-spacing:0.5px; color:#6e5964; font-weight:600;">Email</p>
+                      <p style="margin:0; font-size:15px; color:#3b2a34;">${email}</p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:16px 32px 8px;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#fff0f5; border:1px solid #e8d4de; border-radius:12px;">
+                  <tr>
+                    <td style="padding:16px 20px;">
+                      <p style="margin:0 0 8px; font-size:11px; text-transform:uppercase; letter-spacing:0.5px; color:#6e5964; font-weight:600;">Message</p>
+                      <p style="margin:0; font-size:15px; line-height:1.6; color:#3b2a34;">${message}</p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td align="center" style="padding:24px 32px 8px;">
+                <a href="${replyHref}" style="display:inline-block; background-color:#a63d68; color:#ffffff; text-decoration:none; font-size:14px; font-weight:600; padding:12px 28px; border-radius:999px;">Reply to ${name} &rarr;</a>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:20px 32px 28px;">
+                <p style="margin:0; text-align:center; font-size:12px; color:#6e5964;">Submitted ${submittedAt}</p>
+              </td>
+            </tr>
+          </table>
+          <p style="margin:16px 0 0; font-size:11px; color:#c982a2; text-align:center;">Sent automatically from the Sierra Portfolio contact form.</p>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
+`;
 }
