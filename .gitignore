@@ -43,3 +43,5 @@ next-env.d.ts
 work-next-dev.log
 work-next-dev.err.log
 
+.vercel
+.env*
