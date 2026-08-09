@@ -27,23 +27,23 @@ export default function ContactSection() {
             Have a role, project, or opportunity in mind?
           </h2>
           <p className={styles.intro}>
-            I&apos;m actively interviewing for internship and entry-level
-            developer roles, and open to freelance builds. If you need
-            someone who ships fast, communicates clearly, and sweats the
-            details, let&apos;s talk &mdash; today.
+            Open to internship, entry-level, and freelance opportunities
+            &mdash; let&apos;s talk.
           </p>
+
+          <div className={styles.ctaRow}>
+            <ContactModal />
+          </div>
 
           <div className={styles.trustBadge}>
             <span className={styles.trustIcon} aria-hidden="true">
               ⚡
             </span>
-            I respond to every inquiry within 24 hours.
-          </div>
-
-          <div className={styles.ctaRow}>
-            <ContactModal />
+            Responds within 24 hours
           </div>
         </header>
+
+        <p className={styles.connectLabel}>Or connect with me</p>
 
         <div
           className={styles.socialGrid}
@@ -53,17 +53,19 @@ export default function ContactSection() {
           {SOCIAL_LINKS.map((social) => (
             <a
               key={social.id}
-              className={`${styles.socialButton} ${styles[social.id]}`}
+              className={styles.socialButton}
               href={social.href}
               target="_blank"
               rel="noreferrer"
               aria-label={`${social.label}: ${social.handle} (opens in a new tab)`}
             >
-              <span
-                className={styles.socialIcon}
-                style={{ "--icon": `url(${social.icon})` } as CSSProperties}
-                aria-hidden="true"
-              />
+              <span className={`${styles.socialIconWrap} ${styles[social.id]}`}>
+                <span
+                  className={styles.socialIcon}
+                  style={{ "--icon": `url(${social.icon})` } as CSSProperties}
+                  aria-hidden="true"
+                />
+              </span>
               <span className={styles.socialLabel}>
                 <span className={styles.socialPlatform}>{social.label}</span>
                 <span className={styles.socialHandle}>{social.handle}</span>
