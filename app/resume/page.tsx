@@ -12,7 +12,7 @@ export default function ResumePage() {
     <main>
       <section className={styles.section} aria-labelledby="resume-heading">
         <div className={styles.sectionContainer}>
-          <header className={styles.sectionHeader}>
+          <header className={styles.sectionHeader} style={{ marginBottom: 0 }}>
             <p className={styles.sectionEyebrow}>RESUME</p>
             <h1 id="resume-heading" className={styles.sectionTitle}>
               Fatima Klye M. Sierra
@@ -23,22 +23,6 @@ export default function ResumePage() {
               picture.
             </p>
           </header>
-
-          <div className={styles.heroActions} style={{ justifyContent: "center" }}>
-            <a
-              className={styles.heroPrimaryButton}
-              href="/assets/resume/fatima-sierra-resume.pdf"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Download resume
-              <span aria-hidden="true">↗</span>
-            </a>
-
-            <a className={styles.heroSecondaryButton} href="/about">
-              View background &amp; experience
-            </a>
-          </div>
         </div>
       </section>
     </main>
