@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import { resolveMx, resolve4, resolve6 } from "node:dns/promises";
+import { createHash } from "node:crypto";
 
 export const runtime = "nodejs";
 
@@ -8,8 +9,9 @@ const MAX_MESSAGE_LENGTH = 1000;
 const NAME_PATTERN = /^[\p{L}]+(?:[\s'-][\p{L}]+)*$/u;
 const EMAIL_PATTERN =
   /^(?!.*\.\.)[a-zA-Z0-9._%+-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}$/;
-const RATE_LIMIT_WINDOW_MS = 60_000;
-const RATE_LIMIT_MAX_REQUESTS = 5;
+const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000;
+const RATE_LIMIT_MAX_SUCCESS = 2;
+const RATE_LIMIT_MESSAGE = "You've reached the message limit. Please try again in 1 hour.";
 const GENERIC_ERROR_MESSAGE =
   "Something went wrong while sending your message. Please try again in a moment.";
 
@@ -19,29 +21,49 @@ type ContactPayload = {
   message: string;
 };
 
+// Keyed by a hash of the client IP so the store never retains raw addresses.
 const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
 
 function getClientKey(request: Request) {
   const forwardedFor = request.headers.get("x-forwarded-for");
   const realIp = request.headers.get("x-real-ip");
-  return forwardedFor?.split(",")[0]?.trim() || realIp || "anonymous";
+  const ip = forwardedFor?.split(",")[0]?.trim() || realIp || "anonymous";
+  return createHash("sha256").update(ip).digest("hex");
 }
 
-function isRateLimited(clientKey: string) {
-  const now = Date.now();
-  const current = rateLimitStore.get(clientKey);
-
-  if (!current || current.resetAt <= now) {
-    rateLimitStore.set(clientKey, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+function isRateLimited(clientKey: string): boolean {
+  const entry = rateLimitStore.get(clientKey);
+  if (!entry) {
     return false;
   }
 
-  if (current.count >= RATE_LIMIT_MAX_REQUESTS) {
-    return true;
+  if (entry.resetAt <= Date.now()) {
+    rateLimitStore.delete(clientKey);
+    return false;
   }
 
-  current.count += 1;
-  return false;
+  return entry.count >= RATE_LIMIT_MAX_SUCCESS;
+}
+
+function recordSuccessfulSend(clientKey: string) {
+  const now = Date.now();
+  const entry = rateLimitStore.get(clientKey);
+
+  if (!entry || entry.resetAt <= now) {
+    rateLimitStore.set(clientKey, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+    return;
+  }
+
+  entry.count += 1;
+}
+
+function extractHoneypot(value: unknown): string {
+  if (!value || typeof value !== "object") {
+    return "";
+  }
+
+  const { website } = value as Record<string, unknown>;
+  return typeof website === "string" ? website.trim() : "";
 }
 
 function validatePayload(value: unknown): ContactPayload | null {
@@ -112,11 +134,10 @@ async function hasDeliverableDomain(email: string): Promise<boolean> {
 }
 
 export async function POST(request: Request) {
-  if (isRateLimited(getClientKey(request))) {
-    return Response.json(
-      { error: "Too many requests. Please wait a moment before trying again." },
-      { status: 429 },
-    );
+  const clientKey = getClientKey(request);
+
+  if (isRateLimited(clientKey)) {
+    return Response.json({ error: RATE_LIMIT_MESSAGE }, { status: 429 });
   }
 
   const gmailUser = process.env.GMAIL_USER?.trim();
@@ -135,6 +156,11 @@ export async function POST(request: Request) {
     body = await request.json();
   } catch {
     return Response.json({ error: "Invalid request body." }, { status: 400 });
+  }
+
+  if (extractHoneypot(body)) {
+    // Bots that fill the hidden field get a fake success and no email is sent.
+    return Response.json({ success: true });
   }
 
   const payload = validatePayload(body);
@@ -175,6 +201,7 @@ export async function POST(request: Request) {
       `,
     });
 
+    recordSuccessfulSend(clientKey);
     return Response.json({ success: true });
   } catch (error) {
     console.error(

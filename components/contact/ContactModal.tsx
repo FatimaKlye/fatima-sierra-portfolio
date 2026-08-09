@@ -55,6 +55,7 @@ export default function ContactModal() {
   const [status, setStatus] = useState<Status>("idle");
   const [errorMessage, setErrorMessage] = useState("");
   const [mounted, setMounted] = useState(false);
+  const [honeypot, setHoneypot] = useState("");
   const firstFieldRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -88,6 +89,7 @@ export default function ContactModal() {
     setErrors({});
     setStatus("idle");
     setErrorMessage("");
+    setHoneypot("");
   }
 
   function handleChange(field: keyof FormValues, value: string) {
@@ -124,6 +126,7 @@ export default function ContactModal() {
         name: values.name.trim().replace(/\s+/g, " "),
         email: values.email.trim(),
         message: values.message.trim(),
+        website: honeypot,
       };
 
       const response = await fetch("/api/contact", {
@@ -142,6 +145,7 @@ export default function ContactModal() {
 
       setStatus("success");
       setValues(INITIAL_VALUES);
+      setHoneypot("");
     } catch (error) {
       setStatus("error");
       setErrorMessage(
@@ -204,6 +208,19 @@ export default function ContactModal() {
                 </div>
               ) : (
                 <form className={styles.form} onSubmit={handleSubmit} noValidate>
+                  <div className={styles.honeypotField} aria-hidden="true">
+                    <label htmlFor="contact-website">Leave this field blank</label>
+                    <input
+                      id="contact-website"
+                      name="website"
+                      type="text"
+                      tabIndex={-1}
+                      autoComplete="off"
+                      value={honeypot}
+                      onChange={(event) => setHoneypot(event.target.value)}
+                    />
+                  </div>
+
                   <div className={styles.field}>
                     <label className={styles.label} htmlFor="contact-name">
                       Name
