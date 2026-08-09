@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import AboutHero from "@/components/about/AboutHero";
 import MyStorySection from "@/components/about/MyStorySection";
 import KnowledgeSection from "@/components/about/KnowledgeSection";
 import CredentialsSection from "@/components/about/CredentialsSection";
@@ -17,7 +16,6 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <main>
-      <AboutHero />
       <MyStorySection />
       <KnowledgeSection />
       <CredentialsSection />
