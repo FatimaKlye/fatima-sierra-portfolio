@@ -16,6 +16,7 @@ type FormErrors = Partial<Record<keyof FormValues, string>>;
 type Status = "idle" | "sending" | "success" | "error";
 
 const NAME_PATTERN = /^[\p{L}]+(?:[\s'-][\p{L}]+)*$/u;
+const NAME_INPUT_FILTER = /[^\p{L}\s'-]/gu;
 const EMAIL_PATTERN =
   /^(?!.*\.\.)[a-zA-Z0-9._%+-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}$/;
 const INITIAL_VALUES: FormValues = { name: "", email: "", message: "" };
@@ -51,12 +52,21 @@ function validate(values: FormValues): FormErrors {
 export default function ContactModal() {
   const [isOpen, setIsOpen] = useState(false);
   const [values, setValues] = useState<FormValues>(INITIAL_VALUES);
-  const [errors, setErrors] = useState<FormErrors>({});
+  const [touched, setTouched] = useState<Partial<Record<keyof FormValues, boolean>>>({});
+  const [submitAttempted, setSubmitAttempted] = useState(false);
   const [status, setStatus] = useState<Status>("idle");
   const [errorMessage, setErrorMessage] = useState("");
   const [mounted, setMounted] = useState(false);
   const [honeypot, setHoneypot] = useState("");
   const firstFieldRef = useRef<HTMLInputElement>(null);
+
+  const formErrors = validate(values);
+  const isFormValid = Object.keys(formErrors).length === 0;
+  const displayedErrors: FormErrors = {
+    name: touched.name || submitAttempted ? formErrors.name : undefined,
+    email: touched.email || submitAttempted ? formErrors.email : undefined,
+    message: submitAttempted ? formErrors.message : undefined,
+  };
 
   useEffect(() => {
     setMounted(true);
@@ -86,16 +96,26 @@ export default function ContactModal() {
 
     setIsOpen(false);
     setValues(INITIAL_VALUES);
-    setErrors({});
+    setTouched({});
+    setSubmitAttempted(false);
     setStatus("idle");
     setErrorMessage("");
     setHoneypot("");
   }
 
   function handleChange(field: keyof FormValues, value: string) {
-    const nextValue =
-      field === "message" ? value.slice(0, MAX_MESSAGE_LENGTH) : value;
+    let nextValue = value;
+    if (field === "name") {
+      nextValue = value.replace(NAME_INPUT_FILTER, "");
+    } else if (field === "message") {
+      nextValue = value.slice(0, MAX_MESSAGE_LENGTH);
+    }
     setValues((current) => ({ ...current, [field]: nextValue }));
+    setTouched((current) => (current[field] ? current : { ...current, [field]: true }));
+  }
+
+  function handleBlur(field: keyof FormValues) {
+    setTouched((current) => (current[field] ? current : { ...current, [field]: true }));
   }
 
   function handleOverlayKeyDown(event: KeyboardEvent<HTMLDivElement>) {
@@ -111,10 +131,9 @@ export default function ContactModal() {
       return;
     }
 
-    const validationErrors = validate(values);
-    setErrors(validationErrors);
+    setSubmitAttempted(true);
 
-    if (Object.keys(validationErrors).length > 0) {
+    if (!isFormValid) {
       return;
     }
 
@@ -228,17 +247,18 @@ export default function ContactModal() {
                     <input
                       ref={firstFieldRef}
                       id="contact-name"
-                      className={styles.input}
+                      className={`${styles.input} ${displayedErrors.name ? styles.inputError : ""}`}
                       type="text"
                       value={values.name}
                       onChange={(event) => handleChange("name", event.target.value)}
+                      onBlur={() => handleBlur("name")}
                       disabled={status === "sending"}
-                      aria-invalid={Boolean(errors.name)}
-                      aria-describedby={errors.name ? "contact-name-error" : undefined}
+                      aria-invalid={Boolean(displayedErrors.name)}
+                      aria-describedby={displayedErrors.name ? "contact-name-error" : undefined}
                     />
-                    {errors.name && (
+                    {displayedErrors.name && (
                       <p className={styles.fieldError} id="contact-name-error">
-                        {errors.name}
+                        {displayedErrors.name}
                       </p>
                     )}
                   </div>
@@ -249,17 +269,18 @@ export default function ContactModal() {
                     </label>
                     <input
                       id="contact-email"
-                      className={styles.input}
+                      className={`${styles.input} ${displayedErrors.email ? styles.inputError : ""}`}
                       type="email"
                       value={values.email}
                       onChange={(event) => handleChange("email", event.target.value)}
+                      onBlur={() => handleBlur("email")}
                       disabled={status === "sending"}
-                      aria-invalid={Boolean(errors.email)}
-                      aria-describedby={errors.email ? "contact-email-error" : undefined}
+                      aria-invalid={Boolean(displayedErrors.email)}
+                      aria-describedby={displayedErrors.email ? "contact-email-error" : undefined}
                     />
-                    {errors.email && (
+                    {displayedErrors.email && (
                       <p className={styles.fieldError} id="contact-email-error">
-                        {errors.email}
+                        {displayedErrors.email}
                       </p>
                     )}
                   </div>
@@ -271,24 +292,24 @@ export default function ContactModal() {
                     <div className={styles.textareaWrapper}>
                       <textarea
                         id="contact-message"
-                        className={styles.textarea}
+                        className={`${styles.textarea} ${displayedErrors.message ? styles.inputError : ""}`}
                         rows={4}
                         maxLength={MAX_MESSAGE_LENGTH}
                         value={values.message}
                         onChange={(event) => handleChange("message", event.target.value)}
                         disabled={status === "sending"}
-                        aria-invalid={Boolean(errors.message)}
+                        aria-invalid={Boolean(displayedErrors.message)}
                         aria-describedby={
-                          errors.message ? "contact-message-error contact-message-count" : "contact-message-count"
+                          displayedErrors.message ? "contact-message-error contact-message-count" : "contact-message-count"
                         }
                       />
                       <span className={styles.charCount} id="contact-message-count" aria-live="polite">
                         {values.message.length}/{MAX_MESSAGE_LENGTH}
                       </span>
                     </div>
-                    {errors.message && (
+                    {displayedErrors.message && (
                       <p className={styles.fieldError} id="contact-message-error">
-                        {errors.message}
+                        {displayedErrors.message}
                       </p>
                     )}
                   </div>
@@ -311,7 +332,7 @@ export default function ContactModal() {
                     <button
                       className={styles.sendButton}
                       type="submit"
-                      disabled={status === "sending"}
+                      disabled={status === "sending" || !isFormValid}
                     >
                       {status === "sending" ? "Sending…" : "Send Message"}
                     </button>

@@ -139,6 +139,15 @@
   opacity: 0.65;
 }
 
+.inputError {
+  border-color: #b3261e;
+}
+
+.inputError:focus-visible {
+  border-color: #b3261e;
+  box-shadow: 0 0 0 3px rgba(179, 38, 30, 0.16);
+}
+
 .fieldError {
   margin: 0;
   color: #b3261e;
