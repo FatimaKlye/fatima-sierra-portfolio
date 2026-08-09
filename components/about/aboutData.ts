@@ -25,6 +25,73 @@ export const HERO_CONTENT = {
   },
 };
 
+export type StoryChapter = {
+  id: string;
+  kicker: string;
+  title: string;
+  paragraphs: string[];
+  imageAlt: string;
+  imagePlaceholderLabel: string;
+  image?: string;
+};
+
+export const MY_STORY_CONTENT = {
+  eyebrow: "MY STORY",
+  title: "Cooking to Coding",
+  subtitle: "How I turned creativity into technology",
+  intro:
+    "Before I ever wrote a line of code, I was in the kitchen — measuring, mixing, and learning that good things take patience. This is the story of how that same curiosity led me somewhere I never expected: technology.",
+  closing:
+    "From cooking to coding, one thing never really changed — I just enjoy making something good.",
+};
+
+export const STORY_CHAPTERS: StoryChapter[] = [
+  {
+    id: "where-it-started",
+    kicker: "Chapter 01 — Home Economics",
+    title: "Where It Started",
+    paragraphs: [
+      "Long before laptops and code editors, my hands were busy with flour, knives, and recipe cards. I took Home Economics before college, and I genuinely loved it — there was something so satisfying about following a process step by step and watching it turn into something real, something people could actually enjoy.",
+      "Cooking taught me patience, precision, and the quiet joy of creating something from scratch. I didn't know it yet, but those were the exact same habits I'd need later on.",
+    ],
+    imageAlt: "Photo from Fatima's Home Economics days, cooking and preparing dishes",
+    imagePlaceholderLabel: "Photo · Home Economics days",
+  },
+  {
+    id: "the-realization",
+    kicker: "Chapter 02 — The Shift",
+    title: "The Realization",
+    paragraphs: [
+      "As much as I loved the kitchen, a different kind of curiosity started creeping in. I began wondering what else I could build — something outside of trays and mixing bowls. I found myself paying more attention to how apps worked, how websites were put together, how a single tap could make a screen respond.",
+      "It wasn't a dramatic overnight change. It was more like a slow realization that I wanted to create things a different way — and that realization got harder to ignore the more I noticed it.",
+    ],
+    imageAlt: "Photo capturing Fatima's early curiosity about technology",
+    imagePlaceholderLabel: "Photo · Getting curious about tech",
+  },
+  {
+    id: "choosing-it",
+    kicker: "Chapter 03 — The Decision",
+    title: "Choosing IT",
+    paragraphs: [
+      "When it was time to choose a college course, I chose Information Technology. Part of it was that growing curiosity — I genuinely wanted to learn how to build things with code the way I once built dishes with ingredients.",
+      "But part of it was also practical. I knew tech opened more opportunities and a more stable income, and that mattered to me too. Looking back, it wasn't really leaving cooking behind — it was just choosing a new set of tools to keep creating.",
+    ],
+    imageAlt: "Photo from Fatima's first steps into Information Technology",
+    imagePlaceholderLabel: "Photo · First steps into IT",
+  },
+  {
+    id: "life-outside-tech",
+    kicker: "Chapter 04 — Off the Clock",
+    title: "Life Outside Tech",
+    paragraphs: [
+      "Outside of screens and syntax, I'm still very much the same person who loves a good meal. I love traveling with my family, trying new food wherever we go, and unwinding with a few rounds of mobile or online games.",
+      "And after a long day of building things, there's nothing like good sleep and quiet time alone to recharge. It's a mix of movement and stillness, and I think that balance is part of what keeps me creative.",
+    ],
+    imageAlt: "Photo of Fatima enjoying travel, food, games, and downtime with family",
+    imagePlaceholderLabel: "Photo · Travel, food & downtime",
+  },
+];
+
 export type KnowledgeItem = {
   title: string;
   description: string;
@@ -80,6 +147,116 @@ export const CORE_KNOWLEDGE: KnowledgeItem[] = [
   },
 ];
 
+const DEVICON_BASE =
+  "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons";
+const SIMPLE_ICONS_BASE = "https://cdn.jsdelivr.net/npm/simple-icons@15/icons";
+
+export type TechnologyItem = {
+  name: string;
+  mark: string;
+  icon: string;
+};
+
+export type TechnologyGroup = {
+  id: string;
+  label: string;
+  items: TechnologyItem[];
+};
+
+export const CORE_TECHNOLOGIES_CONTENT = {
+  eyebrow: "CORE TECHNOLOGIES",
+  title: "Tools & Technologies I Work With",
+};
+
+export const TECHNOLOGY_GROUPS: TechnologyGroup[] = [
+  {
+    id: "frontend",
+    label: "Frontend Development",
+    items: [
+      { name: "Next.js", mark: "NX", icon: `${DEVICON_BASE}/nextjs/nextjs-original.svg` },
+      { name: "React", mark: "RE", icon: `${DEVICON_BASE}/react/react-original.svg` },
+      { name: "TypeScript", mark: "TS", icon: `${DEVICON_BASE}/typescript/typescript-original.svg` },
+      { name: "JavaScript", mark: "JS", icon: `${DEVICON_BASE}/javascript/javascript-original.svg` },
+      { name: "HTML", mark: "HT", icon: `${DEVICON_BASE}/html5/html5-original.svg` },
+      { name: "CSS", mark: "CS", icon: `${DEVICON_BASE}/css3/css3-original.svg` },
+    ],
+  },
+  {
+    id: "mobile",
+    label: "Mobile Development",
+    items: [
+      { name: "Flutter", mark: "FL", icon: `${DEVICON_BASE}/flutter/flutter-original.svg` },
+      { name: "Dart", mark: "DA", icon: `${DEVICON_BASE}/dart/dart-original.svg` },
+      { name: "Java", mark: "JV", icon: `${DEVICON_BASE}/java/java-original.svg` },
+    ],
+  },
+  {
+    id: "backend-database",
+    label: "Backend & Database",
+    items: [
+      { name: "Supabase", mark: "SU", icon: `${DEVICON_BASE}/supabase/supabase-original.svg` },
+      { name: "PostgreSQL", mark: "PG", icon: `${DEVICON_BASE}/postgresql/postgresql-original.svg` },
+    ],
+  },
+  {
+    id: "tools",
+    label: "Development Tools",
+    items: [
+      { name: "Git", mark: "GT", icon: `${DEVICON_BASE}/git/git-original.svg` },
+      { name: "GitHub", mark: "GH", icon: `${DEVICON_BASE}/github/github-original.svg` },
+      { name: "Visual Studio Code", mark: "VS", icon: `${DEVICON_BASE}/vscode/vscode-original.svg` },
+      { name: "Cursor", mark: "CU", icon: `${SIMPLE_ICONS_BASE}/cursor.svg` },
+      { name: "Figma", mark: "FI", icon: `${DEVICON_BASE}/figma/figma-original.svg` },
+      { name: "Canva", mark: "CV", icon: `${SIMPLE_ICONS_BASE}/canva.svg` },
+      { name: "ChatGPT", mark: "AI", icon: `${SIMPLE_ICONS_BASE}/openai.svg` },
+      { name: "Claude", mark: "AI", icon: `${SIMPLE_ICONS_BASE}/claude.svg` },
+    ],
+  },
+];
+
+export type CapabilityItem = {
+  id: "build" | "integrate" | "test" | "document";
+  verb: string;
+  title: string;
+  description: string;
+};
+
+export const CAPABILITIES_CONTENT = {
+  eyebrow: "CAPABILITIES",
+  title: "What I Can Do",
+};
+
+export const CAPABILITIES: CapabilityItem[] = [
+  {
+    id: "build",
+    verb: "Build",
+    title: "Web & Mobile Applications",
+    description:
+      "Responsive web apps and cross-platform mobile apps with Next.js, React, and Flutter.",
+  },
+  {
+    id: "integrate",
+    verb: "Integrate",
+    title: "Database & Authentication",
+    description:
+      "Supabase and PostgreSQL data models, authentication, and real-time workflows.",
+  },
+  {
+    id: "test",
+    verb: "Test",
+    title: "Functional & Responsive Testing",
+    description:
+      "Test-case preparation, functional validation, debugging, and responsive testing.",
+  },
+  {
+    id: "document",
+    verb: "Document",
+    title: "Technical Documentation & Workflows",
+    description:
+      "Requirements organization, technical documentation, and workflow explanation for handoff.",
+  },
+];
+
 export const LEARNING_EXPOSURE: string[] = [
   "Cybersecurity awareness",
   "Cloud computing concepts",
@@ -98,7 +275,6 @@ export const PROFESSIONAL_SKILLS: string[] = [
   "Verbal and written communication",
   "Collaboration",
   "Adaptability",
-  "Basic computer literacy",
 ];
 
 export type CertificateCategory =

@@ -42,7 +42,9 @@ export default function ContactSection() {
           <div className={styles.ctaRow}>
             <a
               className={styles.primaryButton}
-              href="mailto:fatimaklyesierra081005@gmail.com?subject=Let%27s%20Connect"
+              href="https://mail.google.com/mail/?view=cm&fs=1&to=fatimaklyesierra081005@gmail.com"
+              target="_blank"
+              rel="noreferrer"
             >
               Email Me Directly
               <span aria-hidden="true">↗</span>
@@ -60,13 +62,9 @@ export default function ContactSection() {
               key={social.id}
               className={`${styles.socialButton} ${styles[social.id]}`}
               href={social.href}
-              target={social.id === "email" ? undefined : "_blank"}
-              rel={social.id === "email" ? undefined : "noopener noreferrer"}
-              aria-label={
-                social.id === "email"
-                  ? `${social.label}: ${social.handle}`
-                  : `${social.label}: ${social.handle} (opens in a new tab)`
-              }
+              target="_blank"
+              rel="noreferrer"
+              aria-label={`${social.label}: ${social.handle} (opens in a new tab)`}
             >
               <span
                 className={styles.socialIcon}

@@ -184,30 +184,6 @@
   box-shadow: 0 14px 28px rgba(139, 53, 88, 0.28);
 }
 
-.availability {
-  display: inline-flex;
-  align-items: center;
-  justify-self: end;
-  gap: 9px;
-  padding: 11px 15px;
-  border: 1px solid rgba(166, 61, 104, 0.18);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.58);
-  color: var(--color-text-primary);
-  font-size: 0.74rem;
-  font-weight: 600;
-  box-shadow: 0 10px 26px rgba(166, 61, 104, 0.08);
-  backdrop-filter: blur(14px);
-}
-
-.availabilityDot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--color-primary);
-  box-shadow: 0 0 0 5px rgba(166, 61, 104, 0.12);
-}
-
 @media (max-width: 1180px) {
   .container {
     width: min(calc(100% - 40px), var(--page-max-width));
@@ -215,10 +191,6 @@
 
   .navbar {
     gap: 18px;
-  }
-
-  .availability {
-    display: none;
   }
 
   .navigation {

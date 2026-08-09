@@ -41,7 +41,7 @@ export const SOCIAL_LINKS: SocialLink[] = [
     id: "email",
     label: "Email",
     handle: "fatimaklyesierra081005@gmail.com",
-    href: "mailto:fatimaklyesierra081005@gmail.com?subject=Let%27s%20Connect",
+    href: "https://mail.google.com/mail/?view=cm&fs=1&to=fatimaklyesierra081005@gmail.com",
     icon: `${SIMPLE_ICONS_BASE}/gmail.svg`,
   },
 ];

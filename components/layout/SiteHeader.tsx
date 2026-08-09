@@ -118,11 +118,6 @@ export default function SiteHeader() {
               onClick={closeMenu}
             />
           )}
-
-          <Link className={styles.availability} href="/contact">
-            <span className={styles.availabilityDot} aria-hidden="true" />
-            Open to opportunities
-          </Link>
         </div>
       </div>
     </header>

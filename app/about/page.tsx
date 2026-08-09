@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import AboutHero from "@/components/about/AboutHero";
+import MyStorySection from "@/components/about/MyStorySection";
 import KnowledgeSection from "@/components/about/KnowledgeSection";
 import CredentialsSection from "@/components/about/CredentialsSection";
 import AchievementsSection from "@/components/about/AchievementsSection";
@@ -17,6 +18,7 @@ export default function AboutPage() {
   return (
     <main>
       <AboutHero />
+      <MyStorySection />
       <KnowledgeSection />
       <CredentialsSection />
       <AchievementsSection />
