@@ -27,12 +27,21 @@ export const HERO_CONTENT = {
 
 export type StoryChapter = {
   id: string;
+  number: string;
   kicker: string;
   title: string;
-  paragraphs: string[];
+  paragraph: string;
+  tags: string[];
   imageAlt: string;
   imagePlaceholderLabel: string;
+  /**
+   * Path under /public. The file does not need to exist yet — MyStorySection
+   * checks the filesystem and falls back to a labeled placeholder until it
+   * does. Drop a real photo at this exact path and it appears automatically,
+   * no code changes needed.
+   */
   image?: string;
+  imagePosition?: string;
 };
 
 export const MY_STORY_CONTENT = {
@@ -48,47 +57,75 @@ export const MY_STORY_CONTENT = {
 export const STORY_CHAPTERS: StoryChapter[] = [
   {
     id: "where-it-started",
-    kicker: "Chapter 01 — Home Economics",
+    number: "01",
+    kicker: "Home Economics",
     title: "Where It Started",
-    paragraphs: [
-      "Long before laptops and code editors, my hands were busy with flour, knives, and recipe cards. I took Home Economics before college, and I genuinely loved it — there was something so satisfying about following a process step by step and watching it turn into something real, something people could actually enjoy.",
-      "Cooking taught me patience, precision, and the quiet joy of creating something from scratch. I didn't know it yet, but those were the exact same habits I'd need later on.",
-    ],
-    imageAlt: "Photo from Fatima's Home Economics days, cooking and preparing dishes",
-    imagePlaceholderLabel: "Photo · Home Economics days",
+    paragraph:
+      "Long before code editors, my hands were busy with flour, knives, and recipe cards. I took Home Economics before college and loved following a process step by step until it became something real. Cooking taught me patience, precision, and the quiet satisfaction of building something from scratch — habits I'd need again later.",
+    tags: ["Creativity", "Patience", "Craft"],
+    imageAlt: "Fatima cooking and preparing dishes during her Home Economics days",
+    imagePlaceholderLabel: "Add photo — save as story/01-where-it-started.jpg",
+    image: "/assets/about/story/01-where-it-started.jpg",
   },
   {
     id: "the-realization",
-    kicker: "Chapter 02 — The Shift",
-    title: "The Realization",
-    paragraphs: [
-      "As much as I loved the kitchen, a different kind of curiosity started creeping in. I began wondering what else I could build — something outside of trays and mixing bowls. I found myself paying more attention to how apps worked, how websites were put together, how a single tap could make a screen respond.",
-      "It wasn't a dramatic overnight change. It was more like a slow realization that I wanted to create things a different way — and that realization got harder to ignore the more I noticed it.",
-    ],
-    imageAlt: "Photo capturing Fatima's early curiosity about technology",
-    imagePlaceholderLabel: "Photo · Getting curious about tech",
+    number: "02",
+    kicker: "The Shift",
+    title: "Growing Curiosity",
+    paragraph:
+      "As much as I loved the kitchen, a different kind of curiosity crept in. I started paying attention to how apps worked, how websites were put together, and how a single tap could make a screen respond. It wasn't a dramatic change — just a quiet realization I couldn't ignore.",
+    tags: ["Curiosity", "Exploration"],
+    imageAlt: "Fatima exploring apps and websites, the early spark of her interest in tech",
+    imagePlaceholderLabel: "Add photo — save as story/02-growing-curiosity.jpg",
+    image: "/assets/about/story/02-growing-curiosity.jpg",
   },
   {
     id: "choosing-it",
-    kicker: "Chapter 03 — The Decision",
+    number: "03",
+    kicker: "The Decision",
     title: "Choosing IT",
-    paragraphs: [
-      "When it was time to choose a college course, I chose Information Technology. Part of it was that growing curiosity — I genuinely wanted to learn how to build things with code the way I once built dishes with ingredients.",
-      "But part of it was also practical. I knew tech opened more opportunities and a more stable income, and that mattered to me too. Looking back, it wasn't really leaving cooking behind — it was just choosing a new set of tools to keep creating.",
-    ],
-    imageAlt: "Photo from Fatima's first steps into Information Technology",
-    imagePlaceholderLabel: "Photo · First steps into IT",
+    paragraph:
+      "When it was time to choose a college course, I chose Information Technology. Part of it was curiosity — I wanted to build things with code the way I once built dishes with ingredients. Part of it was practical: tech meant more opportunities and a more stable future. Looking back, it wasn't leaving cooking behind — just choosing a new set of tools to keep creating.",
+    tags: ["Decision Making", "Growth", "Opportunity"],
+    imageAlt: "Fatima at the start of her Information Technology studies",
+    imagePlaceholderLabel: "Add photo — save as story/03-choosing-it.jpg",
+    image: "/assets/about/story/03-choosing-it.jpg",
   },
   {
-    id: "life-outside-tech",
-    kicker: "Chapter 04 — Off the Clock",
-    title: "Life Outside Tech",
-    paragraphs: [
-      "Outside of screens and syntax, I'm still very much the same person who loves a good meal. I love traveling with my family, trying new food wherever we go, and unwinding with a few rounds of mobile or online games.",
-      "And after a long day of building things, there's nothing like good sleep and quiet time alone to recharge. It's a mix of movement and stillness, and I think that balance is part of what keeps me creative.",
-    ],
-    imageAlt: "Photo of Fatima enjoying travel, food, games, and downtime with family",
-    imagePlaceholderLabel: "Photo · Travel, food & downtime",
+    id: "learning-the-craft",
+    number: "04",
+    kicker: "Building Foundations",
+    title: "Learning the Craft",
+    paragraph:
+      "College brought Next.js, React, databases, and a lot of late nights figuring things out. I earned Dean's Lister honors, completed IT Specialist certifications in HTML & CSS and Databases, and kept showing up for workshops on UI/UX, cybersecurity, and cloud computing. Every course and certificate was another ingredient added to the recipe.",
+    tags: ["Growth", "Discipline", "Continuous Learning"],
+    imageAlt: "Fatima studying and building her Information Technology foundations",
+    imagePlaceholderLabel: "Add photo — save as story/04-learning-the-craft.jpg",
+    image: "/assets/about/story/04-learning-the-craft.jpg",
+  },
+  {
+    id: "building-projects",
+    number: "05",
+    kicker: "Turning Ideas Into Systems",
+    title: "Building Real Projects",
+    paragraph:
+      "Learning stopped being just theory once I started building — IGNIS SAFE's fire-safety web and mobile platforms, an ID tracking system for a campus office, and Beautiverse, a storefront for a beauty community. Each project meant designing real interfaces, connecting databases, and testing until things actually worked. It felt a lot like a recipe: plan it, build it, taste-test, adjust, repeat.",
+    tags: ["Problem Solving", "Collaboration", "Craftsmanship"],
+    imageAlt: "Fatima working on web and mobile application projects",
+    imagePlaceholderLabel: "Add photo — save as story/05-building-projects.jpg",
+    image: "/assets/about/story/05-building-projects.jpg",
+  },
+  {
+    id: "where-i-am-now",
+    number: "06",
+    kicker: "Today",
+    title: "Where I Am Now",
+    paragraph:
+      "Today, I'm a Web & Mobile Application Developer building responsive apps with Next.js, React, and Flutter — from interface design to database integration and testing. The same patience I learned in the kitchen still shows up in how I debug and build: step by step, until it works. I'm looking for opportunities where I can keep growing, keep building, and keep making something good.",
+    tags: ["Growth", "Purpose", "Technology"],
+    imageAlt: "Fatima today, working as a web and mobile application developer",
+    imagePlaceholderLabel: "Add photo — save as story/06-where-i-am-now.jpg",
+    image: "/assets/about/story/06-where-i-am-now.jpg",
   },
 ];
 
