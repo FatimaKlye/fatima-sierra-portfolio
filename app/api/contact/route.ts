@@ -1,10 +1,13 @@
 import nodemailer from "nodemailer";
+import { resolveMx, resolve4, resolve6 } from "node:dns/promises";
 
 export const runtime = "nodejs";
 
 const MAX_NAME_LENGTH = 100;
-const MAX_MESSAGE_LENGTH = 500;
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const MAX_MESSAGE_LENGTH = 1000;
+const NAME_PATTERN = /^[\p{L}]+(?:[\s'-][\p{L}]+)*$/u;
+const EMAIL_PATTERN =
+  /^(?!.*\.\.)[a-zA-Z0-9._%+-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}$/;
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX_REQUESTS = 5;
 const GENERIC_ERROR_MESSAGE =
@@ -52,11 +55,15 @@ function validatePayload(value: unknown): ContactPayload | null {
     return null;
   }
 
-  const trimmedName = name.trim().slice(0, MAX_NAME_LENGTH);
+  const trimmedName = name.trim().replace(/\s+/g, " ").slice(0, MAX_NAME_LENGTH);
   const trimmedEmail = email.trim();
   const trimmedMessage = message.trim();
 
   if (!trimmedName || !trimmedEmail || !trimmedMessage) {
+    return null;
+  }
+
+  if (!NAME_PATTERN.test(trimmedName)) {
     return null;
   }
 
@@ -71,6 +78,39 @@ function validatePayload(value: unknown): ContactPayload | null {
   return { name: trimmedName, email: trimmedEmail, message: trimmedMessage };
 }
 
+async function hasDeliverableDomain(email: string): Promise<boolean> {
+  const domain = email.split("@")[1];
+  if (!domain) {
+    return false;
+  }
+
+  try {
+    const mxRecords = await resolveMx(domain);
+    if (mxRecords.length > 0) {
+      return true;
+    }
+  } catch {
+    // No MX records or DNS lookup failed; fall back to A/AAAA records
+    // since mail can still be routed to a host with no explicit MX entry.
+  }
+
+  try {
+    const aRecords = await resolve4(domain);
+    if (aRecords.length > 0) {
+      return true;
+    }
+  } catch {
+    // ignore, try AAAA next
+  }
+
+  try {
+    const aaaaRecords = await resolve6(domain);
+    return aaaaRecords.length > 0;
+  } catch {
+    return false;
+  }
+}
+
 export async function POST(request: Request) {
   if (isRateLimited(getClientKey(request))) {
     return Response.json(
@@ -79,9 +119,9 @@ export async function POST(request: Request) {
     );
   }
 
-  const gmailUser = process.env.GMAIL_USER;
-  const gmailAppPassword = process.env.GMAIL_APP_PASSWORD;
-  const recipient = process.env.CONTACT_TO_EMAIL || gmailUser;
+  const gmailUser = process.env.GMAIL_USER?.trim();
+  const gmailAppPassword = process.env.GMAIL_APP_PASSWORD?.replace(/\s+/g, "");
+  const recipient = process.env.CONTACT_TO_EMAIL?.trim() || gmailUser;
 
   if (!gmailUser || !gmailAppPassword || !recipient) {
     console.error(
@@ -101,6 +141,13 @@ export async function POST(request: Request) {
   if (!payload) {
     return Response.json(
       { error: "Please provide a valid name, email address, and message." },
+      { status: 400 },
+    );
+  }
+
+  if (!(await hasDeliverableDomain(payload.email))) {
+    return Response.json(
+      { error: "Please enter an email address with a valid, deliverable domain." },
       { status: 400 },
     );
   }

@@ -15,21 +15,28 @@ type FormErrors = Partial<Record<keyof FormValues, string>>;
 
 type Status = "idle" | "sending" | "success" | "error";
 
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const NAME_PATTERN = /^[\p{L}]+(?:[\s'-][\p{L}]+)*$/u;
+const EMAIL_PATTERN =
+  /^(?!.*\.\.)[a-zA-Z0-9._%+-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}$/;
 const INITIAL_VALUES: FormValues = { name: "", email: "", message: "" };
-const MAX_MESSAGE_LENGTH = 500;
+const MAX_MESSAGE_LENGTH = 1000;
 
 function validate(values: FormValues): FormErrors {
   const errors: FormErrors = {};
 
-  if (!values.name.trim()) {
+  const normalizedName = values.name.trim().replace(/\s+/g, " ");
+  if (!normalizedName) {
     errors.name = "Please enter your name.";
+  } else if (!NAME_PATTERN.test(normalizedName)) {
+    errors.name =
+      "Please enter a valid name using letters, spaces, apostrophes, or hyphens only.";
   }
 
-  if (!values.email.trim()) {
+  const trimmedEmail = values.email.trim();
+  if (!trimmedEmail) {
     errors.email = "Please enter your email address.";
-  } else if (!EMAIL_PATTERN.test(values.email.trim())) {
-    errors.email = "Please enter a valid email address.";
+  } else if (!EMAIL_PATTERN.test(trimmedEmail)) {
+    errors.email = "Please enter a valid email address (e.g. name@example.com).";
   }
 
   if (!values.message.trim()) {
@@ -113,10 +120,16 @@ export default function ContactModal() {
     setErrorMessage("");
 
     try {
+      const payload = {
+        name: values.name.trim().replace(/\s+/g, " "),
+        email: values.email.trim(),
+        message: values.message.trim(),
+      };
+
       const response = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
+        body: JSON.stringify(payload),
       });
 
       const data = (await response.json().catch(() => null)) as
