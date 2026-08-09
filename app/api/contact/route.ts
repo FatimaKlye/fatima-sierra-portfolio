@@ -187,9 +187,14 @@ export async function POST(request: Request) {
       },
     });
 
+    // `dateStyle`/`timeStyle` cannot be combined with `timeZoneName` per the
+    // Intl spec (throws "Invalid option : option"), so use component options.
     const submittedAt = new Date().toLocaleString("en-US", {
-      dateStyle: "long",
-      timeStyle: "short",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
       timeZoneName: "short",
     });
 
