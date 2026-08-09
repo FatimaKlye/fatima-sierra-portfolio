@@ -97,6 +97,23 @@
 .textarea {
   resize: vertical;
   min-height: 96px;
+  width: 100%;
+  padding-bottom: 26px;
+}
+
+.textareaWrapper {
+  position: relative;
+  display: flex;
+}
+
+.charCount {
+  position: absolute;
+  right: 12px;
+  bottom: 8px;
+  color: var(--color-text-muted);
+  font-size: 0.74rem;
+  font-weight: 600;
+  pointer-events: none;
 }
 
 .input:focus-visible,

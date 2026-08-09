@@ -3,7 +3,7 @@ import nodemailer from "nodemailer";
 export const runtime = "nodejs";
 
 const MAX_NAME_LENGTH = 100;
-const MAX_MESSAGE_LENGTH = 2000;
+const MAX_MESSAGE_LENGTH = 500;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX_REQUESTS = 5;
@@ -54,9 +54,13 @@ function validatePayload(value: unknown): ContactPayload | null {
 
   const trimmedName = name.trim().slice(0, MAX_NAME_LENGTH);
   const trimmedEmail = email.trim();
-  const trimmedMessage = message.trim().slice(0, MAX_MESSAGE_LENGTH);
+  const trimmedMessage = message.trim();
 
   if (!trimmedName || !trimmedEmail || !trimmedMessage) {
+    return null;
+  }
+
+  if (trimmedMessage.length > MAX_MESSAGE_LENGTH) {
     return null;
   }
 
@@ -80,6 +84,9 @@ export async function POST(request: Request) {
   const recipient = process.env.CONTACT_TO_EMAIL || gmailUser;
 
   if (!gmailUser || !gmailAppPassword || !recipient) {
+    console.error(
+      "[contact] Missing email configuration. Ensure GMAIL_USER and GMAIL_APP_PASSWORD are set to real values in the environment.",
+    );
     return Response.json({ error: GENERIC_ERROR_MESSAGE }, { status: 503 });
   }
 
@@ -122,7 +129,11 @@ export async function POST(request: Request) {
     });
 
     return Response.json({ success: true });
-  } catch {
+  } catch (error) {
+    console.error(
+      "[contact] Failed to send message via Gmail:",
+      error instanceof Error ? error.message : error,
+    );
     return Response.json({ error: GENERIC_ERROR_MESSAGE }, { status: 500 });
   }
 }

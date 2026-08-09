@@ -17,6 +17,7 @@ type Status = "idle" | "sending" | "success" | "error";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const INITIAL_VALUES: FormValues = { name: "", email: "", message: "" };
+const MAX_MESSAGE_LENGTH = 500;
 
 function validate(values: FormValues): FormErrors {
   const errors: FormErrors = {};
@@ -33,6 +34,8 @@ function validate(values: FormValues): FormErrors {
 
   if (!values.message.trim()) {
     errors.message = "Please enter a message or question.";
+  } else if (values.message.length > MAX_MESSAGE_LENGTH) {
+    errors.message = `Message must be ${MAX_MESSAGE_LENGTH} characters or fewer.`;
   }
 
   return errors;
@@ -81,7 +84,9 @@ export default function ContactModal() {
   }
 
   function handleChange(field: keyof FormValues, value: string) {
-    setValues((current) => ({ ...current, [field]: value }));
+    const nextValue =
+      field === "message" ? value.slice(0, MAX_MESSAGE_LENGTH) : value;
+    setValues((current) => ({ ...current, [field]: nextValue }));
   }
 
   function handleOverlayKeyDown(event: KeyboardEvent<HTMLDivElement>) {
@@ -233,16 +238,24 @@ export default function ContactModal() {
                     <label className={styles.label} htmlFor="contact-message">
                       Message / Question
                     </label>
-                    <textarea
-                      id="contact-message"
-                      className={styles.textarea}
-                      rows={4}
-                      value={values.message}
-                      onChange={(event) => handleChange("message", event.target.value)}
-                      disabled={status === "sending"}
-                      aria-invalid={Boolean(errors.message)}
-                      aria-describedby={errors.message ? "contact-message-error" : undefined}
-                    />
+                    <div className={styles.textareaWrapper}>
+                      <textarea
+                        id="contact-message"
+                        className={styles.textarea}
+                        rows={4}
+                        maxLength={MAX_MESSAGE_LENGTH}
+                        value={values.message}
+                        onChange={(event) => handleChange("message", event.target.value)}
+                        disabled={status === "sending"}
+                        aria-invalid={Boolean(errors.message)}
+                        aria-describedby={
+                          errors.message ? "contact-message-error contact-message-count" : "contact-message-count"
+                        }
+                      />
+                      <span className={styles.charCount} id="contact-message-count" aria-live="polite">
+                        {values.message.length}/{MAX_MESSAGE_LENGTH}
+                      </span>
+                    </div>
                     {errors.message && (
                       <p className={styles.fieldError} id="contact-message-error">
                         {errors.message}
