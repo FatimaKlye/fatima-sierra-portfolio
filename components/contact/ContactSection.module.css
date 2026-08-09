@@ -2,6 +2,8 @@
   position: relative;
   isolation: isolate;
   overflow: hidden;
+  min-height: 100vh;
+  min-height: 100dvh;
   padding: 0 0 clamp(64px, 7vw, 96px);
   border-top: 1px solid rgba(166, 61, 104, 0.12);
   background:
