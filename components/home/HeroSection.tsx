@@ -1,571 +1,411 @@
 "use client";
 
+import type { CSSProperties, KeyboardEvent, PointerEvent } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { HERO_CONTENT, CORE_KNOWLEDGE, EDUCATION } from "@/components/about/aboutData";
+import { CERTIFICATES } from "@/components/certificates/certificatesData";
+import { PROJECTS, type Project } from "@/components/projects/projectsData";
 import styles from "./HeroSection.module.css";
 
-const FOCUS_AREAS = [
-    "building solutions",
-    "creating experiences",
-    "solving problems",
-    "developing ideas" 
-];
+const HERO_SCROLL_DISTANCE = 700;
+const MOTION_QUERY = "(prefers-reduced-motion: reduce)";
 
-type ExpertiseId =
-  | "mobile"
-  | "web"
-  | "responsive-ui"
-  | "database"
-  | "documentation"
-  | "ai-assisted-development";
-
-type Technology = {
-  name: string;
-  mark: string;
-  icon: string;
+type DragState = {
+  active: boolean;
+  startX: number;
+  startY: number;
+  x: number;
+  y: number;
 };
 
-type ExpertiseArea = {
-  id: ExpertiseId;
-  label: string;
-  technologies: string[];
+const INITIAL_DRAG: DragState = {
+  active: false,
+  startX: 0,
+  startY: 0,
+  x: 0,
+  y: 0,
 };
 
-const DEVICON_BASE =
-  "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons";
+const rosterRows = CORE_KNOWLEDGE.slice(0, 5).map((item, index) => ({
+  label: `Focus ${String(index + 1).padStart(2, "0")}`,
+  name: item.title,
+  count: String(index + 1).padStart(2, "0"),
+}));
 
-const TECHNOLOGIES: Technology[] = [
+const dateRows = [
   {
-    name: "Flutter",
-    mark: "FL",
-    icon: `${DEVICON_BASE}/flutter/flutter-original.svg`,
+    date: "2023-Present",
+    title: "Bachelor of Science in Information Technology",
+    type: "Education",
+    place: EDUCATION[0]?.institution ?? "National University - Dasmarinas",
   },
+  ...CERTIFICATES.slice(0, 2).map((certificate) => ({
+    date: certificate.dateAwarded,
+    title: certificate.title,
+    type: certificate.credentialName,
+    place: certificate.issuer,
+  })),
   {
-    name: "React",
-    mark: "RE",
-    icon: `${DEVICON_BASE}/react/react-original.svg`,
-  },
-  {
-    name: "Dart",
-    mark: "DA",
-    icon: `${DEVICON_BASE}/dart/dart-original.svg`,
-  },
-  {
-    name: "C#",
-    mark: "C#",
-    icon: `${DEVICON_BASE}/csharp/csharp-original.svg`,
-  },
-  {
-    name: "Supabase",
-    mark: "SU",
-    icon: `${DEVICON_BASE}/supabase/supabase-original.svg`,
-  },
-  {
-    name: "PostgreSQL",
-    mark: "PG",
-    icon: `${DEVICON_BASE}/postgresql/postgresql-original.svg`,
-  },
-  {
-    name: "Next.js",
-    mark: "NX",
-    icon: `${DEVICON_BASE}/nextjs/nextjs-original.svg`,
-  },
-  {
-    name: "TypeScript",
-    mark: "TS",
-    icon: `${DEVICON_BASE}/typescript/typescript-original.svg`,
-  },
-  {
-    name: "JavaScript",
-    mark: "JS",
-    icon: `${DEVICON_BASE}/javascript/javascript-original.svg`,
-  },
-  {
-    name: "HTML",
-    mark: "HT",
-    icon: `${DEVICON_BASE}/html5/html5-original.svg`,
-  },
-  {
-    name: "CSS",
-    mark: "CS",
-    icon: `${DEVICON_BASE}/css3/css3-original.svg`,
-  },
-  {
-    name: "Java",
-    mark: "JV",
-    icon: `${DEVICON_BASE}/java/java-original.svg`,
-  },
-  {
-    name: "Git",
-    mark: "GT",
-    icon: `${DEVICON_BASE}/git/git-original.svg`,
-  },
-  {
-    name: "GitHub",
-    mark: "GH",
-    icon: `${DEVICON_BASE}/github/github-original.svg`,
-  },
-  {
-    name: "ChatGPT",
-    mark: "AI",
-    icon: "https://cdn.jsdelivr.net/npm/simple-icons@15/icons/openai.svg",
-  },
-  {
-    name: "Claude",
-    mark: "AI",
-    icon: "https://cdn.jsdelivr.net/npm/simple-icons@15/icons/claude.svg",
-  },
-  {
-    name: "Figma",
-    mark: "FI",
-    icon: `${DEVICON_BASE}/figma/figma-original.svg`,
-  },
-  {
-    name: "Figma Make",
-    mark: "FM",
-    icon: `${DEVICON_BASE}/figma/figma-original.svg`,
-  },
-  {
-    name: "Canva",
-    mark: "CV",
-    icon: "https://cdn.jsdelivr.net/npm/simple-icons@15/icons/canva.svg",
-  },
-  {
-    name: "Visual Studio Code",
-    mark: "VS",
-    icon: `${DEVICON_BASE}/vscode/vscode-original.svg`,
-  },
-  {
-    name: "Cursor",
-    mark: "CU",
-    icon: "https://cdn.jsdelivr.net/npm/simple-icons@15/icons/cursor.svg",
+    date: "April 23, 2025",
+    title: "Modern Web + AI (UI/UX)",
+    type: "Certificate of Completion",
+    place: "NU Dasmarinas Computer Society",
   },
 ];
 
-const EXPERTISE_AREAS: ExpertiseArea[] = [
-  {
-    id: "mobile",
-    label: "Mobile application development",
-    technologies: [
-      "Visual Studio Code",
-      "Cursor",
-      "Flutter",
-      "Dart",
-      "Java",
-      "Supabase",
-    ],
-  },
-  {
-    id: "web",
-    label: "Web application development",
-    technologies: [
-      "Visual Studio Code",
-      "Cursor",
-      "Next.js",
-      "React",
-      "TypeScript",
-      "JavaScript",
-      "HTML",
-      "CSS",
-      "Supabase",
-      "PostgreSQL",
-    ],
-  },
-  {
-    id: "responsive-ui",
-    label: "Responsive user interface design",
-    technologies: [
-      "Figma",
-      "Figma Make",
-      "Canva",
-      "React",
-      "Next.js",
-      "TypeScript",
-      "HTML",
-      "CSS",
-      "Flutter",
-    ],
-  },
-  {
-    id: "database",
-    label: "Database integration",
-    technologies: ["Supabase", "PostgreSQL", "TypeScript", "JavaScript"],
-  },
-  {
-    id: "documentation",
-    label: "Basic system documentation",
-    technologies: ["Git", "GitHub", "TypeScript"],
-  },
-  {
-    id: "ai-assisted-development",
-    label: "AI-assisted development",
-    technologies: ["ChatGPT", "Claude", "Cursor", "Figma Make"],
-  },
-];
+function projectHref(project: Project) {
+  return project.externalUrl ?? `/projects/${project.slug}`;
+}
 
+function projectButtonLabel(project: Project) {
+  return project.buttonLabel ? `${project.buttonLabel} →` : "Open Case Study →";
+}
+
+function clamp(value: number, min: number, max: number) {
+  return Math.min(Math.max(value, min), max);
+}
 
 export default function HeroSection() {
-  const [focusIndex, setFocusIndex] = useState(0);
-  const [typedFocus, setTypedFocus] = useState("");
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [selectedExpertise, setSelectedExpertise] =
-    useState<ExpertiseId>("mobile");
-  const [brokenIcons, setBrokenIcons] = useState<Set<string>>(new Set());
+  const heroRef = useRef<HTMLElement>(null);
+  const deckRef = useRef<HTMLDivElement>(null);
+  const [portalProgress, setPortalProgress] = useState(1);
+  const [reduceMotion, setReduceMotion] = useState(false);
+  const [activeProject, setActiveProject] = useState(0);
+  const [drag, setDrag] = useState<DragState>(INITIAL_DRAG);
 
-  const selectedArea =
-    EXPERTISE_AREAS.find((area) => area.id === selectedExpertise) ??
-    EXPERTISE_AREAS[0];
-  const activeTechnologies = new Set(selectedArea.technologies);
+  const selectedProject = PROJECTS[activeProject] ?? PROJECTS[0];
+  const releaseProgress = useMemo(
+    () => `${String(activeProject + 1).padStart(2, "0")} / ${String(PROJECTS.length).padStart(2, "0")}`,
+    [activeProject],
+  );
 
   useEffect(() => {
-    const currentFocus = FOCUS_AREAS[focusIndex];
+    const media = window.matchMedia(MOTION_QUERY);
 
-    let delay = isDeleting ? 42 : 72;
+    const updateReducedMotion = () => {
+      setReduceMotion(media.matches);
+      if (media.matches) {
+        setPortalProgress(1);
+      }
+    };
 
-    if (!isDeleting && typedFocus === currentFocus) {
-      delay = 1450;
-    } else if (isDeleting && typedFocus === "") {
-      delay = 260;
+    updateReducedMotion();
+    media.addEventListener("change", updateReducedMotion);
+
+    return () => media.removeEventListener("change", updateReducedMotion);
+  }, []);
+
+  useEffect(() => {
+    if (reduceMotion) return;
+
+    const updatePortalProgress = () => {
+      const hero = heroRef.current;
+      if (!hero) return;
+
+      const rect = hero.getBoundingClientRect();
+      setPortalProgress(clamp(-rect.top / HERO_SCROLL_DISTANCE, 0, 1));
+    };
+
+    updatePortalProgress();
+    window.addEventListener("scroll", updatePortalProgress, { passive: true });
+    window.addEventListener("resize", updatePortalProgress);
+
+    return () => {
+      window.removeEventListener("scroll", updatePortalProgress);
+      window.removeEventListener("resize", updatePortalProgress);
+    };
+  }, [reduceMotion]);
+
+  const showNextProject = () => {
+    setActiveProject((current) => (current + 1) % PROJECTS.length);
+  };
+
+  const showPreviousProject = () => {
+    setActiveProject((current) => (current - 1 + PROJECTS.length) % PROJECTS.length);
+  };
+
+  const handleDeckKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      showNextProject();
     }
 
-    const timer = window.setTimeout(() => {
-      if (!isDeleting && typedFocus === currentFocus) {
-        setIsDeleting(true);
-        return;
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      showPreviousProject();
+    }
+  };
+
+  const handlePointerDown = (event: PointerEvent<HTMLDivElement>) => {
+    if (reduceMotion) return;
+
+    event.currentTarget.setPointerCapture(event.pointerId);
+    setDrag({
+      active: true,
+      startX: event.clientX,
+      startY: event.clientY,
+      x: 0,
+      y: 0,
+    });
+  };
+
+  const handlePointerMove = (event: PointerEvent<HTMLDivElement>) => {
+    if (!drag.active || reduceMotion) return;
+
+    setDrag((current) => ({
+      ...current,
+      x: event.clientX - current.startX,
+      y: event.clientY - current.startY,
+    }));
+  };
+
+  const handlePointerEnd = (event: PointerEvent<HTMLDivElement>) => {
+    if (!drag.active) return;
+
+    const width = deckRef.current?.getBoundingClientRect().width ?? 1;
+    const shouldThrow = Math.abs(drag.x) > width * 0.1;
+
+    if (shouldThrow) {
+      if (drag.x < 0) {
+        showNextProject();
+      } else {
+        showPreviousProject();
       }
+    }
 
-      if (isDeleting && typedFocus === "") {
-        setIsDeleting(false);
-        setFocusIndex((currentIndex) => (currentIndex + 1) % FOCUS_AREAS.length);
-        return;
-      }
-
-      setTypedFocus(
-        currentFocus.slice(0, typedFocus.length + (isDeleting ? -1 : 1)),
-      );
-    }, delay);
-
-    return () => window.clearTimeout(timer);
-  }, [focusIndex, isDeleting, typedFocus]);
+    event.currentTarget.releasePointerCapture(event.pointerId);
+    setDrag(INITIAL_DRAG);
+  };
 
   return (
     <>
-      <section className={styles.hero} aria-labelledby="home-heading">
-      <div className={styles.decorativeOrbOne} aria-hidden="true" />
-      <div className={styles.decorativeOrbTwo} aria-hidden="true" />
-      <div className={styles.decorativeRing} aria-hidden="true" />
+      <section
+        ref={heroRef}
+        className={styles.portalHero}
+        aria-labelledby="home-heading"
+        style={{ "--portal-progress": portalProgress } as CSSProperties}
+      >
+        <div className={styles.portalStage}>
+          <Image
+            className={styles.portalImage}
+            src={HERO_CONTENT.portrait.src}
+            alt=""
+            aria-hidden="true"
+            fill
+            priority
+            sizes="100vw"
+          />
+          <div className={styles.portalTone} aria-hidden="true" />
+          <div className={styles.portalVeil} aria-hidden="true" />
+          <div className={`${styles.portalPanel} ${styles.portalPanelLeft}`} aria-hidden="true" />
+          <div className={`${styles.portalPanel} ${styles.portalPanelRight}`} aria-hidden="true" />
+          <span className={`${styles.portalDot} ${styles.portalDotOne}`} aria-hidden="true" />
+          <span className={`${styles.portalDot} ${styles.portalDotTwo}`} aria-hidden="true" />
 
-      <div className={styles.container}>
+          <div className={styles.portalMetaTop} aria-hidden="true">
+            Web & Mobile Developer
+          </div>
+          <div className={styles.portalMetaBottom} aria-hidden="true">
+            Portfolio / 2026
+          </div>
 
-        <div className={styles.heroGrid}>
-          <div className={styles.copyColumn}>
-            <p className={styles.eyebrow}>WEB &amp; MOBILE DEVELOPER</p>
-
-            <h1 id="home-heading" className={styles.heading}>
-              Creating purposeful digital solutions
+          <div className={styles.portalCopy}>
+            <p className={styles.eyebrow}>Portfolio Catalogue</p>
+            <h1 id="home-heading" className={styles.portalTitle}>
+              <span>FATIMA</span>
+              <span>SIERRA</span>
             </h1>
-
-            <p
-              className={styles.focusLine}
-              aria-label="Fatima Klye M. Sierra. Focused on public safety, education, sustainability, and community development."
-            >
-              <span aria-hidden="true">
-                <strong>Fatima Klye M. Sierra</strong>
-                <span className={styles.focusSeparator}> · </span>
-                Focused on{" "}
-                <span className={styles.typewriterGroup}>
-                  <span className={styles.rotatingFocus}>{typedFocus}</span>
-                  <span className={styles.typeCursor}>|</span>
-                </span>
-              </span>
-            </p>
-          </div>
-
-          <div className={styles.visualColumn}>
-            <div className={styles.portraitArea}>
-              <div className={styles.portraitGlow} aria-hidden="true" />
-
-              <div className={styles.codeWindowGroup}>
-                <div
-                  className={styles.portraitFrame}
-                  aria-label="Code profile for Fatima Klye M. Sierra"
-                >
-                <div className={styles.codeHeader} aria-hidden="true">
-                  <span className={styles.codeDots}>
-                    <i />
-                    <i />
-                    <i />
-                  </span>
-                  <span className={styles.codeFilename}>profile.ts</span>
-                  <span className={styles.codeHeaderSpacer} />
-                </div>
-
-                <div className={styles.codeBody} aria-hidden="true">
-                  <div className={styles.codeLine}>
-                    <span className={styles.lineNumber}>1</span>
-                    <span>
-                      <span className={styles.codeKeyword}>const</span>{" "}
-                      <span className={styles.codeVariable}>developer</span>{" "}
-                      <span className={styles.codePunctuation}>= {"{"}</span>
-                    </span>
-                  </div>
-
-                  <div className={styles.codeLine}>
-                    <span className={styles.lineNumber}>2</span>
-                    <span className={styles.codeIndentOne}>
-                      <span className={styles.codeProperty}>name</span>
-                      <span className={styles.codePunctuation}>: </span>
-                      <span className={styles.codeString}>
-                        &quot;Fatima Klye M. Sierra&quot;
-                      </span>
-                      <span className={styles.codePunctuation}>,</span>
-                    </span>
-                  </div>
-
-                  <div className={styles.codeLine}>
-                    <span className={styles.lineNumber}>3</span>
-                    <span className={styles.codeIndentOne}>
-                      <span className={styles.codeProperty}>role</span>
-                      <span className={styles.codePunctuation}>: </span>
-                      <span className={styles.codeString}>
-                        &quot;Web &amp; Mobile Developer&quot;
-                      </span>
-                      <span className={styles.codePunctuation}>,</span>
-                    </span>
-                  </div>
-
-                  <div className={styles.codeLine}>
-                    <span className={styles.lineNumber}>4</span>
-                    <span className={styles.codeIndentOne}>
-                      <span className={styles.codeProperty}>focus</span>
-                      <span className={styles.codePunctuation}>: [</span>
-                    </span>
-                  </div>
-
-                  <div className={styles.codeLine}>
-                    <span className={styles.lineNumber}>5</span>
-                    <span className={styles.codeIndentTwo}>
-                      <span className={styles.codeString}>
-                        &quot;building digital solutions&quot;
-                      </span>
-                      <span className={styles.codePunctuation}>,</span>
-                    </span>
-                  </div>
-
-                  <div className={styles.codeLine}>
-                    <span className={styles.lineNumber}>6</span>
-                    <span className={styles.codeIndentTwo}>
-                      <span className={styles.codeString}>
-                        &quot;creating useful experiences&quot;
-                      </span>
-                      <span className={styles.codePunctuation}>,</span>
-                    </span>
-                  </div>
-
-                  <div className={styles.codeLine}>
-                    <span className={styles.lineNumber}>7</span>
-                    <span className={styles.codeIndentTwo}>
-                      <span className={styles.codeString}>
-                        &quot;solving real-world problems&quot;
-                      </span>
-                      <span className={styles.codePunctuation}>,</span>
-                    </span>
-                  </div>
-
-                  <div className={styles.codeLine}>
-                    <span className={styles.lineNumber}>8</span>
-                    <span className={styles.codeIndentTwo}>
-                      <span className={styles.codeString}>
-                        &quot;turning ideas into systems&quot;
-                      </span>
-                      <span className={styles.codePunctuation}>,</span>
-                    </span>
-                  </div>
-
-                  <div className={styles.codeLine}>
-                    <span className={styles.lineNumber}>9</span>
-                    <span className={styles.codeIndentOne}>
-                      <span className={styles.codePunctuation}>],</span>
-                    </span>
-                  </div>
-
-                  <div className={styles.codeLine}>
-                    <span className={styles.lineNumber}>10</span>
-                    <span className={styles.codeIndentOne}>
-                      <span className={styles.codeProperty}>stack</span>
-                      <span className={styles.codePunctuation}>: [</span>
-                      <span className={styles.codeString}>
-                        &quot;Next.js&quot;
-                      </span>
-                      <span className={styles.codePunctuation}>, </span>
-                      <span className={styles.codeString}>
-                        &quot;Flutter&quot;
-                      </span>
-                      <span className={styles.codePunctuation}>, </span>
-                      <span className={styles.codeString}>
-                        &quot;Java&quot;
-                      </span>
-                      <span className={styles.codePunctuation}>, </span>
-                      <span className={styles.codeString}>
-                        &quot;React JS&quot;
-                      </span>
-                      <span className={styles.codePunctuation}>],</span>
-                    </span>
-                  </div>
-
-                  <div className={styles.codeLine}>
-                    <span className={styles.lineNumber}>11</span>
-                    <span className={styles.codePunctuation}>{"};"}</span>
-                  </div>
-
-                  <div className={styles.codeLine}>
-                    <span className={styles.lineNumber}>12</span>
-                    <span>
-                      <span className={styles.codeKeyword}>export default</span>{" "}
-                      <span className={styles.codeVariable}>developer</span>
-                      <span className={styles.codePunctuation}>;</span>
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div className={styles.codeBadgeOne} aria-hidden="true">
-                <span>MOBILE</span>
-                Flutter + Supabase
-              </div>
-
-              <div className={styles.codeBadgeTwo} aria-hidden="true">
-                <span>WEB</span>
-                Next.js + TypeScript
-              </div>
-              </div>
-
-              <div className={styles.smallOrb} aria-hidden="true" />
-            </div>
-          </div>
-
-          <div className={styles.actions}>
-            <Link className={styles.primaryButton} href="/projects">
-              Explore my work
-              <span aria-hidden="true">↗</span>
-            </Link>
-
-            <a
-              className={styles.secondaryButton}
-              href="/assets/resume/fatima-sierra-resume.pdf"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Download resume
-            </a>
+            <p className={styles.portalLead}>{HERO_CONTENT.tagline}</p>
           </div>
         </div>
-      </div>
       </section>
 
-      <section
-        className={styles.expertiseSection}
-        aria-labelledby="expertise-heading"
-      >
-        <div className={styles.expertiseGlowOne} aria-hidden="true" />
-        <div className={styles.expertiseGlowTwo} aria-hidden="true" />
-
-        <div className={styles.expertiseContainer}>
-          <header className={styles.expertiseHeader}>
-            <p className={styles.sectionEyebrow}>OVERVIEW</p>
-            <h2 id="expertise-heading" className={styles.expertiseTitle}>
-              CORE CAPABILITIES 
+      <section className={styles.statementFold} aria-labelledby="statement-heading">
+        <div className={styles.statementInner}>
+          <div>
+            <p className={styles.eyebrow}>Statement</p>
+            <h2 id="statement-heading" className={styles.statementTitle}>
+              I build practical systems where <span>interface clarity</span>,
+              database structure, and responsive behavior carry the experience.
             </h2>
-            <p className={styles.expertiseIntro}>
-             Explore each area to see the tools and technologies I use to design, develop, and deliver reliable digital solutions.
+          </div>
+          <p className={styles.indexNumber} aria-hidden="true">
+            01
+          </p>
+          <Image
+            className={styles.statementImage}
+            src={HERO_CONTENT.portrait.src}
+            alt=""
+            aria-hidden="true"
+            width={430}
+            height={430}
+          />
+        </div>
+      </section>
+
+      <section className={styles.releases} aria-labelledby="releases-heading">
+        <div className={styles.releasesInner}>
+          <div className={styles.releaseCopy}>
+            <p className={styles.eyebrow}>Selected Releases</p>
+            <h2 id="releases-heading">A working catalogue of portfolio systems.</h2>
+            <p>
+              Browse project cards from the portfolio. Unverified FOCUSIT details
+              remain explicitly marked pending confirmation.
             </p>
-          </header>
-
-          <div className={styles.expertiseLayout}>
-            <div className={styles.expertiseColumn}>
-              <p className={styles.columnLabel}>
-                Expertise & Technology
-              </p>
-
-              <div
-                className={styles.expertisePills}
-                role="group"
-                aria-label="Expertise areas"
+            <div className={styles.releaseActions}>
+              <Link className={styles.primaryButton} href="/projects">
+                View All Projects
+              </Link>
+              <a
+                className={styles.secondaryButton}
+                href={projectHref(selectedProject)}
+                target={selectedProject.externalUrl ? selectedProject.target : undefined}
+                rel={selectedProject.externalUrl ? selectedProject.rel : undefined}
               >
-                {EXPERTISE_AREAS.map((area) => {
-                  const isActive = selectedExpertise === area.id;
-
-                  return (
-                    <button
-                      key={area.id}
-                      type="button"
-                      className={`${styles.expertisePill}${
-                        isActive ? ` ${styles.expertisePillActive}` : ""
-                      }`}
-                      aria-pressed={isActive}
-                      onClick={() => setSelectedExpertise(area.id)}
-                    >
-                      {area.label}
-                    </button>
-                  );
-                })}
-              </div>
+                {projectButtonLabel(selectedProject)}
+              </a>
             </div>
+          </div>
 
-            <div className={styles.technologyColumn}>
-              <p className={styles.columnLabel}>RELATED TECHNOLOGY</p>
+          <div className={styles.deckWrap}>
+            <div
+              ref={deckRef}
+              className={styles.deck}
+              tabIndex={0}
+              role="group"
+              aria-label="Project catalogue deck. Use left and right arrow keys to change the top project."
+              onKeyDown={handleDeckKeyDown}
+              onPointerDown={handlePointerDown}
+              onPointerMove={handlePointerMove}
+              onPointerUp={handlePointerEnd}
+              onPointerCancel={handlePointerEnd}
+            >
+              {PROJECTS.map((project, index) => {
+                const stackPosition =
+                  (index - activeProject + PROJECTS.length) % PROJECTS.length;
+                const isTopCard = stackPosition === 0;
+                const dragRotation = drag.x / 22;
+                const inlineStyle = {
+                  "--stack-index": stackPosition,
+                  "--drag-x": isTopCard ? `${drag.x}px` : "0px",
+                  "--drag-y": isTopCard ? `${drag.y}px` : "0px",
+                  "--drag-rotate": isTopCard ? `${dragRotation}deg` : "0deg",
+                  zIndex: PROJECTS.length - stackPosition,
+                } as CSSProperties;
 
-              <div
-                className={styles.technologyGrid}
-                aria-label={`Technologies related to ${selectedArea.label}`}
-              >
-                {TECHNOLOGIES.map((technology) => {
-                  const isActive = activeTechnologies.has(technology.name);
-                  const iconFailed = brokenIcons.has(technology.name);
-
-                  return (
-                    <span
-                      key={technology.name}
-                      className={`${styles.techChip} ${
-                        isActive
-                          ? styles.techChipActive
-                          : styles.techChipMuted
-                      }`}
-                    >
-                      <span
-                        className={styles.techIconFrame}
-                        aria-hidden="true"
-                      >
-                        {iconFailed ? (
-                          <span className={styles.techIconFallback}>
-                            {technology.mark}
-                          </span>
-                        ) : (
-                          <img
-                            className={styles.techIcon}
-                            src={technology.icon}
-                            alt=""
-                            width="24"
-                            height="24"
-                            loading="lazy"
-                            onError={() => {
-                              setBrokenIcons((previous) => {
-                                const next = new Set(previous);
-                                next.add(technology.name);
-                                return next;
-                              });
-                            }}
-                          />
-                        )}
-                      </span>
-                      <span>{technology.name}</span>
-                    </span>
-                  );
-                })}
-              </div>
+                return (
+                  <article
+                    key={project.id}
+                    className={`${styles.deckCard}${isTopCard ? ` ${styles.deckCardActive}` : ""}${
+                      drag.active && isTopCard ? ` ${styles.deckCardDragging}` : ""
+                    }`}
+                    style={inlineStyle}
+                    aria-hidden={!isTopCard}
+                  >
+                    <div className={styles.deckImageFrame}>
+                      <Image
+                        src={project.image}
+                        alt={project.imageAlt}
+                        fill
+                        sizes="(max-width: 900px) 80vw, 36vw"
+                      />
+                    </div>
+                    <div className={styles.deckCardBody}>
+                      <p>{project.category}</p>
+                      <h3>{project.title}</h3>
+                      <span>{project.technologies.join(" / ")}</span>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+            <div className={styles.deckHint}>
+              <span>Drag sleeve or use arrow keys</span>
+              <strong>{releaseProgress}</strong>
+            </div>
+            <div className={styles.progressDots} aria-hidden="true">
+              {PROJECTS.map((project, index) => (
+                <span
+                  key={project.id}
+                  className={index === activeProject ? styles.progressDotActive : undefined}
+                />
+              ))}
             </div>
           </div>
         </div>
+      </section>
+
+      <section className={styles.rosterSection} aria-labelledby="roster-heading">
+        <div className={styles.roster}>
+          <div className={styles.sectionHeader}>
+            <p className={styles.eyebrow}>Roster</p>
+            <h2 id="roster-heading">Core capability rows</h2>
+          </div>
+          <div className={styles.rosterRows}>
+            {rosterRows.map((row) => (
+              <div className={styles.rosterRow} key={row.name}>
+                <span>{row.label}</span>
+                <strong>{row.name}</strong>
+                <em>{row.count}</em>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className={styles.datesSection} aria-labelledby="dates-heading">
+        <div className={styles.dates}>
+          <div className={styles.sectionHeader}>
+            <p className={styles.eyebrow}>Dates</p>
+            <h2 id="dates-heading">Verified education and credential markers</h2>
+          </div>
+          <div className={styles.dateTable}>
+            <div className={styles.dateHead} aria-hidden="true">
+              <span>Date</span>
+              <span>Record</span>
+              <span>Type</span>
+              <span>Source</span>
+            </div>
+            {dateRows.map((row) => (
+              <div className={styles.dateRow} key={`${row.date}-${row.title}`}>
+                <strong>{row.date}</strong>
+                <span>{row.title}</span>
+                <span>{row.type}</span>
+                <span>{row.place}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className={styles.closeSection} aria-labelledby="close-heading">
+        <div className={styles.closeInner}>
+          <div className={styles.closeTop}>
+            <div>
+              <p className={styles.eyebrow}>Close</p>
+              <h2 id="close-heading">Available for practical web and mobile work.</h2>
+              <p>For opportunities, project details, or verified references, use the contact page.</p>
+            </div>
+            <div className={styles.closeActions}>
+              <Link className={styles.primaryButton} href="/contact">
+                Contact
+              </Link>
+              <a
+                className={styles.secondaryButton}
+                href="/assets/resume/fatima-sierra-resume.pdf"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Resume
+              </a>
+            </div>
+          </div>
+        </div>
+        <p className={styles.closeWordmark} aria-hidden="true">
+          SIERRA
+        </p>
       </section>
     </>
   );

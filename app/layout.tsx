@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Poppins } from "next/font/google";
+import { Poppins, Syne } from "next/font/google";
 import SiteHeader from "@/components/layout/SiteHeader";
 import "./globals.css";
 
@@ -7,6 +7,13 @@ const poppins = Poppins({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],
   variable: "--font-poppins",
+  display: "swap",
+});
+
+const syne = Syne({
+  subsets: ["latin"],
+  weight: ["600", "700", "800"],
+  variable: "--font-syne",
   display: "swap",
 });
 
@@ -23,7 +30,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={poppins.variable}>
+      <body className={`${poppins.variable} ${syne.variable}`}>
         <SiteHeader />
         {children}
       </body>

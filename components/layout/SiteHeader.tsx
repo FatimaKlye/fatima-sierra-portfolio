@@ -60,11 +60,8 @@ export default function SiteHeader() {
             aria-label="Fatima Sierra home"
             onClick={closeMenu}
           >
-            <span className={styles.brandMark}>FS</span>
-
             <span className={styles.brandText}>
-              FATIMA
-              <strong>SIERRA</strong>
+              SIERRA<span>.</span>
             </span>
           </Link>
 

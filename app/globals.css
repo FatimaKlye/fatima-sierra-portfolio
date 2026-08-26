@@ -35,6 +35,7 @@ body {
   background: var(--color-background);
   color: var(--color-text-primary);
   font-family: var(--font-poppins), Arial, sans-serif;
+  padding-top: 58px;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
