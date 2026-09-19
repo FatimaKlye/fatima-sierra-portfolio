@@ -40,6 +40,14 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+body:has([data-home-page]) {
+  padding-top: 0;
+}
+
+html {
+  scroll-padding-top: 72px;
+}
+
 button,
 a,
 input,

@@ -1,0 +1,70 @@
+.trigger {
+  border-radius: 6px;
+  padding: 0 2px;
+  margin: 0 -2px;
+  font-weight: 700;
+  color: inherit;
+  cursor: default;
+}
+
+.triggerHoverable {
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-decoration-color: rgba(166, 61, 104, 0.45);
+  text-underline-offset: 3px;
+  transition: color 180ms ease, background-color 180ms ease;
+}
+
+.triggerHoverable:hover,
+.triggerHoverable:focus-visible {
+  color: var(--color-primary);
+  background-color: rgba(166, 61, 104, 0.08);
+  text-decoration-color: var(--color-primary);
+}
+
+/* Touch/coarse-pointer fallback: readable static emphasis, no popup */
+.trigger:not(.triggerHoverable) {
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-decoration-color: rgba(166, 61, 104, 0.45);
+  text-underline-offset: 3px;
+  color: var(--color-primary-hover);
+}
+
+.card {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 60;
+  width: 220px;
+  padding: 12px;
+  pointer-events: none;
+  border: 1px solid rgba(166, 61, 104, 0.16);
+  border-radius: 16px;
+  background: linear-gradient(180deg, #ffffff 0%, #fff0f5 100%);
+  box-shadow: 0 20px 42px rgba(59, 42, 52, 0.14);
+}
+
+.cardImage {
+  width: 100%;
+  height: 120px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  object-fit: cover;
+  background: rgba(166, 61, 104, 0.06);
+}
+
+.cardDescription {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .triggerHoverable {
+    transition: none;
+  }
+}

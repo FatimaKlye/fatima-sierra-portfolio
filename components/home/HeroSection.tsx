@@ -1,412 +1,281 @@
-"use client";
-
-import type { CSSProperties, KeyboardEvent, PointerEvent } from "react";
-import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { HERO_CONTENT, CORE_KNOWLEDGE, EDUCATION } from "@/components/about/aboutData";
-import { CERTIFICATES } from "@/components/certificates/certificatesData";
-import { PROJECTS, type Project } from "@/components/projects/projectsData";
+import {
+  CERTIFICATES,
+  CORE_KNOWLEDGE,
+  EDUCATION,
+  HERO_CONTENT,
+  TECHNOLOGY_GROUPS,
+} from "@/components/about/aboutData";
+import { SOCIAL_LINKS } from "@/components/contact/contactData";
+import { PROJECTS } from "@/components/projects/projectsData";
+import SocialFlipButton, { type SocialFlipItem } from "@/components/ui/SocialFlipButton";
+import ContactCTA from "./ContactCTA";
+import CredentialsTeaser from "./CredentialsTeaser";
+import WorkGallery from "./WorkGallery";
+import { getGithubContributions } from "./githubContributions";
 import styles from "./HeroSection.module.css";
 
-const HERO_SCROLL_DISTANCE = 700;
-const MOTION_QUERY = "(prefers-reduced-motion: reduce)";
+const CONTRIBUTION_LEVEL_COLORS = [
+  "rgba(166, 61, 104, 0.08)",
+  "#F6DDE7",
+  "#C982A2",
+  "#B85078",
+  "#A63D68",
+];
 
-type DragState = {
-  active: boolean;
-  startX: number;
-  startY: number;
-  x: number;
-  y: number;
-};
-
-const INITIAL_DRAG: DragState = {
-  active: false,
-  startX: 0,
-  startY: 0,
-  x: 0,
-  y: 0,
-};
-
-const rosterRows = CORE_KNOWLEDGE.slice(0, 5).map((item, index) => ({
-  label: `Focus ${String(index + 1).padStart(2, "0")}`,
-  name: item.title,
-  count: String(index + 1).padStart(2, "0"),
-}));
-
-const dateRows = [
+const CAPABILITY_GROUPS = [
   {
-    date: "2023-Present",
-    title: "Bachelor of Science in Information Technology",
-    type: "Education",
-    place: EDUCATION[0]?.institution ?? "National University - Dasmarinas",
+    title: "Web Development",
+    items: TECHNOLOGY_GROUPS.find((group) => group.id === "frontend")?.items ?? [],
+    description: CORE_KNOWLEDGE.find((item) => item.title === "Web Application Development")?.description,
   },
-  ...CERTIFICATES.slice(0, 2).map((certificate) => ({
-    date: certificate.dateAwarded,
-    title: certificate.title,
-    type: certificate.credentialName,
-    place: certificate.issuer,
-  })),
   {
-    date: "April 23, 2025",
-    title: "Modern Web + AI (UI/UX)",
-    type: "Certificate of Completion",
-    place: "NU Dasmarinas Computer Society",
+    title: "Mobile Development",
+    items: TECHNOLOGY_GROUPS.find((group) => group.id === "mobile")?.items ?? [],
+    description: CORE_KNOWLEDGE.find((item) => item.title === "Mobile Application Development")?.description,
+  },
+  {
+    title: "Backend & Tools",
+    items: [
+      ...(TECHNOLOGY_GROUPS.find((group) => group.id === "backend-database")?.items ?? []),
+      ...(TECHNOLOGY_GROUPS.find((group) => group.id === "tools")?.items ?? []),
+    ].slice(0, 6),
+    description: CORE_KNOWLEDGE.find((item) => item.title === "Database Integration")?.description,
   },
 ];
 
-function projectHref(project: Project) {
-  return project.externalUrl ?? `/projects/${project.slug}`;
-}
+const JOURNEY_CREDENTIALS = CERTIFICATES.filter(
+  (certificate) => certificate.featured && certificate.date,
+).slice(0, 3);
+const TEASER_CREDENTIAL_IDS = ["html-and-css", "databases", "modern-web-ai-uiux"];
+const TEASER_CREDENTIALS = TEASER_CREDENTIAL_IDS.flatMap((id) => {
+  const certificate = CERTIFICATES.find((entry) => entry.id === id);
+  return certificate ? [certificate] : [];
+});
+const PROFESSIONAL_LINKS = ["linkedin", "github", "email"].flatMap((id) => {
+  const link = SOCIAL_LINKS.find((item) => item.id === id);
+  return link ? [link] : [];
+});
 
-function projectButtonLabel(project: Project) {
-  return project.buttonLabel ? `${project.buttonLabel} →` : "Open Case Study →";
-}
+const SOCIAL_FLIP_ITEMS: SocialFlipItem[] = PROFESSIONAL_LINKS.map((link) => ({
+  id: link.id,
+  label: link.label,
+  letter: link.label.charAt(0),
+  iconSrc: link.icon,
+  href: link.id === "email" ? `mailto:${link.handle}` : link.href,
+  external: link.id !== "email",
+}));
 
-function clamp(value: number, min: number, max: number) {
-  return Math.min(Math.max(value, min), max);
-}
+const FOOTER_NAV_LINKS = [
+  { href: "/about", label: "about" },
+  { href: "#projects", label: "projects" },
+  { href: "#skills", label: "skills" },
+  { href: "#contact", label: "contact" },
+];
 
-export default function HeroSection() {
-  const heroRef = useRef<HTMLElement>(null);
-  const deckRef = useRef<HTMLDivElement>(null);
-  const [portalProgress, setPortalProgress] = useState(1);
-  const [reduceMotion, setReduceMotion] = useState(false);
-  const [activeProject, setActiveProject] = useState(0);
-  const [drag, setDrag] = useState<DragState>(INITIAL_DRAG);
-
-  const selectedProject = PROJECTS[activeProject] ?? PROJECTS[0];
-  const releaseProgress = useMemo(
-    () => `${String(activeProject + 1).padStart(2, "0")} / ${String(PROJECTS.length).padStart(2, "0")}`,
-    [activeProject],
-  );
-
-  useEffect(() => {
-    const media = window.matchMedia(MOTION_QUERY);
-
-    const updateReducedMotion = () => {
-      setReduceMotion(media.matches);
-      if (media.matches) {
-        setPortalProgress(1);
-      }
-    };
-
-    updateReducedMotion();
-    media.addEventListener("change", updateReducedMotion);
-
-    return () => media.removeEventListener("change", updateReducedMotion);
-  }, []);
-
-  useEffect(() => {
-    if (reduceMotion) return;
-
-    const updatePortalProgress = () => {
-      const hero = heroRef.current;
-      if (!hero) return;
-
-      const rect = hero.getBoundingClientRect();
-      setPortalProgress(clamp(-rect.top / HERO_SCROLL_DISTANCE, 0, 1));
-    };
-
-    updatePortalProgress();
-    window.addEventListener("scroll", updatePortalProgress, { passive: true });
-    window.addEventListener("resize", updatePortalProgress);
-
-    return () => {
-      window.removeEventListener("scroll", updatePortalProgress);
-      window.removeEventListener("resize", updatePortalProgress);
-    };
-  }, [reduceMotion]);
-
-  const showNextProject = () => {
-    setActiveProject((current) => (current + 1) % PROJECTS.length);
-  };
-
-  const showPreviousProject = () => {
-    setActiveProject((current) => (current - 1 + PROJECTS.length) % PROJECTS.length);
-  };
-
-  const handleDeckKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.key === "ArrowRight") {
-      event.preventDefault();
-      showNextProject();
-    }
-
-    if (event.key === "ArrowLeft") {
-      event.preventDefault();
-      showPreviousProject();
-    }
-  };
-
-  const handlePointerDown = (event: PointerEvent<HTMLDivElement>) => {
-    if (reduceMotion) return;
-
-    event.currentTarget.setPointerCapture(event.pointerId);
-    setDrag({
-      active: true,
-      startX: event.clientX,
-      startY: event.clientY,
-      x: 0,
-      y: 0,
-    });
-  };
-
-  const handlePointerMove = (event: PointerEvent<HTMLDivElement>) => {
-    if (!drag.active || reduceMotion) return;
-
-    setDrag((current) => ({
-      ...current,
-      x: event.clientX - current.startX,
-      y: event.clientY - current.startY,
-    }));
-  };
-
-  const handlePointerEnd = (event: PointerEvent<HTMLDivElement>) => {
-    if (!drag.active) return;
-
-    const width = deckRef.current?.getBoundingClientRect().width ?? 1;
-    const shouldThrow = Math.abs(drag.x) > width * 0.1;
-
-    if (shouldThrow) {
-      if (drag.x < 0) {
-        showNextProject();
-      } else {
-        showPreviousProject();
-      }
-    }
-
-    event.currentTarget.releasePointerCapture(event.pointerId);
-    setDrag(INITIAL_DRAG);
-  };
+export default async function HeroSection() {
+  const currentEducation = EDUCATION[0];
+  const githubLink = SOCIAL_LINKS.find((item) => item.id === "github");
+  const githubUsername = githubLink?.handle.replace(/^@/, "") ?? "";
+  const githubContributions = githubUsername ? await getGithubContributions(githubUsername) : null;
+  const currentYear = new Date().getFullYear();
 
   return (
-    <>
-      <section
-        ref={heroRef}
-        className={styles.portalHero}
-        aria-labelledby="home-heading"
-        style={{ "--portal-progress": portalProgress } as CSSProperties}
-      >
-        <div className={styles.portalStage}>
-          <Image
-            className={styles.portalImage}
-            src={HERO_CONTENT.portrait.src}
-            alt=""
-            aria-hidden="true"
-            fill
-            priority
-            sizes="100vw"
-          />
-          <div className={styles.portalTone} aria-hidden="true" />
-          <div className={styles.portalVeil} aria-hidden="true" />
-          <div className={`${styles.portalPanel} ${styles.portalPanelLeft}`} aria-hidden="true" />
-          <div className={`${styles.portalPanel} ${styles.portalPanelRight}`} aria-hidden="true" />
-          <span className={`${styles.portalDot} ${styles.portalDotOne}`} aria-hidden="true" />
-          <span className={`${styles.portalDot} ${styles.portalDotTwo}`} aria-hidden="true" />
-
-          <div className={styles.portalMetaTop} aria-hidden="true">
-            Web & Mobile Developer
-          </div>
-          <div className={styles.portalMetaBottom} aria-hidden="true">
-            Portfolio / 2026
-          </div>
-
-          <div className={styles.portalCopy}>
-            <p className={styles.eyebrow}>Portfolio Catalogue</p>
-            <h1 id="home-heading" className={styles.portalTitle}>
-              <span>FATIMA</span>
-              <span>SIERRA</span>
+    <div className={styles.home} data-home-page>
+      <section className={styles.hero} aria-labelledby="home-hero-title">
+        <div className={styles.technicalGrid} aria-hidden="true" />
+        <div className={styles.heroInner}>
+          <div className={`${styles.heroCopy} ${styles.reveal}`}>
+            <p className={styles.eyebrow}>Web &amp; Mobile Developer</p>
+            <h1 id="home-hero-title">
+              Designing and building <em>purposeful digital experiences.</em>
             </h1>
-            <p className={styles.portalLead}>{HERO_CONTENT.tagline}</p>
-          </div>
-        </div>
-      </section>
-
-      <section className={styles.statementFold} aria-labelledby="statement-heading">
-        <div className={styles.statementInner}>
-          <div>
-            <p className={styles.eyebrow}>Statement</p>
-            <h2 id="statement-heading" className={styles.statementTitle}>
-              I build practical systems where <span>interface clarity</span>,
-              database structure, and responsive behavior carry the experience.
-            </h2>
-          </div>
-          <p className={styles.indexNumber} aria-hidden="true">
-            01
-          </p>
-          <Image
-            className={styles.statementImage}
-            src={HERO_CONTENT.portrait.src}
-            alt=""
-            aria-hidden="true"
-            width={430}
-            height={430}
-          />
-        </div>
-      </section>
-
-      <section className={styles.releases} aria-labelledby="releases-heading">
-        <div className={styles.releasesInner}>
-          <div className={styles.releaseCopy}>
-            <p className={styles.eyebrow}>Selected Releases</p>
-            <h2 id="releases-heading">A working catalogue of portfolio systems.</h2>
-            <p>
-              Browse project cards from the portfolio. Unverified FOCUSIT details
-              remain explicitly marked pending confirmation.
+            <p className={styles.heroLead}>
+              I create practical web and mobile applications with a focus on thoughtful interfaces,
+              reliable functionality, and user-centered experiences.
             </p>
-            <div className={styles.releaseActions}>
-              <Link className={styles.primaryButton} href="/projects">
-                View All Projects
+            <div className={styles.actions}>
+              <Link className={styles.primaryButton} href="#projects">
+                View Projects
               </Link>
-              <a
-                className={styles.secondaryButton}
-                href={projectHref(selectedProject)}
-                target={selectedProject.externalUrl ? selectedProject.target : undefined}
-                rel={selectedProject.externalUrl ? selectedProject.rel : undefined}
-              >
-                {projectButtonLabel(selectedProject)}
-              </a>
+              <Link className={styles.secondaryButton} href="/about">
+                About Me
+              </Link>
             </div>
+            <dl className={styles.heroMeta}>
+              <div><dt>Location</dt><dd>{currentEducation.location}</dd></div>
+              <div><dt>Focus</dt><dd>{HERO_CONTENT.statusLabel}</dd></div>
+            </dl>
           </div>
 
-          <div className={styles.deckWrap}>
-            <div
-              ref={deckRef}
-              className={styles.deck}
-              tabIndex={0}
-              role="group"
-              aria-label="Project catalogue deck. Use left and right arrow keys to change the top project."
-              onKeyDown={handleDeckKeyDown}
-              onPointerDown={handlePointerDown}
-              onPointerMove={handlePointerMove}
-              onPointerUp={handlePointerEnd}
-              onPointerCancel={handlePointerEnd}
-            >
-              {PROJECTS.map((project, index) => {
-                const stackPosition =
-                  (index - activeProject + PROJECTS.length) % PROJECTS.length;
-                const isTopCard = stackPosition === 0;
-                const dragRotation = drag.x / 22;
-                const inlineStyle = {
-                  "--stack-index": stackPosition,
-                  "--drag-x": isTopCard ? `${drag.x}px` : "0px",
-                  "--drag-y": isTopCard ? `${drag.y}px` : "0px",
-                  "--drag-rotate": isTopCard ? `${dragRotation}deg` : "0deg",
-                  zIndex: PROJECTS.length - stackPosition,
-                } as CSSProperties;
-
-                return (
-                  <article
-                    key={project.id}
-                    className={`${styles.deckCard}${isTopCard ? ` ${styles.deckCardActive}` : ""}${
-                      drag.active && isTopCard ? ` ${styles.deckCardDragging}` : ""
-                    }`}
-                    style={inlineStyle}
-                    aria-hidden={!isTopCard}
-                  >
-                    <div className={styles.deckImageFrame}>
-                      <Image
-                        src={project.image}
-                        alt={project.imageAlt}
-                        fill
-                        sizes="(max-width: 900px) 80vw, 36vw"
-                      />
-                    </div>
-                    <div className={styles.deckCardBody}>
-                      <p>{project.category}</p>
-                      <h3>{project.title}</h3>
-                      <span>{project.technologies.join(" / ")}</span>
-                    </div>
-                  </article>
-                );
-              })}
+          <div className={`${styles.portraitComposition} ${styles.reveal}`}>
+            <div className={styles.circleOne} aria-hidden="true" />
+            <div className={styles.circleTwo} aria-hidden="true" />
+            <div className={styles.circleThree} aria-hidden="true" />
+            <div className={styles.codeGeometry} aria-hidden="true"><span>&lt;/&gt;</span></div>
+            <div className={styles.portraitFrame}>
+              <Image
+                src="/assets/profile/profile_picture.jpg"
+                alt="Professional portrait of Fatima Klye M. Sierra"
+                fill
+                priority
+                sizes="(max-width: 820px) 88vw, 46vw"
+                className={styles.portraitImage}
+              />
             </div>
-            <div className={styles.deckHint}>
-              <span>Drag sleeve or use arrow keys</span>
-              <strong>{releaseProgress}</strong>
-            </div>
-            <div className={styles.progressDots} aria-hidden="true">
-              {PROJECTS.map((project, index) => (
-                <span
-                  key={project.id}
-                  className={index === activeProject ? styles.progressDotActive : undefined}
-                />
-              ))}
-            </div>
+            <p className={styles.portraitLabel}>Interface development · Reliable systems</p>
           </div>
         </div>
       </section>
 
-      <section className={styles.rosterSection} aria-labelledby="roster-heading">
-        <div className={styles.roster}>
-          <div className={styles.sectionHeader}>
-            <p className={styles.eyebrow}>Roster</p>
-            <h2 id="roster-heading">Core capability rows</h2>
+      <section className={`${styles.section} ${styles.projectsSection}`} id="projects" aria-labelledby="projects-title">
+        <div className={`${styles.sectionInner} ${styles.reveal}`}>
+          <WorkGallery projects={PROJECTS} />
+        </div>
+      </section>
+
+      <section className={styles.section} id="skills" aria-labelledby="skills-title">
+        <div className={styles.sectionInner}>
+          <div className={`${styles.sectionHeading} ${styles.reveal}`}>
+            <p className={styles.eyebrow}>Capabilities</p>
+            <h2 id="skills-title">Tools I use to turn ideas into <em>working products.</em></h2>
           </div>
-          <div className={styles.rosterRows}>
-            {rosterRows.map((row) => (
-              <div className={styles.rosterRow} key={row.name}>
-                <span>{row.label}</span>
-                <strong>{row.name}</strong>
-                <em>{row.count}</em>
-              </div>
+          <div className={styles.capabilityGrid}>
+            {CAPABILITY_GROUPS.map((group, index) => (
+              <article className={`${styles.capability} ${styles.reveal}`} key={group.title}>
+                <span className={styles.capabilityIndex}>0{index + 1}</span>
+                <h3>{group.title}</h3>
+                <p>{group.description}</p>
+                <ul>{group.items.map((item) => <li key={item.name}>{item.name}</li>)}</ul>
+              </article>
             ))}
           </div>
         </div>
       </section>
 
-      <section className={styles.datesSection} aria-labelledby="dates-heading">
-        <div className={styles.dates}>
-          <div className={styles.sectionHeader}>
-            <p className={styles.eyebrow}>Dates</p>
-            <h2 id="dates-heading">Verified education and credential markers</h2>
+      <section className={`${styles.section} ${styles.journeySection}`} id="experience" aria-labelledby="journey-title">
+        <div className={styles.sectionInner}>
+          <div className={`${styles.sectionHeading} ${styles.reveal}`}>
+            <p className={styles.eyebrow}>Journey</p>
+            <h2 id="journey-title">Learning through <em>building.</em></h2>
           </div>
-          <div className={styles.dateTable}>
-            <div className={styles.dateHead} aria-hidden="true">
-              <span>Date</span>
-              <span>Record</span>
-              <span>Type</span>
-              <span>Source</span>
-            </div>
-            {dateRows.map((row) => (
-              <div className={styles.dateRow} key={`${row.date}-${row.title}`}>
-                <strong>{row.date}</strong>
-                <span>{row.title}</span>
-                <span>{row.type}</span>
-                <span>{row.place}</span>
-              </div>
+          <div className={styles.timeline}>
+            {EDUCATION.slice(0, 2).map((entry) => (
+              <article className={`${styles.timelineRow} ${styles.reveal}`} key={entry.institution}>
+                <p className={styles.timelineDate}>{entry.years}</p>
+                <div><p className={styles.timelineType}>Education</p><h3>{entry.institution}</h3><p>{entry.detail || entry.location}</p></div>
+              </article>
+            ))}
+            {JOURNEY_CREDENTIALS.map((entry) => (
+              <article className={`${styles.timelineRow} ${styles.reveal}`} key={entry.id}>
+                <p className={styles.timelineDate}>{entry.date}</p>
+                <div><p className={styles.timelineType}>{entry.type}</p><h3>{entry.title}</h3><p>{entry.issuer}</p></div>
+              </article>
             ))}
           </div>
         </div>
       </section>
 
-      <section className={styles.closeSection} aria-labelledby="close-heading">
-        <div className={styles.closeInner}>
-          <div className={styles.closeTop}>
-            <div>
-              <p className={styles.eyebrow}>Close</p>
-              <h2 id="close-heading">Available for practical web and mobile work.</h2>
-              <p>For opportunities, project details, or verified references, use the contact page.</p>
-            </div>
-            <div className={styles.closeActions}>
-              <Link className={styles.primaryButton} href="/contact">
-                Contact
-              </Link>
+      <section className={styles.approach} aria-labelledby="approach-title">
+        <div className={styles.approachDecoration} aria-hidden="true" />
+        <div className={`${styles.approachInner} ${styles.reveal}`}>
+          <p className={styles.approachEyebrow}>My Approach</p>
+          <h2 id="approach-title">Good digital products should feel <em>clear, purposeful,</em> and easy to use.</h2>
+        </div>
+      </section>
+
+      <section className={`${styles.section} ${styles.credentialsSection}`} aria-labelledby="credentials-title">
+        <div className={`${styles.sectionInner} ${styles.reveal}`}>
+          <CredentialsTeaser certificates={TEASER_CREDENTIALS} />
+        </div>
+      </section>
+
+      <section className={styles.section} id="github" aria-labelledby="github-title">
+        <div className={styles.sectionInner}>
+          <div className={`${styles.githubHeader} ${styles.reveal}`}>
+            <p className={styles.eyebrow} id="github-title">07 — GitHub</p>
+            {githubLink && (
               <a
-                className={styles.secondaryButton}
-                href="/assets/resume/fatima-sierra-resume.pdf"
+                className={styles.githubHandle}
+                href={githubLink.href}
                 target="_blank"
                 rel="noreferrer"
+                aria-label={`Open ${githubLink.handle} on GitHub in a new tab`}
               >
-                Resume
+                {githubLink.handle}
+                <span className={styles.externalArrow} aria-hidden="true">↗</span>
               </a>
+            )}
+          </div>
+
+          {githubContributions ? (
+            <div className={`${styles.githubBody} ${styles.reveal}`}>
+              <div className={styles.githubGridScroll}>
+                <div
+                  className={styles.githubGrid}
+                  role="img"
+                  aria-label={`GitHub contribution graph: ${githubContributions.totalLastYear} contributions in ${currentYear}`}
+                >
+                  {githubContributions.weeks.map((week, weekIndex) => (
+                    <div className={styles.githubWeek} key={weekIndex}>
+                      {week.map((day, dayIndex) =>
+                        day ? (
+                          <span
+                            className={styles.githubDay}
+                            key={day.date}
+                            style={{ backgroundColor: CONTRIBUTION_LEVEL_COLORS[day.level] ?? CONTRIBUTION_LEVEL_COLORS[0] }}
+                            title={`${day.count} contribution${day.count === 1 ? "" : "s"} on ${day.date}`}
+                          />
+                        ) : (
+                          <span
+                            className={`${styles.githubDay} ${styles.githubDayEmpty}`}
+                            key={`empty-${weekIndex}-${dayIndex}`}
+                            aria-hidden="true"
+                          />
+                        ),
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <p className={styles.githubCount}>
+                <strong>{githubContributions.totalLastYear.toLocaleString()}</strong> contributions in {currentYear}
+              </p>
+            </div>
+          ) : (
+            <p className={`${styles.githubFallback} ${styles.reveal}`}>
+              Activity graph is temporarily unavailable — view the profile directly on GitHub.
+            </p>
+          )}
+        </div>
+      </section>
+
+      <section className={`${styles.section} ${styles.contactSection}`} id="contact" aria-labelledby="contact-title">
+        <div className={`${styles.contactInner} ${styles.reveal}`}>
+          <div>
+            <p className={styles.eyebrow}>Let&apos;s Connect</p>
+            <h2 id="contact-title">Have an opportunity or <em>project in mind?</em></h2>
+          </div>
+          <div className={styles.contactCopy}>
+            <p>I&apos;m open to internship opportunities where I can contribute, learn, and continue developing practical web and mobile solutions.</p>
+            <div className={styles.contactActions}>
+              <ContactCTA />
+              <SocialFlipButton items={SOCIAL_FLIP_ITEMS} className={styles.contactSocials} />
             </div>
           </div>
         </div>
-        <p className={styles.closeWordmark} aria-hidden="true">
-          SIERRA
-        </p>
       </section>
-    </>
+
+      <footer className={styles.footer}>
+        <div className={styles.footerGrid}>
+          <div><Link className={styles.footerBrand} href="/">Fatima Sierra</Link><p>Web &amp; Mobile Developer creating purposeful digital experiences.</p></div>
+          <div><p className={styles.footerLabel}>Navigate</p><nav>{FOOTER_NAV_LINKS.map((link) => <Link href={link.href} key={link.href}>{link.label}</Link>)}</nav></div>
+          <div><p className={styles.footerLabel}>Connect</p><nav>{PROFESSIONAL_LINKS.map((link) => <a href={link.href} target="_blank" rel="noreferrer" key={link.id}>{link.label}</a>)}</nav></div>
+          <div><p className={styles.footerLabel}>Education</p><p>{currentEducation.detail}<br />Mobile &amp; Web Applications</p></div>
+        </div>
+        <div className={styles.footerBottom}><span>© 2026 Fatima Sierra</span><span>Designed &amp; developed by Fatima Sierra</span></div>
+      </footer>
+    </div>
   );
 }

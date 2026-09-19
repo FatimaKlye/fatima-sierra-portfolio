@@ -21,7 +21,8 @@ export const SOCIAL_LINKS: SocialLink[] = [
     label: "LinkedIn",
     handle: "Fatima Klye Sierra",
     href: "https://www.linkedin.com/in/fatima-klye-sierra-902060288/",
-    icon: `${SIMPLE_ICONS_BASE}/linkedin.svg`,
+    // simple-icons dropped the LinkedIn glyph starting v14; v13 still has it.
+    icon: "https://cdn.jsdelivr.net/npm/simple-icons@13/icons/linkedin.svg",
   },
   {
     id: "facebook",

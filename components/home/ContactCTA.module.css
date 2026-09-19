@@ -1,0 +1,311 @@
+.trigger {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 22px;
+  border: 1px solid var(--color-primary);
+  border-radius: 2px;
+  background: var(--color-primary);
+  color: var(--color-white);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 220ms ease, color 220ms ease, border-color 220ms ease;
+}
+
+.trigger:hover,
+.trigger:focus-visible {
+  border-color: var(--color-primary-hover);
+  background: var(--color-primary-hover);
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+  padding: 24px;
+  background: rgba(59, 42, 52, 0.56);
+  backdrop-filter: blur(4px);
+}
+
+.dialog {
+  width: min(100%, 420px);
+  max-height: min(88vh, 620px);
+  overflow-y: auto;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-background);
+  box-shadow: var(--shadow-soft);
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 22px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-background);
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--color-primary);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.title {
+  margin: 4px 0 0;
+  color: var(--color-text-primary);
+  font-family: var(--font-cormorant), Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+.close {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  background: var(--color-white);
+  color: var(--color-text-primary);
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease;
+}
+
+.close:hover,
+.close:focus-visible {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: var(--color-white);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 22px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.honeypotField {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  left: -9999px;
+}
+
+.label {
+  color: var(--color-text-primary);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.input,
+.textarea {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  padding: 11px 13px;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  font-family: inherit;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 88px;
+  width: 100%;
+  padding-bottom: 24px;
+}
+
+.textareaWrapper {
+  position: relative;
+  display: flex;
+}
+
+.charCount {
+  position: absolute;
+  right: 12px;
+  bottom: 8px;
+  color: var(--color-text-muted);
+  font-size: 0.68rem;
+  font-weight: 600;
+  pointer-events: none;
+}
+
+.input:focus-visible,
+.textarea:focus-visible {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(166, 61, 104, 0.14);
+}
+
+.input:disabled,
+.textarea:disabled {
+  opacity: 0.65;
+}
+
+.inputError {
+  border-color: #b3261e;
+}
+
+.inputError:focus-visible {
+  border-color: #b3261e;
+  box-shadow: 0 0 0 3px rgba(179, 38, 30, 0.14);
+}
+
+.fieldError {
+  margin: 0;
+  color: #b3261e;
+  font-size: 0.74rem;
+  font-weight: 600;
+}
+
+.formError {
+  margin: 0;
+  padding: 10px 13px;
+  border: 1px solid rgba(179, 38, 30, 0.24);
+  border-radius: 8px;
+  background: rgba(179, 38, 30, 0.06);
+  color: #b3261e;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.sendButton {
+  min-height: 48px;
+  margin-top: 4px;
+  border: 1px solid var(--color-primary);
+  border-radius: 2px;
+  background: var(--color-primary);
+  color: var(--color-white);
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 600;
+  transition: background-color 220ms ease, border-color 220ms ease;
+}
+
+.sendButton:hover:not(:disabled),
+.sendButton:focus-visible:not(:disabled) {
+  border-color: var(--color-primary-hover);
+  background: var(--color-primary-hover);
+}
+
+.sendButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.close:focus-visible,
+.input:focus-visible,
+.textarea:focus-visible,
+.sendButton:focus-visible,
+.doneButton:focus-visible {
+  outline: 3px solid rgba(166, 61, 104, 0.28);
+  outline-offset: 2px;
+}
+
+.successState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 40px 26px 34px;
+  text-align: center;
+}
+
+.successIcon {
+  display: grid;
+  width: 52px;
+  height: 52px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--color-soft-blush);
+  color: var(--color-primary);
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.successText {
+  margin: 8px 0 0;
+  color: var(--color-text-primary);
+  font-family: var(--font-cormorant), Georgia, serif;
+  font-size: 1.3rem;
+  font-weight: 500;
+}
+
+.successSubtext {
+  margin: 0;
+  max-width: 300px;
+  color: var(--color-text-muted);
+  font-size: 0.84rem;
+  line-height: 1.6;
+}
+
+.doneButton {
+  min-height: 44px;
+  margin-top: 12px;
+  padding: 0 26px;
+  border: 1px solid var(--color-primary);
+  border-radius: 2px;
+  background: transparent;
+  color: var(--color-primary);
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 600;
+  transition: background-color 200ms ease, color 200ms ease;
+}
+
+.doneButton:hover {
+  background: var(--color-soft-blush);
+}
+
+@media (max-width: 480px) {
+  .overlay {
+    padding: 16px;
+  }
+
+  .dialog {
+    max-height: 92vh;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trigger,
+  .close,
+  .sendButton,
+  .doneButton {
+    transition: none;
+  }
+}

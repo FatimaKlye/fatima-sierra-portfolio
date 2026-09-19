@@ -1,0 +1,219 @@
+.header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 24px;
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--color-primary);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.heading {
+  max-width: 720px;
+  margin: 12px 0 0;
+  color: var(--color-text-primary);
+  font-family: var(--font-cormorant), Georgia, serif;
+  font-weight: 500;
+  font-size: clamp(2.8rem, 5vw, 5rem);
+  line-height: 0.98;
+}
+
+.intro {
+  max-width: 520px;
+  margin: 16px 0 0;
+  color: var(--color-text-muted);
+  font-size: clamp(0.94rem, 1.05vw, 1.02rem);
+  line-height: 1.75;
+}
+
+.viewMoreButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  margin-top: 46px;
+  padding: 0 20px;
+  border: 1px solid var(--color-primary);
+  border-radius: 2px;
+  background: transparent;
+  color: var(--color-primary);
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background-color 220ms ease, color 220ms ease, border-color 220ms ease;
+}
+
+.viewMoreButton:hover,
+.viewMoreButton:focus-visible {
+  background: var(--color-soft-blush);
+  border-color: var(--color-primary-hover);
+  color: var(--color-primary-hover);
+}
+
+.arrow {
+  display: inline-block;
+  transition: transform 300ms ease;
+}
+
+.viewMoreButton:hover .arrow,
+.viewMoreButton:focus-visible .arrow {
+  transform: translate(2px, -2px);
+}
+
+.gallery {
+  display: flex;
+  align-items: stretch;
+  gap: 14px;
+  width: 100%;
+  height: clamp(360px, 34vw, 480px);
+  margin-top: 72px;
+}
+
+.card {
+  position: relative;
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  min-width: 0;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 20px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+  transition: flex-grow 650ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cardActive {
+  flex-grow: 6;
+}
+
+.cardImageWrap {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--color-soft-blush);
+}
+
+.cardImage {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  transition: transform 650ms cubic-bezier(0.22, 1, 0.36, 1), filter 400ms ease;
+  filter: saturate(0.85);
+}
+
+.card:hover .cardImage,
+.card:focus-visible .cardImage,
+.cardActive .cardImage {
+  transform: scale(1.03);
+  filter: saturate(1);
+}
+
+.cardOverlay {
+  position: absolute;
+  inset: auto 0 0 0;
+  padding: 28px 22px 20px;
+  background: linear-gradient(to top, rgba(59, 42, 52, 0.92) 0%, rgba(59, 42, 52, 0) 100%);
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 400ms ease 120ms, transform 400ms ease 120ms;
+}
+
+.cardActive .cardOverlay {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.cardDescription {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--color-white);
+  font-size: 0.86rem;
+  line-height: 1.6;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.cardMeta {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: 2px;
+  padding: 14px 4px 0;
+}
+
+.cardTitle {
+  overflow: hidden;
+  color: var(--color-text-primary);
+  font-family: var(--font-cormorant), Georgia, serif;
+  font-weight: 600;
+  font-size: clamp(0.98rem, 1.4vw, 1.2rem);
+  line-height: 1.25;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.cardCategory {
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: 0.74rem;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 820px) {
+  .header {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .viewMoreButton {
+    align-self: flex-start;
+    margin-top: 0;
+  }
+
+  .gallery {
+    margin-top: 48px;
+  }
+}
+
+@media (max-width: 640px) {
+  .gallery {
+    flex-direction: column;
+    height: clamp(560px, 150vw, 760px);
+    gap: 12px;
+  }
+
+  .card {
+    flex-basis: 0;
+  }
+
+  .cardActive {
+    flex-grow: 5;
+  }
+
+  .cardMeta {
+    padding: 10px 2px 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .cardImage,
+  .cardOverlay,
+  .arrow,
+  .viewMoreButton .arrow {
+    transition: none;
+  }
+}
