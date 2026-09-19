@@ -36,7 +36,7 @@
 .title {
   margin: 0;
   color: var(--color-text-primary);
-  font-family: var(--font-cormorant), Georgia, serif;
+  font-family: var(--font-poppins), sans-serif;
   font-size: 1.4rem;
   font-weight: 500;
 }

@@ -189,7 +189,7 @@
   align-items: center;
   border-bottom: 1px solid var(--color-border);
   color: var(--color-text-primary);
-  font-family: var(--font-cormorant), Georgia, serif;
+  font-family: var(--font-poppins), sans-serif;
   font-size: 1.75rem;
   font-weight: 500;
   transition: color 250ms ease, padding-left 250ms ease;

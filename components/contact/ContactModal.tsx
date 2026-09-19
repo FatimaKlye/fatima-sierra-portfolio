@@ -56,7 +56,6 @@ export default function ContactModal() {
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const [status, setStatus] = useState<Status>("idle");
   const [errorMessage, setErrorMessage] = useState("");
-  const [mounted, setMounted] = useState(false);
   const [honeypot, setHoneypot] = useState("");
   const firstFieldRef = useRef<HTMLInputElement>(null);
 
@@ -67,10 +66,6 @@ export default function ContactModal() {
     email: touched.email || submitAttempted ? formErrors.email : undefined,
     message: submitAttempted ? formErrors.message : undefined,
   };
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
     if (!isOpen) {
@@ -183,7 +178,7 @@ export default function ContactModal() {
       </button>
 
       {isOpen &&
-        mounted &&
+        typeof document !== "undefined" &&
         createPortal(
           <div
             className={styles.overlay}

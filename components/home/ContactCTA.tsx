@@ -50,7 +50,6 @@ function validate(values: FormValues): FormErrors {
 
 export default function ContactCTA() {
   const [isOpen, setIsOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
   const [values, setValues] = useState<FormValues>(INITIAL_VALUES);
   const [touched, setTouched] = useState<Partial<Record<keyof FormValues, boolean>>>({});
   const [submitAttempted, setSubmitAttempted] = useState(false);
@@ -67,10 +66,6 @@ export default function ContactCTA() {
     email: touched.email || submitAttempted ? formErrors.email : undefined,
     message: submitAttempted ? formErrors.message : undefined,
   };
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -178,11 +173,10 @@ export default function ContactCTA() {
         Send Me a Message
       </button>
 
-      {mounted &&
+      {isOpen && typeof document !== "undefined" &&
         createPortal(
           <AnimatePresence>
-            {isOpen && (
-              <motion.div
+            <motion.div
                 className={styles.overlay}
                 role="presentation"
                 onClick={closeModal}
@@ -339,8 +333,7 @@ export default function ContactCTA() {
                     </form>
                   )}
                 </motion.div>
-              </motion.div>
-            )}
+            </motion.div>
           </AnimatePresence>,
           document.body,
         )}

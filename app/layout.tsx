@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Poppins } from "next/font/google";
+import { Poppins } from "next/font/google";
 import SiteHeader from "@/components/layout/SiteHeader";
 import "./globals.css";
 
@@ -7,14 +7,6 @@ const poppins = Poppins({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-poppins",
-  display: "swap",
-});
-
-const cormorant = Cormorant_Garamond({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  style: ["normal", "italic"],
-  variable: "--font-cormorant",
   display: "swap",
 });
 
@@ -31,7 +23,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${poppins.variable} ${cormorant.variable}`}>
+      <body className={poppins.variable}>
         <SiteHeader />
         {children}
       </body>

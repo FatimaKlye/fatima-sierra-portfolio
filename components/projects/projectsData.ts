@@ -113,28 +113,6 @@ export const PROJECTS: Project[] = [
     repoUrl: "https://github.com/andreii2404/Beautiverse-digi",
   },
   {
-    id: "focusit",
-    slug: "focusit",
-    category: "Temporary category (unverified)",
-    title: "FOCUSIT",
-    description:
-      "Temporary description (unverified): detailed project information is pending confirmation.",
-    technologies: ["Unverified"],
-    image: "/assets/projects/focusit/focusit-screenshot.png",
-    imageAlt: "FOCUSIT project screenshot exported from Figma",
-    screenshots: [
-      {
-        src: "/assets/projects/focusit/focusit-screenshot.png",
-        alt: "FOCUSIT project screenshot exported from Figma",
-      },
-    ],
-    externalUrl:
-      "https://www.figma.com/make/qqKN0sSjlFwNrpX316zFXe/FOCUSIT---FINAL-FINAL?t=vKefT98pNXZhE5ff-6",
-    buttonLabel: "Explore Project",
-    target: "_blank",
-    rel: "noreferrer",
-  },
-  {
     id: "maddy-cassy",
     slug: "maddy-cassy",
     category: "Web Application · Equipment Rental & Commerce",
