@@ -63,7 +63,7 @@ export default function ProjectEcosystem({ ecosystem, currentSlug, number }: Pro
   const [first, second] = ecosystem.surfaces;
 
   return (
-    <section className={styles.ecosystem} aria-labelledby="ecosystem-title">
+    <section className={styles.ecosystem} id="ecosystem" aria-labelledby="ecosystem-title" data-nav-label="Ecosystem">
       <div className={styles.container}>
         <div className={styles.ecosystemHead}>
           <SectionHead id="ecosystem-title" number={number} eyebrow="Connected system" title={ecosystem.title} />

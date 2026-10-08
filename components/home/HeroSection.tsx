@@ -47,7 +47,7 @@ export default async function HeroSection() {
 
   return (
     <div className={styles.home} data-home-page>
-      <section className={styles.hero} id="home" aria-labelledby="home-hero-title">
+      <section className={styles.hero} id="home" aria-labelledby="home-hero-title" data-nav-label="Intro" data-nav-intro>
         <div className={styles.technicalGrid} aria-hidden="true" />
         <div className={styles.heroInner}>
           <div className={`${styles.heroCopy} ${styles.reveal}`}>
@@ -103,13 +103,13 @@ export default async function HeroSection() {
 
       <AboutPreview />
 
-      <section className={editorialStyles.section} id="projects" aria-labelledby="projects-title">
+      <section className={editorialStyles.section} id="projects" aria-labelledby="projects-title" data-nav-label="Projects">
         <div className={`${editorialStyles.container} mx-auto w-full`}>
           <WorkGallery projects={PROJECTS} />
         </div>
       </section>
 
-      <section className={editorialStyles.section} id="skills" aria-labelledby="skills-title">
+      <section className={editorialStyles.section} id="skills" aria-labelledby="skills-title" data-nav-label="Skills">
         <div className={`${editorialStyles.container} mx-auto w-full`}>
           <PreviewHeader
             number="03 — Skills"
@@ -137,7 +137,7 @@ export default async function HeroSection() {
         </div>
       </section>
 
-      <section className={`${editorialStyles.section} ${editorialStyles.surfaceSection}`} id="experience" aria-labelledby="experience-title">
+      <section className={`${editorialStyles.section} ${editorialStyles.surfaceSection}`} id="experience" aria-labelledby="experience-title" data-nav-label="Experience">
         <div className={`${editorialStyles.container} mx-auto w-full`}>
           <PreviewHeader
             number="04 — Experience & Education"
@@ -162,13 +162,13 @@ export default async function HeroSection() {
         </div>
       </section>
 
-      <section className={`${editorialStyles.section} ${editorialStyles.surfaceSection}`} aria-labelledby="credentials-title">
+      <section className={`${editorialStyles.section} ${editorialStyles.surfaceSection}`} id="credentials" aria-labelledby="credentials-title" data-nav-label="Certifications">
         <div className={`${editorialStyles.container} mx-auto w-full`}>
           <CredentialsTeaser certificates={TEASER_CREDENTIALS} />
         </div>
       </section>
 
-      <section className={`${editorialStyles.section} ${editorialStyles.githubSection}`} id="github" aria-labelledby="github-title">
+      <section className={`${editorialStyles.section} ${editorialStyles.githubSection}`} id="github" aria-labelledby="github-title" data-nav-label="GitHub">
         <div className={`${editorialStyles.container} mx-auto w-full`}>
           <div className={editorialStyles.githubHeader}>
             <p className={editorialStyles.eyebrow} id="github-title">06 — GitHub activity</p>
@@ -202,7 +202,7 @@ export default async function HeroSection() {
         </div>
       </section>
 
-      <section className={`${editorialStyles.section} ${editorialStyles.contactSection}`} id="contact" aria-labelledby="contact-title">
+      <section className={`${editorialStyles.section} ${editorialStyles.contactSection}`} id="contact" aria-labelledby="contact-title" data-nav-label="Contact">
         <div className={`${editorialStyles.container} ${editorialStyles.contactInner}`}>
           <div className={editorialStyles.contactCopy}>
             <p className={editorialStyles.sectionNumber}>07 — Contact</p>

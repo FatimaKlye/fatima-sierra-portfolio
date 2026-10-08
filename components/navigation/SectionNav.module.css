@@ -1,0 +1,372 @@
+/* "On this page" index — a frosted rail on wide screens, a compact menu below.
+   z-index sits above page content and the cursor card (60) but under modals (80+)
+   and the site header (1000). */
+
+/* ---------- Desktop rail ---------- */
+
+/* Page content runs to a 32px gutter until the 1440px container stops growing, so the
+   collapsed rail is kept slim enough to live in that gutter and is centred in it on
+   wider screens. Labels only overlay content while the visitor is using the rail. */
+.rail {
+  --rail-width: 27px;
+  --gutter: max(32px, (100vw - var(--page-max-width, 1440px)) / 2);
+
+  position: fixed;
+  top: 50%;
+  right: max(3px, calc((var(--gutter) - var(--rail-width)) / 2));
+  z-index: 70;
+  transform: translateY(-50%);
+  transition: opacity 320ms ease, visibility 0s linear 0s;
+}
+
+.rail.isObscured:not(:focus-within) {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 320ms ease, visibility 0s linear 320ms;
+}
+
+.capsule {
+  position: relative;
+  min-width: var(--rail-width);
+  padding: 6px 0;
+  border: 1px solid rgba(232, 212, 222, 0.85);
+  border-radius: 16px;
+  background: rgba(255, 249, 251, 0.8);
+  box-shadow: 0 18px 40px -22px rgba(59, 42, 52, 0.28);
+  backdrop-filter: blur(14px) saturate(1.15);
+  -webkit-backdrop-filter: blur(14px) saturate(1.15);
+  transition: background-color 260ms ease, box-shadow 260ms ease;
+}
+
+.capsule:hover,
+.capsule:focus-within {
+  background: rgba(255, 249, 251, 0.97);
+  box-shadow: 0 24px 50px -24px rgba(59, 42, 52, 0.38);
+}
+
+/* Soft pill that glides behind the current entry; it fills as that section is read. */
+.thumb {
+  position: absolute;
+  top: 0;
+  right: 3px;
+  left: 3px;
+  height: 28px;
+  overflow: hidden;
+  border-radius: 10px;
+  background: var(--color-soft-blush);
+  will-change: transform, height;
+}
+
+.thumbFill {
+  position: absolute;
+  inset: 0;
+  background: rgba(166, 61, 104, 0.2);
+  transform: scaleY(0);
+  transform-origin: 50% 0;
+}
+
+.railList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Positioned so it paints above the thumb (rows stay offset against the capsule). */
+.railLink {
+  position: relative;
+  display: flex;
+  min-height: 28px;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 6px;
+  color: var(--color-text-muted);
+  border-radius: 10px;
+  transition: color 220ms ease;
+}
+
+.railLabel {
+  display: block;
+  width: 0;
+  max-width: 230px;
+  overflow: hidden;
+  color: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+  opacity: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Air around the label; collapses with it, so the closed rail stays slim. */
+.railLabel::before,
+.railLabel::after {
+  content: "";
+  display: inline-block;
+  width: 10px;
+}
+
+.railNumber {
+  min-width: 2ch;
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  opacity: 0.6;
+  text-align: center;
+  transition: opacity 220ms ease, color 220ms ease;
+}
+
+.railLink:hover,
+.railLink:focus-visible {
+  color: var(--color-text-primary);
+}
+
+.railLink:hover .railNumber,
+.railLink:focus-visible .railNumber {
+  opacity: 1;
+}
+
+.railLink.isActive {
+  color: var(--color-primary);
+}
+
+.railLink.isActive .railNumber {
+  opacity: 1;
+}
+
+.railLink:focus-visible {
+  outline: 2px solid rgba(166, 61, 104, 0.4);
+  outline-offset: -2px;
+}
+
+/* Brief label beside the rail whenever the current section changes. */
+.chip {
+  position: absolute;
+  top: 0;
+  right: calc(100% + 10px);
+  padding: 7px 14px;
+  border: 1px solid rgba(232, 212, 222, 0.85);
+  border-radius: 999px;
+  background: rgba(255, 249, 251, 0.86);
+  box-shadow: 0 14px 30px -20px rgba(59, 42, 52, 0.35);
+  color: var(--color-primary);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.2;
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  white-space: nowrap;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* ---------- Compact menu (tablet & mobile) ---------- */
+
+.compact {
+  position: fixed;
+  right: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  z-index: 70;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(14px);
+  transition: opacity 280ms ease, transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.compact.isShown,
+.compact:focus-within {
+  opacity: 1;
+  pointer-events: auto;
+  transform: none;
+}
+
+.trigger {
+  display: inline-flex;
+  min-height: 48px;
+  max-width: min(64vw, 260px);
+  align-items: center;
+  gap: 10px;
+  padding: 5px 18px 5px 6px;
+  border: 1px solid rgba(232, 212, 222, 0.9);
+  border-radius: 999px;
+  background: rgba(255, 249, 251, 0.86);
+  box-shadow: 0 18px 40px -20px rgba(59, 42, 52, 0.35);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  backdrop-filter: blur(14px) saturate(1.15);
+  -webkit-backdrop-filter: blur(14px) saturate(1.15);
+  transition: border-color 220ms ease, box-shadow 220ms ease;
+}
+
+.trigger:hover,
+.trigger[aria-expanded="true"] {
+  border-color: rgba(166, 61, 104, 0.4);
+}
+
+.trigger:focus-visible {
+  outline: 3px solid rgba(166, 61, 104, 0.32);
+  outline-offset: 3px;
+}
+
+.ring {
+  position: relative;
+  display: grid;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+}
+
+.ring svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.ringTrack,
+.ringFill {
+  fill: none;
+  stroke-width: 1.5;
+}
+
+.ringTrack {
+  stroke: var(--color-border);
+}
+
+.ringFill {
+  stroke: var(--color-primary);
+  stroke-linecap: round;
+}
+
+.ringNumber {
+  position: relative;
+  color: var(--color-primary);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+.triggerLabel {
+  overflow: hidden;
+  font-size: 12.5px;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Out of flow, so the hidden panel never leaves an invisible click-blocking box above the button. */
+.panel {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 10px);
+  width: min(300px, calc(100vw - 32px));
+  max-height: min(62vh, 460px);
+  overflow-y: auto;
+  padding: 8px;
+  border: 1px solid rgba(232, 212, 222, 0.9);
+  border-radius: 20px;
+  background: rgba(255, 249, 251, 0.94);
+  box-shadow: var(--shadow-soft);
+  opacity: 0;
+  overscroll-behavior: contain;
+  transform-origin: 100% 100%;
+  visibility: hidden;
+  backdrop-filter: blur(16px) saturate(1.15);
+  -webkit-backdrop-filter: blur(16px) saturate(1.15);
+}
+
+.panelHead {
+  display: flex;
+  justify-content: space-between;
+  margin: 0;
+  padding: 10px 12px 8px;
+  color: var(--color-text-muted);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.panelList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.panelLink {
+  position: relative;
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 14px;
+  padding: 0 12px;
+  border-radius: 12px;
+  color: var(--color-text-primary);
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 200ms ease, color 200ms ease;
+}
+
+.panelNumber {
+  min-width: 2ch;
+  color: var(--color-text-muted);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+}
+
+.panelLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.panelLink:hover,
+.panelLink:focus-visible {
+  background: var(--color-surface);
+}
+
+.panelLink:focus-visible {
+  outline: 2px solid rgba(166, 61, 104, 0.4);
+  outline-offset: -2px;
+}
+
+.panelLink.isActive {
+  background: var(--color-soft-blush);
+  color: var(--color-primary);
+}
+
+.panelLink.isActive .panelNumber {
+  color: var(--color-primary);
+}
+
+/* Small phones: the ring alone, so it never meets the case-study "Back to Projects" pill. */
+@media (max-width: 479px) {
+  .trigger {
+    padding-right: 6px;
+  }
+
+  .triggerLabel {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rail,
+  .compact,
+  .railLink,
+  .railNumber,
+  .trigger,
+  .panelLink {
+    transition: none;
+  }
+}

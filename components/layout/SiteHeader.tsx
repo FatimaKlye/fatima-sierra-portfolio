@@ -110,7 +110,7 @@ export default function SiteHeader() {
 
   return (
     <>
-      <header className={`${styles.header}${scrolled ? ` ${styles.scrolled}` : ""}`}>
+      <header className={`${styles.header}${scrolled ? ` ${styles.scrolled}` : ""}`} data-site-header>
         <div className={styles.container}>
           <Link
             className={styles.brand}

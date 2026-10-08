@@ -54,7 +54,7 @@ export default function AboutStory() {
         </div>
 
         {/* The method: recipe → code --------------------------------------- */}
-        <div className={`${styles.container} ${styles.method}`}>
+        <div className={`${styles.container} ${styles.method}`} id="method" data-nav-label="The method">
           <div className={styles.methodCopy} data-reveal>
             <p className={styles.eyebrow}>The method</p>
             <h2 className={styles.blockTitle}>
@@ -71,7 +71,7 @@ export default function AboutStory() {
         </div>
 
         {/* Chapter 01: the kitchen ----------------------------------------- */}
-        <article className={`${styles.container} ${styles.chapter}`} aria-labelledby="chapter-kitchen">
+        <article className={`${styles.container} ${styles.chapter}`} id="the-kitchen" aria-labelledby="chapter-kitchen" data-nav-label="The kitchen">
           <header className={styles.chapterMeta}>
             <span className={styles.chapterNumber} aria-hidden="true">01</span>
             <p className={styles.chapterYears}>{SENIOR_HIGH.years}</p>
@@ -153,7 +153,7 @@ export default function AboutStory() {
         </article>
 
         {/* Chapter 02: choosing IT ----------------------------------------- */}
-        <article className={`${styles.container} ${styles.chapter}`} aria-labelledby="chapter-switch">
+        <article className={`${styles.container} ${styles.chapter}`} id="choosing-it" aria-labelledby="chapter-switch" data-nav-label="Choosing IT">
           <header className={styles.chapterMeta}>
             <span className={styles.chapterNumber} aria-hidden="true">02</span>
             <p className={styles.chapterYears}>{COLLEGE.years}</p>
@@ -213,7 +213,7 @@ export default function AboutStory() {
         </article>
 
         {/* Chapter 03: building ------------------------------------------- */}
-        <article className={`${styles.container} ${styles.chapter}`} aria-labelledby="chapter-build">
+        <article className={`${styles.container} ${styles.chapter}`} id="building" aria-labelledby="chapter-build" data-nav-label="Building today">
           <header className={styles.chapterMeta}>
             <span className={styles.chapterNumber} aria-hidden="true">03</span>
             <p className={styles.chapterYears}>Today</p>
@@ -266,7 +266,7 @@ export default function AboutStory() {
         </article>
 
         {/* Beyond the code ------------------------------------------------- */}
-        <div className={`${styles.container} ${styles.table}`}>
+        <div className={`${styles.container} ${styles.table}`} id="what-i-bring" data-nav-label="What I bring">
           <h2 className={styles.blockTitle} data-reveal>
             What I bring <em>to the table.</em>
           </h2>
@@ -318,7 +318,7 @@ export default function AboutStory() {
         </div>
 
         {/* Recognition: every verified honour, oldest first --------------- */}
-        <div className={`${styles.container} ${styles.roll}`}>
+        <div className={`${styles.container} ${styles.roll}`} id="recognition" data-nav-label="Recognition">
           <header className={styles.rollHead}>
             <p className={styles.eyebrow} data-reveal>Recognition</p>
             <h2 className={styles.blockTitle} data-reveal>
@@ -340,7 +340,7 @@ export default function AboutStory() {
         </div>
 
         {/* Finale: approach + what's next ----------------------------------- */}
-        <div className={styles.finale}>
+        <div className={styles.finale} id="whats-next" data-nav-label="What’s next">
           <div className={styles.finaleInner}>
             <p className={styles.finaleEyebrow} data-reveal>What&apos;s next</p>
             <h2 className={styles.finaleTitle} data-reveal>

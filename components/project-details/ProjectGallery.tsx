@@ -176,7 +176,7 @@ export default function ProjectGallery({ items, number }: ProjectGalleryProps) {
   );
 
   return (
-    <section className={styles.gallery} aria-labelledby="gallery-title">
+    <section className={styles.gallery} id="gallery" aria-labelledby="gallery-title" data-nav-label="Gallery">
       <div className={styles.container}>
         <SectionHead
           id="gallery-title"

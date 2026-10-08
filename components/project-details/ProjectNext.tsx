@@ -10,7 +10,7 @@ type ProjectNextProps = {
 
 export default function ProjectNext({ next, previous }: ProjectNextProps) {
   return (
-    <section className={styles.next} aria-label="More projects">
+    <section className={styles.next} id="more-projects" aria-label="More projects" data-nav-label="More projects">
       <div className={styles.container}>
         {next && (
           <Link href={`/projects/${next.slug}`} className={styles.nextLink} data-reveal>

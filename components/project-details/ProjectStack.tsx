@@ -4,7 +4,7 @@ import styles from "./ProjectDetails.module.css";
 
 export default function ProjectStack({ stack, number }: { stack: ProjectStackGroup[]; number: string }) {
   return (
-    <section className={styles.stack} aria-labelledby="stack-title">
+    <section className={styles.stack} id="stack" aria-labelledby="stack-title" data-nav-label="Tech stack">
       <div className={`${styles.container} ${styles.stackGrid}`}>
         <SectionHead id="stack-title" number={number} eyebrow="Technology stack" title="Built with" />
 

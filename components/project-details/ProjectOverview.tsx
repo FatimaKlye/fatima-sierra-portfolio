@@ -11,7 +11,7 @@ export default function ProjectOverview({ project, number }: { project: ProjectD
   ].filter((row): row is { label: string; text: string } => Boolean(row.text));
 
   return (
-    <section className={styles.overview} aria-labelledby="overview-title">
+    <section className={styles.overview} id="overview" aria-labelledby="overview-title" data-nav-label="Overview">
       <div className={`${styles.container} ${styles.overviewGrid}`}>
         <div className={styles.overviewLead}>
           <SectionHead id="overview-title" number={number} eyebrow="Overview" title="The project in brief" />

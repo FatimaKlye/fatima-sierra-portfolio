@@ -11,7 +11,7 @@ export default function ProjectChallenges({
   number: string;
 }) {
   return (
-    <section className={styles.challenges} aria-labelledby="challenges-title">
+    <section className={styles.challenges} id="challenges" aria-labelledby="challenges-title" data-nav-label="Challenges">
       <div className={styles.container}>
         <SectionHead
           id="challenges-title"

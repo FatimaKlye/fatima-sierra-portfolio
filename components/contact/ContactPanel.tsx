@@ -20,6 +20,10 @@ const PANEL_SOCIALS = PANEL_SOCIAL_IDS.flatMap((id) => {
   return link ? [link] : [];
 });
 
+/** The standalone page indexes its two halves; the embedded variant stays out of the section index. */
+const navMarker = (variant: ContactPanelProps["variant"], id: string, label: string) =>
+  variant === "section" ? {} : { id, "data-nav-label": label };
+
 export default function ContactPanel({
   id,
   headingId,
@@ -35,7 +39,7 @@ export default function ContactPanel({
       aria-labelledby={headingId}
     >
       <div className={styles.frame}>
-        <div className={styles.intro}>
+        <div className={styles.intro} {...navMarker(variant, "say-hello", "Say hello")}>
           <div className={styles.headingWrap}>
             <Heading id={headingId} className={styles.heading}>
               Say hello.
@@ -73,7 +77,7 @@ export default function ContactPanel({
           </div>
         </div>
 
-        <div className={styles.formColumn}>
+        <div className={styles.formColumn} {...navMarker(variant, "message", "Send a message")}>
           <ContactForm />
         </div>
       </div>

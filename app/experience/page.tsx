@@ -59,7 +59,7 @@ export default function ExperiencePage() {
         />
 
         {/* 01 — Development experience ------------------------------------- */}
-        <section className={styles.section} aria-labelledby="development-title">
+        <section className={styles.section} id="development" aria-labelledby="development-title" data-nav-label="Development">
           <div className={`${styles.container} ${styles.split}`}>
             <header className={styles.sideHead}>
               <p className={styles.kicker} data-reveal>01 — Development</p>
@@ -97,7 +97,7 @@ export default function ExperiencePage() {
         </section>
 
         {/* 02 — Education -------------------------------------------------- */}
-        <section className={`${styles.section} ${styles.surface}`} aria-labelledby="education-title">
+        <section className={`${styles.section} ${styles.surface}`} id="education" aria-labelledby="education-title" data-nav-label="Education">
           <div className={styles.container}>
             <header className={styles.head}>
               <p className={styles.kicker} data-reveal>02 — Education</p>
@@ -124,7 +124,7 @@ export default function ExperiencePage() {
         </section>
 
         {/* 03 — Leadership & involvement ------------------------------------ */}
-        <section className={styles.section} aria-labelledby="leadership-title">
+        <section className={styles.section} id="leadership" aria-labelledby="leadership-title" data-nav-label="Leadership">
           <div className={`${styles.container} ${styles.split}`}>
             <header className={styles.sideHead}>
               <p className={styles.kicker} data-reveal>03 — Leadership &amp; involvement</p>
@@ -151,7 +151,7 @@ export default function ExperiencePage() {
         </section>
 
         {/* 04 — Recognition ------------------------------------------------- */}
-        <section className={`${styles.section} ${styles.surface}`} aria-labelledby="recognition-title">
+        <section className={`${styles.section} ${styles.surface}`} id="recognition" aria-labelledby="recognition-title" data-nav-label="Recognition">
           <div className={`${styles.container} ${styles.split}`}>
             <header className={styles.sideHead}>
               <p className={styles.kicker} data-reveal>04 — Recognition</p>
@@ -175,7 +175,7 @@ export default function ExperiencePage() {
         </section>
 
         {/* 05 — Certifications & professional development (kept separate from education) */}
-        <section className={styles.credentials} aria-labelledby="credentials-summary-title">
+        <section className={styles.credentials} id="certifications" aria-labelledby="credentials-summary-title" data-nav-label="Certifications">
           <div className={`${styles.container} ${styles.credentialsInner}`}>
             <div>
               <p className={styles.credentialsKicker} data-reveal>05 — Certifications &amp; professional development</p>

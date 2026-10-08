@@ -22,7 +22,7 @@ export default function ProjectDownload({ download, number, phone }: ProjectDown
   ];
 
   return (
-    <section className={styles.download} id="download" aria-labelledby="download-title">
+    <section className={styles.download} id="download" aria-labelledby="download-title" data-nav-label="Try the app">
       <div className={`${styles.container} ${styles.downloadGrid}`}>
         <div className={styles.downloadCopy}>
           <SectionHead id="download-title" number={number} eyebrow="Try it on Android" title="Install the app" />

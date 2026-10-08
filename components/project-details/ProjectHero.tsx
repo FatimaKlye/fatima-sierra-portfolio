@@ -43,7 +43,7 @@ export default function ProjectHero({ project, index, total }: ProjectHeroProps)
   ].filter((item): item is { label: string; value: string } => Boolean(item.value));
 
   return (
-    <header className={styles.hero} aria-labelledby="project-title">
+    <header className={styles.hero} id="intro" aria-labelledby="project-title" data-nav-label="Intro" data-nav-intro>
       {/* Text-only heroes already show the index inside their panel. */}
       {project.hero && (
         <span className={styles.heroNumeral} aria-hidden="true">

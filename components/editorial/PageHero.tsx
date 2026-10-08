@@ -20,7 +20,7 @@ type PageHeroProps = {
 /** Opening block shared by every dedicated page: breadcrumb, oversized title, intro and a fact row. */
 export default function PageHero({ label, eyebrow, title, intro, meta, index, children }: PageHeroProps) {
   return (
-    <header className={styles.hero}>
+    <header className={styles.hero} id="intro" data-nav-label="Intro" data-nav-intro>
       <div className={styles.grid} aria-hidden="true" />
       {index && (
         <span className={styles.index} aria-hidden="true">

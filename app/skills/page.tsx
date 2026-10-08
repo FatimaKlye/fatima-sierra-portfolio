@@ -37,7 +37,7 @@ export default function SkillsPage() {
           ]}
         />
 
-        <section className={styles.section} aria-labelledby="toolkit-title">
+        <section className={styles.section} id="toolkit" aria-labelledby="toolkit-title" data-nav-label="Toolkit">
           <div className={styles.container}>
             <header className={styles.head}>
               <p className={styles.kicker} data-reveal>01 — Toolkit</p>
@@ -49,7 +49,7 @@ export default function SkillsPage() {
           </div>
         </section>
 
-        <section className={`${styles.section} ${styles.surface}`} aria-labelledby="capabilities-title">
+        <section className={`${styles.section} ${styles.surface}`} id="capabilities" aria-labelledby="capabilities-title" data-nav-label="Capabilities">
           <div className={styles.container}>
             <header className={styles.head}>
               <p className={styles.kicker} data-reveal>02 — Capabilities</p>
@@ -71,7 +71,7 @@ export default function SkillsPage() {
           </div>
         </section>
 
-        <section className={styles.section} aria-labelledby="knowledge-title">
+        <section className={styles.section} id="knowledge" aria-labelledby="knowledge-title" data-nav-label="Knowledge areas">
           <div className={styles.container}>
             <header className={styles.head}>
               <p className={styles.kicker} data-reveal>03 — Knowledge areas</p>
@@ -91,7 +91,7 @@ export default function SkillsPage() {
           </div>
         </section>
 
-        <section className={`${styles.section} ${styles.surface}`} aria-labelledby="growing-title">
+        <section className={`${styles.section} ${styles.surface}`} id="still-learning" aria-labelledby="growing-title" data-nav-label="Still learning">
           <div className={`${styles.container} ${styles.growing}`}>
             <div>
               <p className={styles.kicker} data-reveal>04 — Still learning</p>

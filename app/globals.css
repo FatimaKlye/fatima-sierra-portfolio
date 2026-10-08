@@ -130,6 +130,11 @@ svg {
   outline-offset: 4px;
 }
 
+/* Sections receive programmatic focus from the section index; no ring around a whole region. */
+[data-nav-label][tabindex="-1"]:focus {
+  outline: none;
+}
+
 /* Buttons — one system for every call to action.
    .ui-btn + a tone (--primary, --secondary; --light / --ghost-light on pink
    or dark sections) + an optional size (--sm, --lg).

@@ -13,7 +13,7 @@ export default function ProjectOutcomes({ project, number }: { project: ProjectD
   );
 
   return (
-    <section className={styles.outcomes} aria-labelledby="outcomes-title">
+    <section className={styles.outcomes} id="outcomes" aria-labelledby="outcomes-title" data-nav-label="Outcomes">
       <div className={styles.container}>
         <SectionHead id="outcomes-title" number={number} eyebrow="Outcomes" title="Where it landed" tone="onDark" />
 

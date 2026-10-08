@@ -219,7 +219,7 @@ export default function CredentialsSection({
         </div>
 
         {filteredFeatured.length > 0 && (
-          <div className={styles.featuredGrid}>
+          <div className={styles.featuredGrid} id="professional" data-nav-label="Professional">
             {filteredFeatured.map((record) => (
               <CertificateCard key={record.id} record={record} onPreview={setActiveCertificate} />
             ))}
@@ -227,7 +227,7 @@ export default function CredentialsSection({
         )}
 
         {visibleLearning.length > 0 && (
-          <div className={styles.certGrid}>
+          <div className={styles.certGrid} id="learning" data-nav-label="Learning records">
             {visibleLearning.map((record) => (
               <CertificateCard key={record.id} record={record} onPreview={setActiveCertificate} />
             ))}

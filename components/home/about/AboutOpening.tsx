@@ -30,7 +30,10 @@ export default function AboutOpening({ headingLevel, eyebrow, variant }: AboutOp
   const Heading = headingLevel === 1 ? "h1" : "h2";
 
   return (
-    <div className={`${styles.container} ${styles.opening}`}>
+    <div
+      className={`${styles.container} ${styles.opening}`}
+      {...(variant === "full" ? { id: "intro", "data-nav-label": "Intro", "data-nav-intro": "" } : {})}
+    >
       <div className={styles.openingCopy}>
         <p className={styles.eyebrow} data-reveal>{eyebrow}</p>
         <Heading id="about-title" className={styles.title}>

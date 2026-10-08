@@ -107,7 +107,7 @@ export default function ProjectsShowcase() {
 
   return (
     <>
-      <section className={styles.indexSection} aria-labelledby="project-index-title">
+      <section className={styles.indexSection} id="index" aria-labelledby="project-index-title" data-nav-label="Index">
         <div className={styles.container}>
           <h2 id="project-index-title" className={styles.kicker} data-reveal>
             Index — hover to preview, select to open the case study
@@ -122,7 +122,7 @@ export default function ProjectsShowcase() {
           const titleId = `project-${project.slug}-title`;
 
           return (
-            <article className={styles.chapter} id={project.slug} key={project.slug} aria-labelledby={titleId}>
+            <article className={styles.chapter} id={project.slug} key={project.slug} aria-labelledby={titleId} data-nav-label={project.title}>
               <div className={styles.chapterInner}>
                 <div className={styles.chapterMedia}>
                   <span className={styles.chapterNumber} aria-hidden="true">{number}</span>

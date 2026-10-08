@@ -34,7 +34,7 @@ export default function ProjectsPage() {
 
         <ProjectsShowcase />
 
-        <section className={styles.closing} aria-labelledby="projects-closing-title">
+        <section className={styles.closing} id="work-together" aria-labelledby="projects-closing-title" data-nav-label="Work together">
           <h2 id="projects-closing-title" className={styles.closingTitle} data-reveal>
             Have a problem worth <em>building for?</em>
           </h2>

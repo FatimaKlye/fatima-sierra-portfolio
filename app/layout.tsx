@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import SiteFooter from "@/components/layout/SiteFooter";
 import SiteHeader from "@/components/layout/SiteHeader";
+import SectionNav from "@/components/navigation/SectionNav";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -26,6 +27,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={poppins.variable}>
         <SiteHeader />
+        <SectionNav />
         {children}
         <SiteFooter />
       </body>

@@ -17,7 +17,12 @@ export default function ProjectTimeline({ id, number, eyebrow, title, steps, var
   const sectionClass = variant === "process" ? `${styles.timeline} ${styles.timelineAlt}` : styles.timeline;
 
   return (
-    <section className={sectionClass} aria-labelledby={id}>
+    <section
+      className={sectionClass}
+      id={variant}
+      aria-labelledby={id}
+      data-nav-label={variant === "process" ? "Development process" : "User journey"}
+    >
       <div className={styles.container}>
         <SectionHead id={id} number={number} eyebrow={eyebrow} title={title} />
 

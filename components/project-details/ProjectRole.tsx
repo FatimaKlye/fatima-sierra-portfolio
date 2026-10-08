@@ -9,7 +9,7 @@ export default function ProjectRole({ project, number }: { project: ProjectDetai
   const context = [project.organization, project.period].filter(Boolean).join(" · ");
 
   return (
-    <section className={styles.role} aria-labelledby="role-title">
+    <section className={styles.role} id="role" aria-labelledby="role-title" data-nav-label="My role">
       <div className={`${styles.container} ${styles.roleGrid}`}>
         <div className={styles.roleLead}>
           <SectionHead id="role-title" number={number} eyebrow="My contribution" title="What I did on this project" />
