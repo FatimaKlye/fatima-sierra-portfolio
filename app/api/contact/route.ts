@@ -1,6 +1,7 @@
 import nodemailer from "nodemailer";
 import { resolveMx, resolve4, resolve6 } from "node:dns/promises";
 import { createHash } from "node:crypto";
+import { isValidPhone, normalizePhone } from "@/lib/contactValidation";
 
 export const runtime = "nodejs";
 
@@ -15,9 +16,13 @@ const RATE_LIMIT_MESSAGE = "You've reached the message limit. Please try again i
 const GENERIC_ERROR_MESSAGE =
   "Something went wrong while sending your message. Please try again in a moment.";
 
+const TURNSTILE_VERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
+const VERIFICATION_ERROR_MESSAGE = "Verification failed. Please try again.";
+
 type ContactPayload = {
   name: string;
   email: string;
+  phone: string;
   message: string;
 };
 
@@ -71,9 +76,14 @@ function validatePayload(value: unknown): ContactPayload | null {
     return null;
   }
 
-  const { name, email, message } = value as Record<string, unknown>;
+  const { name, email, phone, message } = value as Record<string, unknown>;
 
-  if (typeof name !== "string" || typeof email !== "string" || typeof message !== "string") {
+  if (
+    typeof name !== "string" ||
+    typeof email !== "string" ||
+    typeof phone !== "string" ||
+    typeof message !== "string"
+  ) {
     return null;
   }
 
@@ -82,6 +92,10 @@ function validatePayload(value: unknown): ContactPayload | null {
   const trimmedMessage = message.trim();
 
   if (!trimmedName || !trimmedEmail || !trimmedMessage) {
+    return null;
+  }
+
+  if (!isValidPhone(phone)) {
     return null;
   }
 
@@ -97,7 +111,49 @@ function validatePayload(value: unknown): ContactPayload | null {
     return null;
   }
 
-  return { name: trimmedName, email: trimmedEmail, message: trimmedMessage };
+  return {
+    name: trimmedName,
+    email: trimmedEmail,
+    phone: normalizePhone(phone),
+    message: trimmedMessage,
+  };
+}
+
+function extractTurnstileToken(value: unknown): string {
+  if (!value || typeof value !== "object") {
+    return "";
+  }
+
+  const { turnstileToken } = value as Record<string, unknown>;
+  return typeof turnstileToken === "string" ? turnstileToken.trim() : "";
+}
+
+async function verifyTurnstile(secret: string, token: string, request: Request): Promise<boolean> {
+  if (!token) {
+    return false;
+  }
+
+  const form = new URLSearchParams({ secret, response: token });
+  const remoteIp = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
+  if (remoteIp) {
+    form.set("remoteip", remoteIp);
+  }
+
+  try {
+    const response = await fetch(TURNSTILE_VERIFY_URL, {
+      method: "POST",
+      body: form,
+      cache: "no-store",
+    });
+    const result = (await response.json()) as { success?: boolean };
+    return result.success === true;
+  } catch (error) {
+    console.error(
+      "[contact] Turnstile verification request failed:",
+      error instanceof Error ? error.message : error,
+    );
+    return false;
+  }
 }
 
 async function hasDeliverableDomain(email: string): Promise<boolean> {
@@ -166,9 +222,19 @@ export async function POST(request: Request) {
   const payload = validatePayload(body);
   if (!payload) {
     return Response.json(
-      { error: "Please provide a valid name, email address, and message." },
+      { error: "Please provide a valid name, email address, phone number, and message." },
       { status: 400 },
     );
+  }
+
+  // Enforced only once a Turnstile secret is configured; until then the
+  // honeypot and rate limit above are the spam defences.
+  const turnstileSecret = process.env.TURNSTILE_SECRET_KEY?.trim();
+  if (turnstileSecret) {
+    const verified = await verifyTurnstile(turnstileSecret, extractTurnstileToken(body), request);
+    if (!verified) {
+      return Response.json({ error: VERIFICATION_ERROR_MESSAGE }, { status: 400 });
+    }
   }
 
   if (!(await hasDeliverableDomain(payload.email))) {
@@ -203,7 +269,7 @@ export async function POST(request: Request) {
       to: recipient,
       replyTo: `"${payload.name}" <${payload.email}>`,
       subject: `New Portfolio Inquiry — ${payload.name}`,
-      text: `New Portfolio Inquiry\n\nName: ${payload.name}\nEmail: ${payload.email}\n\nMessage:\n${payload.message}\n\nSubmitted: ${submittedAt}`,
+      text: `New Portfolio Inquiry\n\nName: ${payload.name}\nEmail: ${payload.email}\nPhone: ${payload.phone}\n\nMessage:\n${payload.message}\n\nSubmitted: ${submittedAt}`,
       html: buildContactEmailHtml({ ...payload, submittedAt }),
     });
 
@@ -230,6 +296,7 @@ function escapeHtml(value: string) {
 function buildContactEmailHtml(payload: ContactPayload & { submittedAt: string }): string {
   const name = escapeHtml(payload.name);
   const email = escapeHtml(payload.email);
+  const phone = escapeHtml(payload.phone);
   const message = escapeHtml(payload.message).replace(/\n/g, "<br />");
   const submittedAt = escapeHtml(payload.submittedAt);
   const replyHref = `mailto:${encodeURIComponent(payload.email)}`;
@@ -263,9 +330,15 @@ function buildContactEmailHtml(payload: ContactPayload & { submittedAt: string }
                     </td>
                   </tr>
                   <tr>
-                    <td style="padding:16px 20px;">
+                    <td style="padding:16px 20px; border-bottom:1px solid #e8d4de;">
                       <p style="margin:0 0 4px; font-size:11px; text-transform:uppercase; letter-spacing:0.5px; color:#6e5964; font-weight:600;">Email</p>
                       <p style="margin:0; font-size:15px; color:#3b2a34;">${email}</p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding:16px 20px;">
+                      <p style="margin:0 0 4px; font-size:11px; text-transform:uppercase; letter-spacing:0.5px; color:#6e5964; font-weight:600;">Phone</p>
+                      <p style="margin:0; font-size:15px; color:#3b2a34;">${phone}</p>
                     </td>
                   </tr>
                 </table>

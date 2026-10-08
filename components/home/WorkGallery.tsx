@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Project } from "@/components/projects/projectsData";
+import ProjectShowcaseCarousel from "./ProjectShowcaseCarousel";
 import styles from "./WorkGallery.module.css";
 
 type WorkGalleryProps = {
@@ -51,6 +52,8 @@ export default function WorkGallery({
           <span className={styles.arrow} aria-hidden="true">↗</span>
         </Link>
       </header>
+
+      <ProjectShowcaseCarousel projects={projects} />
 
       <div className={styles.projectList}>
         {projects.map((project, index) => {

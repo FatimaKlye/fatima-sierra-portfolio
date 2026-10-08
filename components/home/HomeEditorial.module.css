@@ -310,6 +310,25 @@
   line-height: 1.8;
 }
 
+.contactLinksRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 24px;
+  font-family: monospace;
+}
+
+.contactLinksRow a {
+  color: var(--color-text-muted);
+  text-decoration: none;
+  transition: color 200ms ease;
+}
+
+.contactLinksRow a:hover,
+.contactLinksRow a:focus-visible {
+  color: var(--color-primary);
+}
+
 .contactActions {
   display: flex;
   flex-direction: column;

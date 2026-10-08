@@ -79,6 +79,41 @@ svg {
   max-width: 100%;
 }
 
+/* Scrollbar — primary pink thumb. WebKit/Blink use the pseudo-elements;
+   Firefox needs the standard properties (Chrome 121+ would otherwise let
+   scrollbar-color override the rounded thumb styling below). */
+@supports (-moz-appearance: none) {
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-primary) var(--color-surface);
+  }
+}
+
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-surface);
+}
+
+::-webkit-scrollbar-thumb {
+  border: 3px solid var(--color-surface);
+  border-radius: 999px;
+  background-color: var(--color-primary);
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover,
+::-webkit-scrollbar-thumb:active {
+  background-color: var(--color-primary-hover);
+}
+
+::-webkit-scrollbar-corner {
+  background: var(--color-surface);
+}
+
 ::selection {
   background: var(--color-primary);
   color: var(--color-white);

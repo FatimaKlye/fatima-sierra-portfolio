@@ -7,10 +7,9 @@ import {
   HERO_CONTENT,
   TECHNOLOGY_GROUPS,
 } from "@/components/about/aboutData";
+import ContactPanel from "@/components/contact/ContactPanel";
 import { SOCIAL_LINKS } from "@/components/contact/contactData";
 import { PROJECTS } from "@/components/projects/projectsData";
-import SocialFlipButton, { type SocialFlipItem } from "@/components/ui/SocialFlipButton";
-import ContactCTA from "./ContactCTA";
 import CredentialsTeaser from "./CredentialsTeaser";
 import WorkGallery from "./WorkGallery";
 import { getGithubContributions } from "./githubContributions";
@@ -59,15 +58,6 @@ const PROFESSIONAL_LINKS = ["linkedin", "github", "email"].flatMap((id) => {
   return link ? [link] : [];
 });
 const LINKEDIN_URL = SOCIAL_LINKS.find((link) => link.id === "linkedin")?.href;
-
-const SOCIAL_FLIP_ITEMS: SocialFlipItem[] = PROFESSIONAL_LINKS.map((link) => ({
-  id: link.id,
-  label: link.label,
-  letter: link.label.charAt(0),
-  iconSrc: link.icon,
-  href: link.id === "email" ? `mailto:${link.handle}` : link.href,
-  external: link.id !== "email",
-}));
 
 const FOOTER_NAV_LINKS = [
   { href: "/about", label: "about" },
@@ -244,21 +234,7 @@ export default async function HeroSection() {
         </div>
       </section>
 
-      <section className={`${editorialStyles.section} ${editorialStyles.contactSection}`} id="contact" aria-labelledby="contact-title">
-        <div className={`${editorialStyles.container} ${editorialStyles.contactInner} mx-auto w-full`}>
-          <div>
-            <p className={editorialStyles.eyebrow}>07 — Let&apos;s connect</p>
-            <h2 id="contact-title" className={editorialStyles.contactTitle}>Have an opportunity or <em>project in mind?</em></h2>
-          </div>
-          <div className={editorialStyles.contactCopy}>
-            <p>I&apos;m open to internship opportunities where I can contribute, learn, and continue developing practical web and mobile solutions.</p>
-            <div className={editorialStyles.contactActions}>
-              <ContactCTA />
-              <SocialFlipButton items={SOCIAL_FLIP_ITEMS} className={editorialStyles.contactSocials} />
-            </div>
-          </div>
-        </div>
-      </section>
+      <ContactPanel id="contact" headingId="contact-title" />
 
       <footer className={editorialStyles.footer}>
         <div className={editorialStyles.footerGrid}>

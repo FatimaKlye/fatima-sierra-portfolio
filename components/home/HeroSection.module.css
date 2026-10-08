@@ -7,7 +7,7 @@
 .hero {
   position: relative;
   min-height: 760px;
-  padding: 132px 0 84px;
+  padding: 132px 0 10px;
   overflow: hidden;
   border-bottom: 1px solid var(--color-border);
   background:
@@ -37,6 +37,7 @@
 
 .heroInner {
   position: relative;
+  top: -45px;
   z-index: 2;
   display: grid;
   grid-template-columns: minmax(0, 0.92fr) minmax(420px, 0.88fr);
@@ -146,7 +147,7 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   max-width: 520px;
-  margin: 40px 0 0;
+  margin: 20px 0 0;
   border-top: 1px solid var(--color-border);
 }
 

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import ContactSection from "@/components/contact/ContactSection";
+import ContactPanel from "@/components/contact/ContactPanel";
 
 export const metadata: Metadata = {
   title: "Contact | Fatima Sierra",
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default function ContactPage() {
   return (
     <main>
-      <ContactSection />
+      <ContactPanel headingId="contact-heading" headingLevel={1} />
     </main>
   );
 }
