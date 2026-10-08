@@ -10,6 +10,7 @@ import {
 import ContactPanel from "@/components/contact/ContactPanel";
 import { SOCIAL_LINKS } from "@/components/contact/contactData";
 import { PROJECTS } from "@/components/projects/projectsData";
+import AboutStory from "./about/AboutStory";
 import CredentialsTeaser from "./CredentialsTeaser";
 import WorkGallery from "./WorkGallery";
 import { getGithubContributions } from "./githubContributions";
@@ -126,6 +127,8 @@ export default async function HeroSection() {
         </div>
       </section>
 
+      <AboutStory />
+
       <section className={editorialStyles.section} id="projects" aria-labelledby="projects-title">
         <div className={`${editorialStyles.container} mx-auto w-full`}>
           <WorkGallery projects={PROJECTS} />
@@ -135,7 +138,7 @@ export default async function HeroSection() {
       <section className={editorialStyles.section} id="skills" aria-labelledby="skills-title">
         <div className={`${editorialStyles.container} mx-auto w-full`}>
           <header className={editorialStyles.sectionHeader}>
-            <p className={editorialStyles.sectionNumber}>02 — Capabilities</p>
+            <p className={editorialStyles.sectionNumber}>03 — Capabilities</p>
             <div>
               <h2 id="skills-title" className={editorialStyles.sectionTitle}>A focused toolkit for <em>working products.</em></h2>
               <p className={editorialStyles.sectionIntro}>The technologies and practices I use to turn real requirements into responsive, maintainable experiences.</p>
@@ -159,7 +162,7 @@ export default async function HeroSection() {
       <section className={`${editorialStyles.section} ${editorialStyles.surfaceSection}`} id="experience" aria-labelledby="education-title">
         <div className={`${editorialStyles.container} mx-auto w-full`}>
           <header className={editorialStyles.sectionHeader}>
-            <p className={editorialStyles.sectionNumber}>03 — Education</p>
+            <p className={editorialStyles.sectionNumber}>04 — Education</p>
             <div>
               <h2 id="education-title" className={editorialStyles.sectionTitle}>Where I <em>studied.</em></h2>
               <p className={editorialStyles.sectionIntro}>The academic path in information technology and technical-vocational studies that shaped how I approach product work.</p>
@@ -174,13 +177,6 @@ export default async function HeroSection() {
               </article>
             ))}
           </div>
-        </div>
-      </section>
-
-      <section className={editorialStyles.approach} id="about" aria-labelledby="approach-title">
-        <div className={editorialStyles.approachInner}>
-          <p className={editorialStyles.eyebrow}>04 — My approach</p>
-          <h2 id="approach-title" className={editorialStyles.approachTitle}>Good digital products should feel <em>clear, purposeful,</em> and easy to use.</h2>
         </div>
       </section>
 

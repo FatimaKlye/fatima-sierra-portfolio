@@ -11,7 +11,7 @@ type WorkGalleryProps = {
 
 export default function WorkGallery({
   projects,
-  eyebrow = "01 — Selected projects",
+  eyebrow = "02 — Selected projects",
   title = "Systems built for real people.",
   intro = "A closer look at the web and mobile systems I've helped design, build, and refine. Each project starts with a practical need and ends with a clearer way to get something done.",
 }: WorkGalleryProps) {

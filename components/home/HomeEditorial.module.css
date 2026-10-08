@@ -158,50 +158,6 @@
   line-height: 1.7;
 }
 
-.approach {
-  position: relative;
-  display: grid;
-  min-height: 300px;
-  place-items: center;
-  overflow: hidden;
-  padding: 60px 32px;
-  background-color: var(--color-primary);
-  color: var(--color-white);
-  text-align: center;
-}
-
-.approach::before {
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-  background-size: 42px 42px;
-  content: "";
-  opacity: 0.65;
-}
-
-.approachInner {
-  position: relative;
-  z-index: 1;
-  width: min(100%, 1040px);
-}
-
-.approach .eyebrow { color: var(--color-soft-blush); }
-
-.approachTitle {
-  margin: 20px auto 0;
-  font-size: clamp(2.25rem, 5.5vw, 5.8rem);
-  font-weight: 600;
-  letter-spacing: -0.06em;
-  line-height: 0.98;
-}
-
-.approachTitle em {
-  color: var(--color-soft-blush);
-  font-style: normal;
-}
-
 .githubSection {
   padding: clamp(40px, 5vw, 64px) 0;
   text-align: center;
@@ -436,8 +392,6 @@
   .timelineRow { padding: 18px 0; }
   .timelineDetail { margin-top: 4px; }
 
-  .approach { min-height: 260px; padding: 48px 20px; }
-  .approachTitle { font-size: clamp(2.45rem, 14vw, 4.4rem); }
   .githubGridScroll { margin-inline: -20px; padding-inline: 20px; width: calc(100% + 40px); }
   .githubDay { width: 8px; height: 8px; }
   .githubGrid,
