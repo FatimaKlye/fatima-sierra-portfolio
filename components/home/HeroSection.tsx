@@ -190,7 +190,7 @@ export default async function HeroSection() {
         </div>
       </section>
 
-      <section className={editorialStyles.section} id="github" aria-labelledby="github-title">
+      <section className={`${editorialStyles.section} ${editorialStyles.githubSection}`} id="github" aria-labelledby="github-title">
         <div className={`${editorialStyles.container} mx-auto w-full`}>
           <div className={editorialStyles.githubHeader}>
             <p className={editorialStyles.eyebrow} id="github-title">06 — GitHub evidence</p>

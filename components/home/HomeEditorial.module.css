@@ -202,12 +202,18 @@
   font-style: normal;
 }
 
+.githubSection {
+  padding: clamp(40px, 5vw, 64px) 0;
+  text-align: center;
+}
+
 .githubHeader {
   display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 16px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  text-align: center;
 }
 
 .githubHandle {
@@ -230,11 +236,12 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
-  margin-top: 28px;
+  gap: 12px;
+  margin-top: 16px;
 }
 
 .githubGridScroll {
+  display: flex;
   width: 100%;
   overflow-x: auto;
   scrollbar-width: none;
@@ -242,9 +249,12 @@
 
 .githubGridScroll::-webkit-scrollbar { display: none; }
 
+/* Auto margins center the graph when it fits and fall back to start-aligned scrolling when it overflows. */
 .githubGrid {
-  display: inline-flex;
+  display: flex;
+  flex: 0 0 auto;
   gap: 3px;
+  margin-inline: auto;
   min-width: max-content;
   padding: 5px 0;
 }
@@ -277,7 +287,7 @@
 .githubCount strong { color: var(--color-primary); }
 
 .githubFallback {
-  margin: 28px 0 0;
+  margin: 16px 0 0;
   color: var(--color-text-muted);
   font-size: 0.85rem;
   text-align: center;
@@ -414,6 +424,7 @@
   .footerBottom { width: min(calc(100% - 40px), var(--page-max-width)); }
 
   .section { padding: 44px 0; }
+  .githubSection { padding: 32px 0; }
   .sectionTitle,
   .contactTitle { font-size: clamp(2.35rem, 13vw, 4rem); }
 
