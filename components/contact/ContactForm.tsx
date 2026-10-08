@@ -27,6 +27,7 @@ type TurnstileApi = {
     options: {
       sitekey: string;
       theme?: "light" | "dark" | "auto";
+      appearance?: "always" | "execute" | "interaction-only";
       callback?: (token: string) => void;
       "expired-callback"?: () => void;
       "error-callback"?: () => void;
@@ -141,6 +142,7 @@ function TurnstileBox({ siteKey, resetKey, onToken, onLoadError }: TurnstileBoxP
         widgetIdRef.current = api.render(hostRef.current, {
           sitekey: siteKey,
           theme: "light",
+          appearance: "interaction-only",
           callback: (token) => onToken(token),
           "expired-callback": () => onToken(""),
           "error-callback": () => onToken(""),
@@ -181,14 +183,20 @@ export default function ContactForm() {
   const [turnstileToken, setTurnstileToken] = useState("");
   const [turnstileResetKey, setTurnstileResetKey] = useState(0);
   const [turnstileFailed, setTurnstileFailed] = useState(false);
-  const [humanChecked, setHumanChecked] = useState(false);
+  // Lets the server reject submissions that arrive faster than a person can type them.
+  const mountedAtRef = useRef(0);
+
+  useEffect(() => {
+    mountedAtRef.current = Date.now();
+  }, []);
 
   const handleTurnstileToken = useCallback((token: string) => setTurnstileToken(token), []);
   const handleTurnstileLoadError = useCallback(() => setTurnstileFailed(true), []);
 
   const formErrors = validate(values);
   const isFormValid = Object.keys(formErrors).length === 0;
-  const isVerified = TURNSTILE_SITE_KEY ? Boolean(turnstileToken) : humanChecked;
+  // Without a Turnstile key the honeypot, timing check, and server rate limit are the defences.
+  const isVerified = TURNSTILE_SITE_KEY ? Boolean(turnstileToken) : true;
   const isSending = status === "sending";
 
   const displayedErrors: FormErrors = {
@@ -245,6 +253,7 @@ export default function ContactForm() {
         message: values.message.trim(),
         website: honeypot,
         turnstileToken,
+        elapsedMs: Date.now() - mountedAtRef.current,
       };
 
       const response = await fetch("/api/contact", {
@@ -266,7 +275,6 @@ export default function ContactForm() {
       setTouched({});
       setSubmitAttempted(false);
       setHoneypot("");
-      setHumanChecked(false);
     } catch (error) {
       setStatus("error");
       setErrorMessage(
@@ -435,45 +443,29 @@ export default function ContactForm() {
       </div>
 
       <div className={styles.formFooter}>
-        <div className={styles.verify}>
-          {TURNSTILE_SITE_KEY ? (
-            <TurnstileBox
-              siteKey={TURNSTILE_SITE_KEY}
-              resetKey={turnstileResetKey}
-              onToken={handleTurnstileToken}
-              onLoadError={handleTurnstileLoadError}
-            />
-          ) : (
-            <label className={styles.humanCheck} htmlFor={ids.verify}>
-              <input
-                id={ids.verify}
-                className={styles.humanInput}
-                type="checkbox"
-                checked={humanChecked}
-                onChange={(event) => setHumanChecked(event.target.checked)}
-                disabled={isSending}
-                aria-describedby={verifyError ? `${ids.verify}-error` : undefined}
+        {(TURNSTILE_SITE_KEY || turnstileFailed || verifyError) && (
+          <div className={styles.verify}>
+            {TURNSTILE_SITE_KEY && (
+              <TurnstileBox
+                siteKey={TURNSTILE_SITE_KEY}
+                resetKey={turnstileResetKey}
+                onToken={handleTurnstileToken}
+                onLoadError={handleTurnstileLoadError}
               />
-              <span className={styles.humanBox} aria-hidden="true">
-                <Check size={16} strokeWidth={3} />
-              </span>
-              <span className={styles.humanText}>
-                {humanChecked ? "Verified" : "I’m not a robot"}
-              </span>
-            </label>
-          )}
+            )}
 
-          {turnstileFailed && (
-            <p className={styles.fieldError} role="alert">
-              Verification couldn&apos;t load. Please refresh the page and try again.
-            </p>
-          )}
-          {verifyError && (
-            <p className={styles.fieldError} id={`${ids.verify}-error`} role="alert">
-              Please complete the verification.
-            </p>
-          )}
-        </div>
+            {turnstileFailed && (
+              <p className={styles.fieldError} role="alert">
+                Verification couldn&apos;t load. Please refresh the page and try again.
+              </p>
+            )}
+            {verifyError && (
+              <p className={styles.fieldError} id={`${ids.verify}-error`} role="alert">
+                Still verifying your browser. Please try again in a moment.
+              </p>
+            )}
+          </div>
+        )}
 
         {status === "error" && (
           <p className={styles.formError} role="alert">

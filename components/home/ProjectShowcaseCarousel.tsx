@@ -16,11 +16,11 @@ type Breakpoint = {
 };
 
 const BREAKPOINTS: Breakpoint[] = [
-  { maxWidth: 480, slideWidth: 180, height: 340 },
-  { maxWidth: 640, slideWidth: 220, height: 380 },
-  { maxWidth: 900, slideWidth: 280, height: 430 },
-  { maxWidth: 1200, slideWidth: 340, height: 490 },
-  { maxWidth: Infinity, slideWidth: 420, height: 560 },
+  { maxWidth: 480, slideWidth: 180, height: 315 },
+  { maxWidth: 640, slideWidth: 220, height: 350 },
+  { maxWidth: 900, slideWidth: 280, height: 400 },
+  { maxWidth: 1200, slideWidth: 340, height: 450 },
+  { maxWidth: Infinity, slideWidth: 420, height: 510 },
 ];
 
 function getBreakpoint(width: number): Breakpoint {

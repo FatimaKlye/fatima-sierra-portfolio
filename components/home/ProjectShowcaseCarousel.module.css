@@ -1,7 +1,7 @@
 .carouselWrap {
   position: relative;
   width: 100%;
-  margin-top: clamp(48px, 7vw, 96px);
+  margin-top: clamp(28px, 3.5vw, 48px);
   transition: height 300ms ease;
 }
 

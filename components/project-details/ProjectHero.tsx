@@ -7,7 +7,7 @@ export default function ProjectHero({ project }: { project: ProjectDetail }) {
     <section className={styles.hero} aria-labelledby="project-hero-title">
       <div className={styles.container}>
         <div className={styles.backRow}>
-          <Link href="/projects" className={styles.backLink}>
+          <Link href="/#projects" className={styles.backLink}>
             <span className={styles.backArrow} aria-hidden="true">
               ←
             </span>

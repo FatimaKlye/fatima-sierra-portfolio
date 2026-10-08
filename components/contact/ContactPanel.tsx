@@ -8,6 +8,8 @@ type ContactPanelProps = {
   id?: string;
   headingId: string;
   headingLevel?: 1 | 2;
+  /** "page" fills the viewport (dedicated /contact route); "section" is the compact homepage block. */
+  variant?: "page" | "section";
 };
 
 const PANEL_SOCIAL_IDS = ["github", "linkedin", "instagram", "facebook"];
@@ -18,11 +20,20 @@ const PANEL_SOCIALS = PANEL_SOCIAL_IDS.flatMap((id) => {
   return link ? [link] : [];
 });
 
-export default function ContactPanel({ id, headingId, headingLevel = 2 }: ContactPanelProps) {
+export default function ContactPanel({
+  id,
+  headingId,
+  headingLevel = 2,
+  variant = "page",
+}: ContactPanelProps) {
   const Heading = headingLevel === 1 ? "h1" : "h2";
 
   return (
-    <section id={id} className={styles.section} aria-labelledby={headingId}>
+    <section
+      id={id}
+      className={`${styles.section}${variant === "section" ? ` ${styles.compact}` : ""}`}
+      aria-labelledby={headingId}
+    >
       <div className={styles.frame}>
         <div className={styles.intro}>
           <div className={styles.headingWrap}>

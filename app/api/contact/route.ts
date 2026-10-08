@@ -10,6 +10,7 @@ const MAX_MESSAGE_LENGTH = 1000;
 const NAME_PATTERN = /^[\p{L}]+(?:[\s'-][\p{L}]+)*$/u;
 const EMAIL_PATTERN =
   /^(?!.*\.\.)[a-zA-Z0-9._%+-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?)*\.[a-zA-Z]{2,}$/;
+const MIN_FILL_TIME_MS = 2000;
 const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000;
 const RATE_LIMIT_MAX_SUCCESS = 2;
 const RATE_LIMIT_MESSAGE = "You've reached the message limit. Please try again in 1 hour.";
@@ -69,6 +70,15 @@ function extractHoneypot(value: unknown): string {
 
   const { website } = value as Record<string, unknown>;
   return typeof website === "string" ? website.trim() : "";
+}
+
+function hasHumanPacing(value: unknown): boolean {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  const { elapsedMs } = value as Record<string, unknown>;
+  return typeof elapsedMs === "number" && Number.isFinite(elapsedMs) && elapsedMs >= MIN_FILL_TIME_MS;
 }
 
 function validatePayload(value: unknown): ContactPayload | null {
@@ -217,6 +227,14 @@ export async function POST(request: Request) {
   if (extractHoneypot(body)) {
     // Bots that fill the hidden field get a fake success and no email is sent.
     return Response.json({ success: true });
+  }
+
+  // Real visitors need time to type a message; scripted posts arrive instantly or omit this field.
+  if (!hasHumanPacing(body)) {
+    return Response.json(
+      { error: "That was a little fast. Please review your message and submit again." },
+      { status: 400 },
+    );
   }
 
   const payload = validatePayload(body);

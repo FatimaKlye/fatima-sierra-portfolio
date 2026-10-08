@@ -45,9 +45,6 @@ const CAPABILITY_GROUPS = [
   },
 ];
 
-const JOURNEY_CREDENTIALS = CERTIFICATES.filter(
-  (certificate) => certificate.featured && certificate.date,
-).slice(0, 3);
 const TEASER_CREDENTIAL_IDS = ["html-and-css", "databases", "modern-web-ai-uiux"];
 const TEASER_CREDENTIALS = TEASER_CREDENTIAL_IDS.flatMap((id) => {
   const certificate = CERTIFICATES.find((entry) => entry.id === id);
@@ -60,7 +57,7 @@ const PROFESSIONAL_LINKS = ["linkedin", "github", "email"].flatMap((id) => {
 const LINKEDIN_URL = SOCIAL_LINKS.find((link) => link.id === "linkedin")?.href;
 
 const FOOTER_NAV_LINKS = [
-  { href: "/about", label: "about" },
+  { href: "#about", label: "about" },
   { href: "#projects", label: "projects" },
   { href: "#skills", label: "skills" },
   { href: "#contact", label: "contact" },
@@ -75,7 +72,7 @@ export default async function HeroSection() {
 
   return (
     <div className={styles.home} data-home-page>
-      <section className={styles.hero} aria-labelledby="home-hero-title">
+      <section className={styles.hero} id="home" aria-labelledby="home-hero-title">
         <div className={styles.technicalGrid} aria-hidden="true" />
         <div className={styles.heroInner}>
           <div className={`${styles.heroCopy} ${styles.reveal}`}>
@@ -91,7 +88,7 @@ export default async function HeroSection() {
               <Link className={styles.primaryButton} href="#projects">
                 View Projects
               </Link>
-              <Link className={styles.secondaryButton} href="/about">
+              <Link className={styles.secondaryButton} href="#about">
                 About Me
               </Link>
             </div>
@@ -159,35 +156,28 @@ export default async function HeroSection() {
         </div>
       </section>
 
-      <section className={`${editorialStyles.section} ${editorialStyles.surfaceSection}`} id="experience" aria-labelledby="journey-title">
+      <section className={`${editorialStyles.section} ${editorialStyles.surfaceSection}`} id="experience" aria-labelledby="education-title">
         <div className={`${editorialStyles.container} mx-auto w-full`}>
           <header className={editorialStyles.sectionHeader}>
-            <p className={editorialStyles.sectionNumber}>03 — Journey</p>
+            <p className={editorialStyles.sectionNumber}>03 — Education</p>
             <div>
-              <h2 id="journey-title" className={editorialStyles.sectionTitle}>Learning through <em>building.</em></h2>
-              <p className={editorialStyles.sectionIntro}>Education and focused technical learning that continue to shape how I approach product work.</p>
+              <h2 id="education-title" className={editorialStyles.sectionTitle}>Where I <em>studied.</em></h2>
+              <p className={editorialStyles.sectionIntro}>The academic path in information technology and technical-vocational studies that shaped how I approach product work.</p>
             </div>
           </header>
           <div className={editorialStyles.timeline}>
-            {EDUCATION.slice(0, 2).map((entry) => (
+            {EDUCATION.map((entry) => (
               <article className={editorialStyles.timelineRow} key={entry.institution}>
                 <p className={editorialStyles.timelineDate}>{entry.years}</p>
                 <p className={editorialStyles.timelineType}>Education</p>
                 <div><h3 className={editorialStyles.timelineTitle}>{entry.institution}</h3><p className={editorialStyles.timelineDetail}>{entry.detail || entry.location}</p></div>
               </article>
             ))}
-            {JOURNEY_CREDENTIALS.map((entry) => (
-              <article className={editorialStyles.timelineRow} key={entry.id}>
-                <p className={editorialStyles.timelineDate}>{entry.date}</p>
-                <p className={editorialStyles.timelineType}>{entry.type}</p>
-                <div><h3 className={editorialStyles.timelineTitle}>{entry.title}</h3><p className={editorialStyles.timelineDetail}>{entry.issuer}</p></div>
-              </article>
-            ))}
           </div>
         </div>
       </section>
 
-      <section className={editorialStyles.approach} aria-labelledby="approach-title">
+      <section className={editorialStyles.approach} id="about" aria-labelledby="approach-title">
         <div className={editorialStyles.approachInner}>
           <p className={editorialStyles.eyebrow}>04 — My approach</p>
           <h2 id="approach-title" className={editorialStyles.approachTitle}>Good digital products should feel <em>clear, purposeful,</em> and easy to use.</h2>
@@ -234,7 +224,7 @@ export default async function HeroSection() {
         </div>
       </section>
 
-      <ContactPanel id="contact" headingId="contact-title" />
+      <ContactPanel id="contact" headingId="contact-title" variant="section" />
 
       <footer className={editorialStyles.footer}>
         <div className={editorialStyles.footerGrid}>

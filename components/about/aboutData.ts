@@ -17,7 +17,7 @@ export const HERO_CONTENT = {
     alt: "Professional portrait of Fatima Klye M. Sierra",
   },
   buttons: {
-    primary: { label: "Explore My Projects", href: "/projects" },
+    primary: { label: "Explore My Projects", href: "/#projects" },
     secondary: {
       label: "Download Resume",
       href: "/assets/resume/fatima-sierra-resume.pdf",
@@ -712,18 +712,6 @@ export const EDUCATION: EducationRecord[] = [
     detail: "Technical-Vocational-Livelihood Track",
     location: "Muntinlupa City",
     years: "2021–2023",
-  },
-  {
-    institution: "Mary Mother of God Parochial School",
-    detail: "",
-    location: "Muntinlupa City",
-    years: "2017–2020",
-  },
-  {
-    institution: "Bayanan Elementary School Unit 1",
-    detail: "",
-    location: "Muntinlupa City",
-    years: "2012–2017",
   },
 ];
 

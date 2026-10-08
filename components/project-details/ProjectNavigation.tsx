@@ -27,7 +27,7 @@ export default function ProjectNavigation({
             <span />
           )}
 
-          <Link href="/projects" className={`${styles.navCard} ${styles.navCardCenter}`}>
+          <Link href="/#projects" className={`${styles.navCard} ${styles.navCardCenter}`}>
             <p className={styles.navLabel}>All Projects</p>
             <p className={styles.navTitle}>Back to All Projects</p>
           </Link>
