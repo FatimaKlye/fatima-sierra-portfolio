@@ -41,7 +41,7 @@ export default function ProjectNext({ next, previous }: ProjectNextProps) {
         )}
 
         <div className={styles.nextFoot} data-reveal>
-          <Link href="/#projects" className={`${styles.btn} ${styles.btnPrimary}`}>
+          <Link href="/projects" className={`${styles.btn} ${styles.btnPrimary}`}>
             <ArrowLeft size={16} aria-hidden="true" />
             Back to Projects
           </Link>

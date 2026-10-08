@@ -1150,6 +1150,87 @@
 
 /* Responsive ------------------------------------------------------------------ */
 
+/* Recognition roll ---------------------------------------------------------- */
+
+.roll {
+  padding: clamp(64px, 8vw, 116px) 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.rollHead {
+  max-width: 760px;
+}
+
+.rollList {
+  margin: clamp(32px, 4vw, 52px) 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--color-border);
+}
+
+.rollItem {
+  display: grid;
+  grid-template-columns: minmax(150px, 0.32fr) minmax(0, 1fr) minmax(0, 0.7fr);
+  gap: 12px 32px;
+  align-items: baseline;
+  padding: 22px 0;
+  border-bottom: 1px solid var(--color-border);
+  transition: background-color 0.3s ease, padding 0.3s ease;
+}
+
+.rollItem:hover {
+  padding-inline: 16px;
+  background: var(--color-surface);
+}
+
+.rollYears {
+  color: var(--color-primary);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  line-height: 1.5;
+}
+
+.rollTitle {
+  color: var(--color-text-primary);
+  font-size: clamp(1.02rem, 1.7vw, 1.4rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+
+.rollPlace {
+  color: var(--color-text-muted);
+  font-size: 0.84rem;
+  line-height: 1.55;
+}
+
+/* Homepage preview: the opening on its own, a little tighter. */
+.preview .opening {
+  padding: clamp(72px, 8vw, 120px) 0;
+}
+
+.preview .inlineCta {
+  margin-top: clamp(28px, 3.4vw, 40px);
+}
+
+.inlineCta:focus-visible {
+  outline-offset: 6px;
+}
+
+@media (max-width: 820px) {
+  .rollItem {
+    grid-template-columns: 1fr;
+    gap: 4px;
+    padding: 18px 0;
+  }
+
+  .rollItem:hover {
+    padding-inline: 0;
+    background: transparent;
+  }
+}
+
 @media (max-width: 1000px) {
   .method,
   .kitchenGrid,
@@ -1273,5 +1354,6 @@
   .plateDevice,
   .plateArrow,
   .inlineCta,
+  .rollItem,
   .finalePrimary { transition: none; }
 }

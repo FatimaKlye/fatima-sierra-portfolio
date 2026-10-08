@@ -7,9 +7,7 @@
   background: var(--color-surface);
 }
 
-.container,
-.footerGrid,
-.footerBottom {
+.container {
   width: min(calc(100% - 64px), var(--page-max-width));
   margin: 0 auto;
 }
@@ -23,7 +21,6 @@
 
 .eyebrow,
 .sectionNumber,
-.footerLabel,
 .timelineType {
   margin: 0;
   color: var(--color-primary);
@@ -302,82 +299,156 @@
   gap: 24px;
 }
 
-.footer {
-  padding: 48px 0 0;
-  background: var(--color-background);
-}
+/* Homepage previews ------------------------------------------------------- */
 
-.footerGrid {
+.previewHeader {
   display: grid;
-  grid-template-columns: 1.35fr 0.7fr 0.7fr 1fr;
-  gap: 40px;
-  padding-bottom: 36px;
+  gap: 18px;
 }
 
-.footerBrand {
-  color: var(--color-text-primary);
-  font-size: 1.05rem;
+.previewHeading {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px 48px;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.exploreLink {
+  display: inline-flex;
+  min-height: 46px;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 10px;
+  padding: 0 18px;
+  border: 1px solid var(--color-primary);
+  border-radius: 2px;
+  color: var(--color-primary);
+  font-size: 0.76rem;
   font-weight: 600;
+  white-space: nowrap;
+  transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease;
 }
 
-.footerDescription,
-.footerEducation {
-  max-width: 270px;
-  margin: 14px 0 0;
-  color: var(--color-text-muted);
-  font-size: 0.78rem;
-  line-height: 1.7;
+.exploreArrow {
+  display: inline-block;
+  transition: transform 200ms ease;
 }
 
-.footer nav {
+.exploreLink:hover,
+.exploreLink:focus-visible {
+  border-color: var(--color-primary-hover);
+  background: var(--color-soft-blush);
+  color: var(--color-primary-hover);
+}
+
+.exploreLink:hover .exploreArrow,
+.exploreLink:focus-visible .exploreArrow { transform: translateX(3px); }
+
+.toolStrip {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  margin: clamp(32px, 4vw, 52px) 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--color-border);
+  border-left: 1px solid var(--color-border);
+}
+
+.toolItem {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
-  margin-top: 14px;
+  align-items: center;
+  gap: 14px;
+  padding: clamp(20px, 2.6vw, 32px) 8px;
+  border-right: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+  transition: background-color 250ms ease;
 }
 
-.footer nav a {
-  color: var(--color-text-muted);
-  font-size: 0.78rem;
-  text-transform: capitalize;
-  transition: color 200ms ease;
+.toolItem:hover { background: var(--color-surface); }
+
+.toolIcon {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.footer nav a:hover,
-.footer nav a:focus-visible { color: var(--color-primary); }
+.toolItem:hover .toolIcon { transform: translateY(-4px); }
 
-.footerBottom {
-  display: flex;
-  justify-content: space-between;
-  gap: 24px;
-  padding: 20px 0 24px;
-  border-top: 1px solid var(--color-border);
-  color: var(--color-text-muted);
-  font-size: 9px;
+.toolIcon img {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+}
+
+.toolFallback {
+  color: var(--color-primary);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.toolName {
+  color: var(--color-text-primary);
+  font-size: 0.74rem;
   font-weight: 600;
-  letter-spacing: 0.16em;
-  line-height: 1.6;
-  text-transform: uppercase;
+  text-align: center;
+}
+
+.verbLine {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 0.4em;
+  margin: clamp(28px, 3.6vw, 44px) 0 0;
+  color: var(--color-text-primary);
+  font-size: clamp(1.6rem, 3.6vw, 3.2rem);
+  font-weight: 600;
+  letter-spacing: -0.05em;
+  line-height: 1.05;
+}
+
+.verbLine span:nth-child(even) { color: var(--color-primary); }
+
+.contactInner { align-items: end; }
+
+.contactLead {
+  max-width: 44ch;
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.94rem;
+  line-height: 1.8;
+}
+
+ul.contactLinksRow {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+ul.contactLinksRow a {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
 }
 
 @media (max-width: 820px) {
-  .container,
-  .footerGrid,
-  .footerBottom { width: min(calc(100% - 40px), var(--page-max-width)); }
+  .container { width: min(calc(100% - 40px), var(--page-max-width)); }
 
   .sectionHeader,
   .contactInner { grid-template-columns: 1fr; gap: 18px; }
 
   .capabilityRow { grid-template-columns: 52px minmax(160px, 0.8fr) minmax(0, 1fr); gap: 18px; }
   .timelineRow { grid-template-columns: 82px 160px minmax(0, 1fr); gap: 18px; }
-  .footerGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .toolStrip { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 
 @media (max-width: 640px) {
-  .container,
-  .footerGrid,
-  .footerBottom { width: min(calc(100% - 40px), var(--page-max-width)); }
+  .container { width: min(calc(100% - 40px), var(--page-max-width)); }
 
   .section { padding: 44px 0; }
   .githubSection { padding: 32px 0; }
@@ -396,12 +467,12 @@
   .githubDay { width: 8px; height: 8px; }
   .githubGrid,
   .githubWeek { gap: 2px; }
-  .footer { padding-top: 40px; }
-  .footerGrid { grid-template-columns: 1fr; gap: 28px; padding-bottom: 28px; }
-  .footerBottom { flex-direction: column; gap: 10px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .githubHandle,
-  .footer nav a { transition: none; }
+  .exploreLink,
+  .exploreArrow,
+  .toolItem,
+  .toolIcon { transition: none; }
 }

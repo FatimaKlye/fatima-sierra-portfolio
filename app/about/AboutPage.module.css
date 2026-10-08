@@ -641,7 +641,45 @@
   box-shadow: 0 8px 18px rgba(59, 42, 52, 0.14);
 }
 
+.certPreviewButton {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: zoom-in;
+}
+
+.certPreviewButton:focus-visible {
+  outline-offset: -4px;
+}
+
+.certPreviewHint {
+  position: absolute;
+  right: 26px;
+  bottom: 26px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(59, 42, 52, 0.78);
+  color: #ffffff;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 220ms ease, transform 220ms ease;
+}
+
+.certPreviewButton:hover .certPreviewHint,
+.certPreviewButton:focus-visible .certPreviewHint {
+  opacity: 1;
+  transform: none;
+}
+
 .certPreviewFrame {
+  display: block;
   position: relative;
   overflow: hidden;
   padding: 16px;
@@ -1072,7 +1110,8 @@
   .certLink,
   .linkArrow,
   .storyImageFrame,
-  .storyImage {
+  .storyImage,
+  .certPreviewHint {
     transition: none;
   }
 

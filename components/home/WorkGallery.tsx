@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { Project } from "@/components/projects/projectsData";
 import ProjectShowcaseCarousel from "./ProjectShowcaseCarousel";
 import styles from "./WorkGallery.module.css";
@@ -20,7 +21,7 @@ export default function WorkGallery({
       <header className={styles.header}>
         <div className={styles.headerCopy}>
           <p className={styles.eyebrow}>{eyebrow}</p>
-          <h2 className={styles.heading}>{title}</h2>
+          <h2 id="projects-title" className={styles.heading}>{title}</h2>
           <p className={styles.intro}>{intro}</p>
           <p className={styles.countLine}>
             <span>{String(projects.length).padStart(2, "0")} selected projects</span>
@@ -29,10 +30,10 @@ export default function WorkGallery({
           </p>
         </div>
 
-        <a className={styles.viewMoreButton} href="#project-carousel">
+        <Link className={styles.viewMoreButton} href="/projects">
           View All Projects
-          <span className={styles.arrow} aria-hidden="true">↗</span>
-        </a>
+          <span className={styles.arrow} aria-hidden="true">→</span>
+        </Link>
       </header>
 
       <div id="project-carousel">

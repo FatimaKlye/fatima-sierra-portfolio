@@ -1,10 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
-import { HERO_CONTENT } from "@/components/about/aboutData";
-import AboutMotion from "./AboutMotion";
+import { ACHIEVEMENTS, HERO_CONTENT } from "@/components/about/aboutData";
+import EditorialMotion from "@/components/motion/EditorialMotion";
+import AboutOpening from "./AboutOpening";
 import RecipeToCode from "./RecipeToCode";
 import {
-  ABOUT_PORTRAIT,
   COLLEGE,
   DEANS_LIST,
   HOME_ECONOMICS_AWARDS,
@@ -32,95 +32,11 @@ const MEDAL_ICONS = [
 
 const deansListYears = DEANS_LIST?.years.match(/\d{4}–\d{4}/)?.[0];
 
-function TitleWord({ children, className }: { children: string; className?: string }) {
-  return (
-    <span className={styles.mask}>
-      <span className={className ? `${styles.word} ${className}` : styles.word} data-word>
-        {children}
-      </span>
-    </span>
-  );
-}
-
 export default function AboutStory() {
   return (
-    <section className={styles.about} id="about" aria-labelledby="about-title">
-      <AboutMotion>
-        {/* Opening ------------------------------------------------------- */}
-        <div className={`${styles.container} ${styles.opening}`}>
-          <div className={styles.openingCopy}>
-            <p className={styles.eyebrow} data-reveal>01 — About me</p>
-            <h2 id="about-title" className={styles.title}>
-              <span className={styles.titleLine}>
-                <TitleWord>From</TitleWord> <TitleWord className={styles.kitchenWord}>cooking</TitleWord>
-              </span>{" "}
-              <span className={`${styles.titleLine} ${styles.titleLineIndent}`}>
-                <TitleWord>to</TitleWord> <TitleWord className={styles.codeWord}>coding.</TitleWord>
-                <span className={styles.caret} aria-hidden="true" />
-              </span>
-            </h2>
-
-            <p className={styles.lead} data-reveal>
-              I&apos;m Fatima — a {HERO_CONTENT.statusLabel} who learned to build things in a kitchen first. The
-              patience and precision I picked up at the stove now go into every screen I design, build, and test.
-            </p>
-
-            <dl className={styles.facts} data-stagger>
-              <div>
-                <dt>Started in</dt>
-                <dd>Home Economics · {SENIOR_HIGH.institution}</dd>
-              </div>
-              <div>
-                <dt>Studying</dt>
-                <dd>
-                  {COLLEGE.detail.replace("Bachelor of Science in", "BS")} · {COLLEGE.institution}
-                </dd>
-              </div>
-              <div>
-                <dt>Building</dt>
-                <dd>Web &amp; mobile applications</dd>
-              </div>
-            </dl>
-          </div>
-
-          <div className={styles.openingVisual}>
-            <svg className={styles.journeyLine} viewBox="0 0 400 520" fill="none" aria-hidden="true">
-              <path
-                data-draw
-                d="M30 430C4 330 4 200 30 130S150-6 250 8s110 22 122 56"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-              />
-            </svg>
-
-            <div className={styles.portraitArch}>
-              <div className={styles.portraitInner} data-parallax="5">
-                <Image
-                  src={ABOUT_PORTRAIT.src}
-                  alt={ABOUT_PORTRAIT.alt}
-                  fill
-                  sizes="(max-width: 820px) 78vw, 32vw"
-                  className={styles.portraitImage}
-                />
-              </div>
-            </div>
-
-            {MEDALS.length > 0 && (
-              <div className={styles.stickerRecipe}>
-                <span className={styles.stickerKicker}>Before the code</span>
-                <strong>Gold Medalist</strong>
-                <span>{MEDALS.map((medal) => medal.label).join(" · ")}</span>
-              </div>
-            )}
-
-            <div className={styles.stickerCode} aria-hidden="true">
-              <span className={styles.tok_tag}>&lt;Developer</span>{" "}
-              <span className={styles.tok_fn}>focus</span>=<span className={styles.tok_string}>&quot;web · mobile&quot;</span>{" "}
-              <span className={styles.tok_tag}>/&gt;</span>
-            </div>
-          </div>
-        </div>
+    <section className={styles.about} aria-labelledby="about-title">
+      <EditorialMotion>
+        <AboutOpening headingLevel={1} eyebrow="About me" variant="full" />
 
         {/* Marquee: kitchen and code verbs, alternating ------------------- */}
         <div className={styles.marquee} aria-hidden="true">
@@ -141,9 +57,9 @@ export default function AboutStory() {
         <div className={`${styles.container} ${styles.method}`}>
           <div className={styles.methodCopy} data-reveal>
             <p className={styles.eyebrow}>The method</p>
-            <h3 className={styles.blockTitle}>
+            <h2 className={styles.blockTitle}>
               A recipe is just a program <em>you can taste.</em>
-            </h3>
+            </h2>
             <p className={styles.body}>
               Cooking taught me patience, precision, and the quiet satisfaction of building something from scratch —
               habits I needed again the moment I opened a code editor.
@@ -167,9 +83,9 @@ export default function AboutStory() {
           </header>
 
           <div className={styles.chapterBody}>
-            <h3 id="chapter-kitchen" className={styles.chapterTitle} data-reveal>
+            <h2 id="chapter-kitchen" className={styles.chapterTitle} data-reveal>
               The kitchen <em>came first.</em>
-            </h3>
+            </h2>
             <p className={styles.body} data-reveal>
               Long before code editors, my hands were busy with flour, knives, and recipe cards. I loved following a
               process step by step until it became something real.
@@ -249,9 +165,9 @@ export default function AboutStory() {
           </header>
 
           <div className={styles.chapterBody}>
-            <h3 id="chapter-switch" className={styles.chapterTitle} data-reveal>
+            <h2 id="chapter-switch" className={styles.chapterTitle} data-reveal>
               Then I got curious <em>about screens.</em>
-            </h3>
+            </h2>
             <p className={styles.body} data-reveal>
               I started noticing how apps worked, how websites were put together, and how a single tap could make a
               screen respond. When it was time to choose a college course, I chose Information Technology.
@@ -305,9 +221,9 @@ export default function AboutStory() {
           </header>
 
           <div className={styles.chapterBody}>
-            <h3 id="chapter-build" className={styles.chapterTitle} data-reveal>
+            <h2 id="chapter-build" className={styles.chapterTitle} data-reveal>
               Now I build <em>for real people.</em>
-            </h3>
+            </h2>
             <p className={styles.body} data-reveal>
               Plan it, build it, taste-test, adjust, repeat. The same recipe now goes into responsive web and mobile
               applications — from interface design to database integration and testing.
@@ -344,17 +260,17 @@ export default function AboutStory() {
               })}
             </ul>
 
-            <Link className={styles.inlineCta} href="#projects" data-reveal>
-              See every selected project <span aria-hidden="true">↓</span>
+            <Link className={styles.inlineCta} href="/projects" data-reveal>
+              See every project <span aria-hidden="true">→</span>
             </Link>
           </div>
         </article>
 
         {/* Beyond the code ------------------------------------------------- */}
         <div className={`${styles.container} ${styles.table}`}>
-          <h3 className={styles.blockTitle} data-reveal>
+          <h2 className={styles.blockTitle} data-reveal>
             What I bring <em>to the table.</em>
-          </h3>
+          </h2>
           <div className={styles.tableCols} data-stagger>
             <div>
               <p className={styles.tableLabel}>Carried over from the kitchen</p>
@@ -402,19 +318,41 @@ export default function AboutStory() {
           </div>
         </div>
 
+        {/* Recognition: every verified honour, oldest first --------------- */}
+        <div className={`${styles.container} ${styles.roll}`}>
+          <header className={styles.rollHead}>
+            <p className={styles.eyebrow} data-reveal>Recognition</p>
+            <h2 className={styles.blockTitle} data-reveal>
+              Honours <em>along the way.</em>
+            </h2>
+          </header>
+          <ol className={styles.rollList} data-stagger>
+            {ACHIEVEMENTS.map((achievement) => (
+              <li className={styles.rollItem} key={`${achievement.institution}-${achievement.title}`}>
+                <span className={styles.rollYears}>{achievement.years}</span>
+                <strong className={styles.rollTitle}>{achievement.title}</strong>
+                <span className={styles.rollPlace}>{achievement.institution}</span>
+              </li>
+            ))}
+          </ol>
+          <Link className={styles.inlineCta} href="/experience" data-reveal>
+            Follow the full journey <span aria-hidden="true">→</span>
+          </Link>
+        </div>
+
         {/* Finale: approach + what's next ----------------------------------- */}
         <div className={styles.finale}>
           <div className={styles.finaleInner}>
             <p className={styles.finaleEyebrow} data-reveal>What&apos;s next</p>
-            <h3 className={styles.finaleTitle} data-reveal>
+            <h2 className={styles.finaleTitle} data-reveal>
               Good digital products should feel <em>clear, purposeful,</em> and easy to use.
-            </h3>
+            </h2>
             <p className={styles.finaleBody} data-reveal>
               I&apos;m looking for opportunities where I can keep growing, keep building, and keep making something
               good.
             </p>
             <div className={styles.finaleActions} data-reveal>
-              <Link className={styles.finalePrimary} href="#projects">
+              <Link className={styles.finalePrimary} href="/projects">
                 See my projects
               </Link>
               <Link className={styles.finaleSecondary} href="/contact">
@@ -423,7 +361,7 @@ export default function AboutStory() {
             </div>
           </div>
         </div>
-      </AboutMotion>
+      </EditorialMotion>
     </section>
   );
 }

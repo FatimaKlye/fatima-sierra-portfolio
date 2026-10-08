@@ -5,7 +5,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 /**
- * Drives the About Me animations from data attributes so AboutStory stays
+ * Drives scroll animations from data attributes so page sections stay
  * server markup (same approach as ProjectMotion on the case-study pages):
  *
  *  data-word            title words, masked slide-up when the opening enters view
@@ -14,11 +14,12 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
  *  data-draw            SVG path that draws itself while scrolling
  *  data-spin="n"        rotates n degrees across its scroll (medals)
  *  data-parallax="n"    gentle vertical drift of ±n% while scrolling (wide screens)
+ *  data-grow            line that grows from the top as its parent scrolls through view
  *
  * Nothing is hidden by CSS: GSAP sets the start states after hydration, so
  * reduced-motion visitors and no-JS renders simply see everything.
  */
-export default function AboutMotion({ children, className }: { children: ReactNode; className?: string }) {
+export default function EditorialMotion({ children, className }: { children: ReactNode; className?: string }) {
   const rootRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -91,6 +92,23 @@ export default function AboutMotion({ children, className }: { children: ReactNo
               start: "top 85%",
               end: "bottom 45%",
               scrub: 0.6,
+            },
+          }
+        );
+      });
+
+      all("[data-grow]").forEach((element) => {
+        gsap.fromTo(
+          element,
+          { scaleY: 0, transformOrigin: "50% 0%" },
+          {
+            scaleY: 1,
+            ease: "none",
+            scrollTrigger: {
+              trigger: element.parentElement ?? element,
+              start: "top 70%",
+              end: "bottom 60%",
+              scrub: 0.5,
             },
           }
         );

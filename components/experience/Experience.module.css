@@ -1,0 +1,482 @@
+/* /experience — split editorial sections with a scroll-drawn journey rail. */
+
+.section {
+  padding: clamp(64px, 8vw, 120px) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.surface {
+  background: var(--color-surface);
+}
+
+.container {
+  width: min(calc(100% - 64px), var(--page-max-width));
+  margin: 0 auto;
+}
+
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  gap: clamp(32px, 6vw, 96px);
+  align-items: start;
+}
+
+.sideHead {
+  position: sticky;
+  top: 100px;
+}
+
+.head {
+  margin-bottom: clamp(32px, 4vw, 52px);
+}
+
+.kicker {
+  margin: 0;
+  color: var(--color-primary);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.title {
+  margin: 14px 0 0;
+  color: var(--color-text-primary);
+  font-size: clamp(2.2rem, 4.8vw, 4.6rem);
+  font-weight: 600;
+  letter-spacing: -0.055em;
+  line-height: 0.98;
+}
+
+.title em,
+.credentialsTitle em {
+  color: var(--color-primary);
+  font-style: normal;
+}
+
+.intro {
+  max-width: 40ch;
+  margin: 18px 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.92rem;
+  line-height: 1.75;
+}
+
+/* Journey rail ---------------------------------------------------------------- */
+
+.journey {
+  position: relative;
+  padding-left: 40px;
+}
+
+.journeyRail {
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  left: 7px;
+  width: 2px;
+  background: var(--color-border);
+}
+
+.journeyFill {
+  position: absolute;
+  inset: 0;
+  background: var(--color-primary);
+}
+
+.journeyList {
+  display: grid;
+  gap: clamp(36px, 4.4vw, 56px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.journeyItem {
+  position: relative;
+}
+
+.journeyDot {
+  position: absolute;
+  top: 5px;
+  left: -40px;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--color-primary);
+  border-radius: 50%;
+  background: var(--color-background);
+}
+
+.journeyPeriod {
+  margin: 0;
+  color: var(--color-primary);
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.journeyRole {
+  margin: 10px 0 0;
+  color: var(--color-text-primary);
+  font-size: clamp(1.4rem, 2.6vw, 2.2rem);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+}
+
+.journeyProject {
+  margin: 10px 0 0;
+}
+
+.journeyProject a {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-primary);
+  font-size: 0.96rem;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 5px;
+  transition: color 200ms ease, gap 300ms ease;
+}
+
+.journeyProject a:hover,
+.journeyProject a:focus-visible {
+  gap: 12px;
+  color: var(--color-primary-hover);
+}
+
+.journeyMeta {
+  margin: 4px 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.74rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.journeySummary {
+  max-width: 60ch;
+  margin: 12px 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  line-height: 1.75;
+}
+
+/* Schools --------------------------------------------------------------------- */
+
+.schools {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--color-border);
+}
+
+.school {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(28px, 3.6vw, 48px) clamp(20px, 3vw, 40px) clamp(28px, 3.6vw, 48px) 0;
+}
+
+.school + .school {
+  padding-left: clamp(20px, 3vw, 40px);
+  border-left: 1px solid var(--color-border);
+}
+
+.schoolIndex {
+  position: absolute;
+  right: 12px;
+  bottom: -0.2em;
+  color: transparent;
+  font-size: clamp(5rem, 11vw, 10rem);
+  font-weight: 700;
+  letter-spacing: -0.07em;
+  line-height: 1;
+  -webkit-text-stroke: 1px rgba(166, 61, 104, 0.18);
+  pointer-events: none;
+}
+
+.schoolYears {
+  margin: 0;
+  color: var(--color-primary);
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.schoolName {
+  position: relative;
+  margin: 14px 0 0;
+  color: var(--color-text-primary);
+  font-size: clamp(1.6rem, 3vw, 2.6rem);
+  font-weight: 600;
+  letter-spacing: -0.045em;
+  line-height: 1.05;
+}
+
+.schoolDetail {
+  position: relative;
+  margin: 12px 0 0;
+  color: var(--color-text-primary);
+  font-size: 0.96rem;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.schoolPlace {
+  position: relative;
+  margin: 6px 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.84rem;
+}
+
+.textLink {
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 32px;
+  padding-bottom: 4px;
+  border-bottom: 1.5px solid var(--color-primary);
+  color: var(--color-primary);
+  font-size: 0.86rem;
+  font-weight: 600;
+  transition: gap 300ms ease, color 300ms ease;
+}
+
+.textLink:hover,
+.textLink:focus-visible {
+  gap: 14px;
+  color: var(--color-primary-hover);
+}
+
+/* Record rows ----------------------------------------------------------------- */
+
+.rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--color-border);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(120px, 0.34fr) minmax(0, 1fr);
+  gap: 8px 28px;
+  align-items: baseline;
+  padding: 22px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.rowYears {
+  margin: 0;
+  color: var(--color-primary);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  line-height: 1.6;
+}
+
+.rowTitle {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: clamp(1.02rem, 1.6vw, 1.3rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.35;
+}
+
+.rowDetail {
+  margin: 6px 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.86rem;
+  line-height: 1.6;
+}
+
+/* Certifications band ------------------------------------------------------------ */
+
+.credentials {
+  padding: clamp(64px, 8vw, 120px) 0;
+  background: #2a1c24;
+  color: #efe3e9;
+}
+
+.credentialsInner {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+  gap: clamp(32px, 6vw, 96px);
+  align-items: end;
+}
+
+.credentialsKicker {
+  margin: 0;
+  color: #f3a6c6;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.credentialsTitle {
+  max-width: 18ch;
+  margin: 14px 0 0;
+  color: var(--color-white);
+  font-size: clamp(2.2rem, 4.6vw, 4.4rem);
+  font-weight: 600;
+  letter-spacing: -0.055em;
+  line-height: 1;
+}
+
+.credentials .credentialsTitle em {
+  color: #f3a6c6;
+}
+
+.featuredCerts {
+  display: grid;
+  gap: 14px;
+  margin: 32px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.featuredCerts li {
+  display: grid;
+  gap: 4px;
+  padding-left: 18px;
+  border-left: 2px solid #f3a6c6;
+}
+
+.featuredCerts strong {
+  color: var(--color-white);
+  font-size: 0.96rem;
+  font-weight: 600;
+}
+
+.featuredCerts span {
+  color: #d9c6cf;
+  font-size: 0.82rem;
+}
+
+.credentialsLink {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  gap: 10px;
+  margin-top: 32px;
+  padding: 0 24px;
+  border-radius: 999px;
+  background: var(--color-white);
+  color: var(--color-primary);
+  font-size: 0.86rem;
+  font-weight: 600;
+  transition: background-color 250ms ease, transform 250ms ease;
+}
+
+.credentialsLink:hover,
+.credentialsLink:focus-visible {
+  background: var(--color-soft-blush);
+  transform: translateY(-2px);
+}
+
+.credentials :focus-visible {
+  outline-color: rgba(243, 166, 198, 0.7);
+}
+
+.counts {
+  display: grid;
+  margin: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.counts div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.counts dt {
+  color: #d9c6cf;
+  font-size: 0.86rem;
+}
+
+.counts dd {
+  margin: 0;
+  color: var(--color-white);
+  font-size: clamp(1.8rem, 3vw, 2.6rem);
+  font-weight: 600;
+  letter-spacing: -0.05em;
+  line-height: 1;
+}
+
+@media (max-width: 900px) {
+  .container {
+    width: min(calc(100% - 40px), var(--page-max-width));
+  }
+
+  .split,
+  .credentialsInner {
+    grid-template-columns: 1fr;
+  }
+
+  .sideHead {
+    position: static;
+  }
+
+  .schools {
+    grid-template-columns: 1fr;
+  }
+
+  .school,
+  .school + .school {
+    padding-inline: 0;
+    border-left: 0;
+  }
+
+  .school + .school {
+    border-top: 1px solid var(--color-border);
+  }
+}
+
+@media (max-width: 640px) {
+  .journey {
+    padding-left: 30px;
+  }
+
+  .journeyRail {
+    left: 6px;
+  }
+
+  .journeyDot {
+    left: -30px;
+    width: 14px;
+    height: 14px;
+  }
+
+  .row {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .journeyProject a,
+  .textLink,
+  .credentialsLink {
+    transition: none;
+  }
+
+  .credentialsLink:hover {
+    transform: none;
+  }
+}

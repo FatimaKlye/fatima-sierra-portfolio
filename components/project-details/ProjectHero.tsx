@@ -53,7 +53,7 @@ export default function ProjectHero({ project, index, total }: ProjectHeroProps)
 
       <div className={styles.container}>
         <nav className={styles.crumbs} aria-label="Project navigation" data-intro>
-          <Link href="/#projects" className={styles.backLink}>
+          <Link href="/projects" className={styles.backLink}>
             <ArrowLeft size={16} aria-hidden="true" />
             Back to Projects
           </Link>

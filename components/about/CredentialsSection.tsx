@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import CertificateModal from "@/components/home/CertificateModal";
 import {
   CERTIFICATES,
   CERTIFICATE_FILTERS,
@@ -12,7 +13,13 @@ import styles from "@/app/about/AboutPage.module.css";
 
 const INITIAL_LEARNING_RECORD_COUNT = 6;
 
-function CertificatePreview({ record }: { record: CertificateRecord }) {
+function CertificatePreview({
+  record,
+  onPreview,
+}: {
+  record: CertificateRecord;
+  onPreview: (record: CertificateRecord) => void;
+}) {
   const imageSrc =
     record.fileType === "image" ? record.fileUrl : record.previewImage;
 
@@ -21,21 +28,37 @@ function CertificatePreview({ record }: { record: CertificateRecord }) {
   }
 
   return (
-    <div className={styles.certPreviewFrame}>
-      <img
-        className={styles.certPreviewImage}
-        src={imageSrc}
-        alt={record.previewAlt}
-        loading="lazy"
-      />
-    </div>
+    <button
+      type="button"
+      className={styles.certPreviewButton}
+      onClick={() => onPreview(record)}
+      aria-label={`Preview certificate: ${record.title}`}
+    >
+      <span className={styles.certPreviewFrame}>
+        <img
+          className={styles.certPreviewImage}
+          src={imageSrc}
+          alt={record.previewAlt}
+          loading="lazy"
+        />
+        <span className={styles.certPreviewHint} aria-hidden="true">
+          Preview
+        </span>
+      </span>
+    </button>
   );
 }
 
-function CertificateCard({ record }: { record: CertificateRecord }) {
+function CertificateCard({
+  record,
+  onPreview,
+}: {
+  record: CertificateRecord;
+  onPreview: (record: CertificateRecord) => void;
+}) {
   return (
     <article className={styles.certCard}>
-      <CertificatePreview record={record} />
+      <CertificatePreview record={record} onPreview={onPreview} />
 
       <div className={styles.certBody}>
         <h3 className={styles.certTitle}>{record.title}</h3>
@@ -119,7 +142,18 @@ function CertificateCard({ record }: { record: CertificateRecord }) {
   );
 }
 
-export default function CredentialsSection() {
+type CredentialsSectionProps = {
+  /** Hide the section title when the page already provides one (e.g. /certifications). */
+  showHeader?: boolean;
+  /** Collapse the learning records behind "View All Credentials". */
+  collapsible?: boolean;
+};
+
+export default function CredentialsSection({
+  showHeader = true,
+  collapsible = true,
+}: CredentialsSectionProps) {
+  const [activeCertificate, setActiveCertificate] = useState<CertificateRecord | null>(null);
   const [activeFilter, setActiveFilter] = useState<"all" | CertificateCategory>(
     "all",
   );
@@ -143,7 +177,7 @@ export default function CredentialsSection() {
       ? learningRecords
       : learningRecords.filter((cert) => cert.category === activeFilter);
 
-  const isCollapsible = activeFilter === "all";
+  const isCollapsible = collapsible && activeFilter === "all";
   const visibleLearning =
     isCollapsible && !expanded
       ? filteredLearning.slice(0, INITIAL_LEARNING_RECORD_COUNT)
@@ -152,15 +186,21 @@ export default function CredentialsSection() {
   const canToggle = isCollapsible && filteredLearning.length > INITIAL_LEARNING_RECORD_COUNT;
 
   return (
-    <section className={styles.section} aria-labelledby="credentials-heading">
+    <section
+      className={styles.section}
+      aria-labelledby={showHeader ? "credentials-heading" : undefined}
+      aria-label={showHeader ? undefined : "All certificates"}
+    >
       <div className={styles.sectionContainer}>
-        <header className={styles.sectionHeader}>
-          <p className={styles.sectionEyebrow}>{CREDENTIALS_CONTENT.eyebrow}</p>
-          <h2 id="credentials-heading" className={styles.sectionTitle}>
-            {CREDENTIALS_CONTENT.title}
-          </h2>
-          <p className={styles.sectionIntro}>{CREDENTIALS_CONTENT.intro}</p>
-        </header>
+        {showHeader && (
+          <header className={styles.sectionHeader}>
+            <p className={styles.sectionEyebrow}>{CREDENTIALS_CONTENT.eyebrow}</p>
+            <h2 id="credentials-heading" className={styles.sectionTitle}>
+              {CREDENTIALS_CONTENT.title}
+            </h2>
+            <p className={styles.sectionIntro}>{CREDENTIALS_CONTENT.intro}</p>
+          </header>
+        )}
 
         <div className={styles.filterRow} role="group" aria-label="Filter credentials">
           {CERTIFICATE_FILTERS.map((filter) => (
@@ -184,7 +224,7 @@ export default function CredentialsSection() {
         {filteredFeatured.length > 0 && (
           <div className={styles.featuredGrid}>
             {filteredFeatured.map((record) => (
-              <CertificateCard key={record.id} record={record} />
+              <CertificateCard key={record.id} record={record} onPreview={setActiveCertificate} />
             ))}
           </div>
         )}
@@ -192,7 +232,7 @@ export default function CredentialsSection() {
         {visibleLearning.length > 0 && (
           <div className={styles.certGrid}>
             {visibleLearning.map((record) => (
-              <CertificateCard key={record.id} record={record} />
+              <CertificateCard key={record.id} record={record} onPreview={setActiveCertificate} />
             ))}
           </div>
         )}
@@ -212,6 +252,8 @@ export default function CredentialsSection() {
           </div>
         )}
       </div>
+
+      <CertificateModal certificate={activeCertificate} onClose={() => setActiveCertificate(null)} />
     </section>
   );
 }

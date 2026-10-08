@@ -17,8 +17,8 @@ export default function CredentialsTeaser({
     <>
       <div className={styles.header}>
         <p className={styles.eyebrow} id="credentials-title">05 — Certifications</p>
-        <Link href="/credentials" className={styles.viewAllLink}>
-          ALL CERTIFICATIONS
+        <Link href="/certifications" className={styles.viewAllLink}>
+          VIEW ALL CERTIFICATIONS
           <span aria-hidden="true">→</span>
         </Link>
       </div>

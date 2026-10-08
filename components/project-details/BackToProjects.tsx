@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import styles from "./ProjectDetails.module.css";
 
-/** Floating shortcut back to the carousel; appears once the hero has scrolled away. */
+/** Floating shortcut back to the projects page; appears once the hero has scrolled away. */
 export default function BackToProjects() {
   const [visible, setVisible] = useState(false);
 
@@ -28,7 +28,7 @@ export default function BackToProjects() {
 
   return (
     <Link
-      href="/#projects"
+      href="/projects"
       className={`${styles.floatingBack} ${visible ? styles.floatingBackShown : ""}`}
       aria-label="Back to Projects"
     >

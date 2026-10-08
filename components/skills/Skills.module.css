@@ -1,0 +1,523 @@
+/* /skills — toolkit explorer, capability verbs, knowledge index and learning lists. */
+
+.section {
+  --plum: #2a1c24;
+
+  padding: clamp(64px, 8vw, 120px) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.surface {
+  background: var(--color-surface);
+}
+
+.container {
+  width: min(calc(100% - 64px), var(--page-max-width));
+  margin: 0 auto;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.head {
+  margin-bottom: clamp(32px, 4vw, 56px);
+}
+
+.kicker {
+  margin: 0;
+  color: var(--color-primary);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.title {
+  max-width: 18ch;
+  margin: 14px 0 0;
+  color: var(--color-text-primary);
+  font-size: clamp(2.2rem, 4.8vw, 4.6rem);
+  font-weight: 600;
+  letter-spacing: -0.055em;
+  line-height: 0.98;
+}
+
+.title em {
+  color: var(--color-primary);
+  font-style: normal;
+}
+
+/* Explorer ------------------------------------------------------------------ */
+
+.explorer {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(280px, 0.6fr);
+  gap: clamp(32px, 5vw, 72px);
+  align-items: start;
+}
+
+.groups {
+  display: grid;
+  gap: clamp(28px, 3.4vw, 44px);
+}
+
+.group {
+  padding-top: 18px;
+  border-top: 1px solid var(--color-border);
+}
+
+.groupLabel {
+  display: flex;
+  gap: 14px;
+  align-items: baseline;
+  margin: 0 0 16px;
+  color: var(--color-text-primary);
+  font-size: clamp(1.05rem, 1.6vw, 1.35rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.groupLabel span {
+  color: var(--color-secondary);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+}
+
+.toolGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tool {
+  position: relative;
+  display: inline-flex;
+  min-height: 52px;
+  align-items: center;
+  gap: 12px;
+  padding: 0 18px 0 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-white);
+  color: var(--color-text-primary);
+  font-size: 0.86rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 220ms ease, background-color 220ms ease, transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.tool:hover {
+  border-color: var(--color-secondary);
+  transform: translateY(-2px);
+}
+
+.toolSelected,
+.toolSelected:hover {
+  border-color: var(--color-primary);
+  background: var(--color-soft-blush);
+}
+
+.toolIcon {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 auto;
+  place-items: center;
+}
+
+.toolIcon img {
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+}
+
+.toolFallback {
+  color: var(--color-primary);
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+.toolCount {
+  display: inline-grid;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--color-primary);
+  color: var(--color-white);
+  font-size: 0.66rem;
+  font-weight: 700;
+}
+
+.detail {
+  position: sticky;
+  top: 96px;
+  overflow: hidden;
+  border-radius: 20px;
+  background: var(--plum);
+  color: #efe3e9;
+  box-shadow: var(--shadow-soft);
+}
+
+.detailInner {
+  padding: clamp(24px, 3vw, 36px);
+  animation: detailIn 450ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes detailIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+.detailIcon {
+  display: grid;
+  width: 84px;
+  height: 84px;
+  place-items: center;
+  border-radius: 22px;
+  background: var(--color-white);
+}
+
+.detailIcon img {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+}
+
+.detailGroup {
+  margin: 26px 0 0;
+  color: #f3a6c6;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.detailName {
+  margin: 8px 0 0;
+  color: var(--color-white);
+  font-size: clamp(2rem, 3.2vw, 2.8rem);
+  font-weight: 600;
+  letter-spacing: -0.05em;
+  line-height: 1;
+}
+
+.detailLabel {
+  margin: 28px 0 0;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  color: #a88b99;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.detailProjects {
+  display: grid;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.detailProjects a {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--color-white);
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: color 200ms ease, padding 300ms ease;
+}
+
+.detailProjects a span {
+  color: #f3a6c6;
+}
+
+.detailProjects a:hover,
+.detailProjects a:focus-visible {
+  padding-left: 6px;
+  color: #f6dde7;
+}
+
+.detailEmpty {
+  margin: 10px 0 0;
+  color: #d9c6cf;
+  font-size: 0.86rem;
+  line-height: 1.6;
+}
+
+.detail :focus-visible {
+  outline-color: rgba(243, 166, 198, 0.7);
+}
+
+/* Capability verbs ----------------------------------------------------------- */
+
+.verbs {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--color-border);
+}
+
+.verbRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 16px clamp(24px, 5vw, 80px);
+  align-items: center;
+  padding: clamp(18px, 2.4vw, 30px) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.verb {
+  color: var(--color-text-primary);
+  font-size: clamp(3rem, 8.4vw, 7.6rem);
+  font-weight: 600;
+  letter-spacing: -0.07em;
+  line-height: 0.9;
+  transition: color 300ms ease, letter-spacing 500ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.verbRow:hover .verb {
+  color: var(--color-primary);
+  letter-spacing: -0.05em;
+}
+
+.verbTitle {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: clamp(1.05rem, 1.6vw, 1.3rem);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.verbText {
+  max-width: 46ch;
+  margin: 8px 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.88rem;
+  line-height: 1.7;
+}
+
+/* Knowledge index ------------------------------------------------------------ */
+
+.knowledge {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 clamp(32px, 5vw, 80px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.knowledgeItem {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 6px 16px;
+  padding: 22px 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.knowledgeIndex {
+  grid-row: span 2;
+  color: var(--color-secondary);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  line-height: 2;
+}
+
+.knowledgeTitle {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: clamp(1.02rem, 1.5vw, 1.25rem);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.knowledgeText {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.86rem;
+  line-height: 1.7;
+}
+
+/* Still learning ------------------------------------------------------------- */
+
+.growing {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: clamp(32px, 6vw, 96px);
+  align-items: start;
+}
+
+.growingIntro {
+  max-width: 44ch;
+  margin: 18px 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.92rem;
+  line-height: 1.75;
+}
+
+.textLink {
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 24px;
+  padding-bottom: 4px;
+  border-bottom: 1.5px solid var(--color-primary);
+  color: var(--color-primary);
+  font-size: 0.86rem;
+  font-weight: 600;
+  transition: gap 300ms ease, color 300ms ease;
+}
+
+.textLink:hover,
+.textLink:focus-visible {
+  gap: 14px;
+  color: var(--color-primary-hover);
+}
+
+.growingLists {
+  display: grid;
+  gap: 32px;
+}
+
+.listLabel {
+  margin: 0 0 14px;
+  color: var(--color-text-primary);
+  font-size: 0.96rem;
+  font-weight: 600;
+}
+
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pills li {
+  padding: 9px 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-white);
+  color: var(--color-text-primary);
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+@media (max-width: 900px) {
+  .container {
+    width: min(calc(100% - 40px), var(--page-max-width));
+  }
+
+  .explorer {
+    grid-template-columns: 1fr;
+  }
+
+  /* On small screens the panel docks to the bottom of the viewport while the
+     visitor browses the toolkit, so the result is visible without scrolling. */
+  .detail {
+    top: auto;
+    bottom: 12px;
+    border-radius: 16px;
+  }
+
+  .detailInner {
+    display: grid;
+    grid-template-columns: 52px minmax(0, 1fr);
+    gap: 2px 14px;
+    align-items: center;
+    padding: 14px 16px;
+  }
+
+  .detailIcon {
+    width: 52px;
+    height: 52px;
+    grid-row: span 2;
+    border-radius: 14px;
+  }
+
+  .detailIcon img {
+    width: 32px;
+    height: 32px;
+  }
+
+  .detailGroup {
+    margin: 0;
+  }
+
+  .detailName {
+    margin: 0;
+    font-size: 1.4rem;
+  }
+
+  .detailLabel {
+    grid-column: 1 / -1;
+    margin-top: 10px;
+    padding-top: 10px;
+  }
+
+  .detailProjects,
+  .detailEmpty {
+    grid-column: 1 / -1;
+    margin-top: 4px;
+  }
+
+  .detailProjects {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 16px;
+  }
+
+  .detailProjects a {
+    min-height: 32px;
+    border-bottom: 0;
+    font-size: 0.8rem;
+  }
+
+  .verbRow,
+  .knowledge,
+  .growing {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tool,
+  .verb,
+  .detailProjects a,
+  .textLink {
+    transition: none;
+  }
+
+  .tool:hover {
+    transform: none;
+  }
+
+  .detailInner {
+    animation: none;
+  }
+}

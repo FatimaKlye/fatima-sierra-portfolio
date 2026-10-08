@@ -1,30 +1,16 @@
 import type { Metadata } from "next";
-import AboutIntroSection from "@/components/about/AboutIntroSection";
-import MyStorySection from "@/components/about/MyStorySection";
-import KnowledgeSection from "@/components/about/KnowledgeSection";
-import CredentialsSection from "@/components/about/CredentialsSection";
-import AchievementsSection from "@/components/about/AchievementsSection";
-import LeadershipSection from "@/components/about/LeadershipSection";
-import EducationSection from "@/components/about/EducationSection";
-import ReferencesSection from "@/components/about/ReferencesSection";
+import AboutStory from "@/components/home/about/AboutStory";
 
 export const metadata: Metadata = {
   title: "About | Fatima Sierra",
   description:
-    "Learn about Fatima Klye M. Sierra, a web and mobile developer building practical, accessible, and dependable digital solutions.",
+    "From cooking to coding — the story of Fatima Klye M. Sierra, a web and mobile developer who learned patience and precision in the kitchen before building practical, accessible digital solutions.",
 };
 
 export default function AboutPage() {
   return (
     <main>
-      <AboutIntroSection />
-      <MyStorySection />
-      <KnowledgeSection />
-      <CredentialsSection />
-      <AchievementsSection />
-      <LeadershipSection />
-      <EducationSection />
-      <ReferencesSection />
+      <AboutStory />
     </main>
   );
 }

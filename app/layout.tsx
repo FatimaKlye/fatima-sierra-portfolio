@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
+import SiteFooter from "@/components/layout/SiteFooter";
 import SiteHeader from "@/components/layout/SiteHeader";
 import "./globals.css";
 
@@ -26,6 +27,7 @@ export default function RootLayout({
       <body className={poppins.variable}>
         <SiteHeader />
         {children}
+        <SiteFooter />
       </body>
     </html>
   );

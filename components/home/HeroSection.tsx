@@ -1,17 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
-import {
-  CERTIFICATES,
-  CORE_KNOWLEDGE,
-  EDUCATION,
-  HERO_CONTENT,
-  TECHNOLOGY_GROUPS,
-} from "@/components/about/aboutData";
-import ContactPanel from "@/components/contact/ContactPanel";
+import { CAPABILITIES, CERTIFICATES, EDUCATION, HERO_CONTENT } from "@/components/about/aboutData";
 import { SOCIAL_LINKS } from "@/components/contact/contactData";
+import { EXPERIENCE_HIGHLIGHTS } from "@/components/experience/experienceData";
 import { PROJECTS } from "@/components/projects/projectsData";
-import AboutStory from "./about/AboutStory";
+import TechIcon from "@/components/skills/TechIcon";
+import { PREVIEW_SKILLS } from "@/components/skills/skillsData";
+import AboutPreview from "./about/AboutPreview";
 import CredentialsTeaser from "./CredentialsTeaser";
+import PreviewHeader from "./PreviewHeader";
 import WorkGallery from "./WorkGallery";
 import { getGithubContributions } from "./githubContributions";
 import styles from "./HeroSection.module.css";
@@ -25,45 +22,22 @@ const CONTRIBUTION_LEVEL_COLORS = [
   "var(--color-primary)",
 ];
 
-const CAPABILITY_GROUPS = [
-  {
-    title: "Web Development",
-    items: TECHNOLOGY_GROUPS.find((group) => group.id === "frontend")?.items ?? [],
-    description: CORE_KNOWLEDGE.find((item) => item.title === "Web Application Development")?.description,
-  },
-  {
-    title: "Mobile Development",
-    items: TECHNOLOGY_GROUPS.find((group) => group.id === "mobile")?.items ?? [],
-    description: CORE_KNOWLEDGE.find((item) => item.title === "Mobile Application Development")?.description,
-  },
-  {
-    title: "Backend & Tools",
-    items: [
-      ...(TECHNOLOGY_GROUPS.find((group) => group.id === "backend-database")?.items ?? []),
-      ...(TECHNOLOGY_GROUPS.find((group) => group.id === "tools")?.items ?? []),
-    ].slice(0, 6),
-    description: CORE_KNOWLEDGE.find((item) => item.title === "Database Integration")?.description,
-  },
-];
-
 const TEASER_CREDENTIAL_IDS = ["html-and-css", "databases", "modern-web-ai-uiux"];
 const TEASER_CREDENTIALS = TEASER_CREDENTIAL_IDS.flatMap((id) => {
   const certificate = CERTIFICATES.find((entry) => entry.id === id);
   return certificate ? [certificate] : [];
 });
-const PROFESSIONAL_LINKS = ["linkedin", "github", "email"].flatMap((id) => {
+const CONTACT_LINK_IDS = ["linkedin", "github", "instagram", "facebook"];
+const CONTACT_LINKS = CONTACT_LINK_IDS.flatMap((id) => {
   const link = SOCIAL_LINKS.find((item) => item.id === id);
   return link ? [link] : [];
 });
 const LINKEDIN_URL = SOCIAL_LINKS.find((link) => link.id === "linkedin")?.href;
 
-const FOOTER_NAV_LINKS = [
-  { href: "#about", label: "about" },
-  { href: "#projects", label: "projects" },
-  { href: "#skills", label: "skills" },
-  { href: "#contact", label: "contact" },
-];
-
+/**
+ * The homepage is a set of highlights: each section is a short preview that
+ * links to the dedicated page holding the complete content.
+ */
 export default async function HeroSection() {
   const currentEducation = EDUCATION[0];
   const githubLink = SOCIAL_LINKS.find((item) => item.id === "github");
@@ -127,7 +101,7 @@ export default async function HeroSection() {
         </div>
       </section>
 
-      <AboutStory />
+      <AboutPreview />
 
       <section className={editorialStyles.section} id="projects" aria-labelledby="projects-title">
         <div className={`${editorialStyles.container} mx-auto w-full`}>
@@ -137,43 +111,51 @@ export default async function HeroSection() {
 
       <section className={editorialStyles.section} id="skills" aria-labelledby="skills-title">
         <div className={`${editorialStyles.container} mx-auto w-full`}>
-          <header className={editorialStyles.sectionHeader}>
-            <p className={editorialStyles.sectionNumber}>03 — Capabilities</p>
-            <div>
-              <h2 id="skills-title" className={editorialStyles.sectionTitle}>A focused toolkit for <em>working products.</em></h2>
-              <p className={editorialStyles.sectionIntro}>The technologies and practices I use to turn real requirements into responsive, maintainable experiences.</p>
-            </div>
-          </header>
-          <div className={editorialStyles.capabilityList}>
-            {CAPABILITY_GROUPS.map((group, index) => (
-              <article className={editorialStyles.capabilityRow} key={group.title}>
-                <span className={editorialStyles.capabilityIndex}>0{index + 1}</span>
-                <h3 className={editorialStyles.capabilityTitle}>{group.title}</h3>
-                <div>
-                  <p className={editorialStyles.capabilityDescription}>{group.description}</p>
-                  <ul className={editorialStyles.capabilityTags}>{group.items.map((item) => <li key={item.name}>{item.name}</li>)}</ul>
-                </div>
-              </article>
+          <PreviewHeader
+            number="03 — Skills"
+            headingId="skills-title"
+            title={<>A focused toolkit for <em>working products.</em></>}
+            intro="The core technologies I use to turn real requirements into responsive, maintainable web and mobile apps."
+            href="/skills"
+            linkLabel="View All Skills"
+          />
+          <ul className={editorialStyles.toolStrip} aria-label="Main technologies">
+            {PREVIEW_SKILLS.map((skill) => (
+              <li className={editorialStyles.toolItem} key={skill.name}>
+                <span className={editorialStyles.toolIcon}>
+                  <TechIcon tech={skill} size={30} fallbackClassName={editorialStyles.toolFallback} />
+                </span>
+                <span className={editorialStyles.toolName}>{skill.name}</span>
+              </li>
             ))}
-          </div>
+          </ul>
+          <p className={editorialStyles.verbLine}>
+            {CAPABILITIES.map((capability) => (
+              <span key={capability.id}>{capability.verb}.</span>
+            ))}
+          </p>
         </div>
       </section>
 
-      <section className={`${editorialStyles.section} ${editorialStyles.surfaceSection}`} id="experience" aria-labelledby="education-title">
+      <section className={`${editorialStyles.section} ${editorialStyles.surfaceSection}`} id="experience" aria-labelledby="experience-title">
         <div className={`${editorialStyles.container} mx-auto w-full`}>
-          <header className={editorialStyles.sectionHeader}>
-            <p className={editorialStyles.sectionNumber}>04 — Education</p>
-            <div>
-              <h2 id="education-title" className={editorialStyles.sectionTitle}>Where I <em>studied.</em></h2>
-              <p className={editorialStyles.sectionIntro}>The academic path in information technology and technical-vocational studies that shaped how I approach product work.</p>
-            </div>
-          </header>
+          <PreviewHeader
+            number="04 — Experience & Education"
+            headingId="experience-title"
+            title={<>Building, studying, <em>growing.</em></>}
+            intro="The roles, studies and recognition that shaped how I approach product work."
+            href="/experience"
+            linkLabel="View Full Journey"
+          />
           <div className={editorialStyles.timeline}>
-            {EDUCATION.map((entry) => (
-              <article className={editorialStyles.timelineRow} key={entry.institution}>
-                <p className={editorialStyles.timelineDate}>{entry.years}</p>
-                <p className={editorialStyles.timelineType}>Education</p>
-                <div><h3 className={editorialStyles.timelineTitle}>{entry.institution}</h3><p className={editorialStyles.timelineDetail}>{entry.detail || entry.location}</p></div>
+            {EXPERIENCE_HIGHLIGHTS.map((entry) => (
+              <article className={editorialStyles.timelineRow} key={entry.type}>
+                <p className={editorialStyles.timelineDate}>{entry.date}</p>
+                <p className={editorialStyles.timelineType}>{entry.type}</p>
+                <div>
+                  <h3 className={editorialStyles.timelineTitle}>{entry.title}</h3>
+                  <p className={editorialStyles.timelineDetail}>{entry.detail}</p>
+                </div>
               </article>
             ))}
           </div>
@@ -189,7 +171,7 @@ export default async function HeroSection() {
       <section className={`${editorialStyles.section} ${editorialStyles.githubSection}`} id="github" aria-labelledby="github-title">
         <div className={`${editorialStyles.container} mx-auto w-full`}>
           <div className={editorialStyles.githubHeader}>
-            <p className={editorialStyles.eyebrow} id="github-title">06 — GitHub evidence</p>
+            <p className={editorialStyles.eyebrow} id="github-title">06 — GitHub activity</p>
             {githubLink && (
               <a className={editorialStyles.githubHandle} href={githubLink.href} target="_blank" rel="noreferrer" aria-label={`Open ${githubLink.handle} on GitHub in a new tab`}>
                 {githubLink.handle}<span className={editorialStyles.externalArrow} aria-hidden="true">↗</span>
@@ -220,17 +202,33 @@ export default async function HeroSection() {
         </div>
       </section>
 
-      <ContactPanel id="contact" headingId="contact-title" variant="section" />
-
-      <footer className={editorialStyles.footer}>
-        <div className={editorialStyles.footerGrid}>
-          <div><Link className={editorialStyles.footerBrand} href="/">Fatima Sierra</Link><p className={editorialStyles.footerDescription}>Web &amp; Mobile Developer creating purposeful digital experiences.</p></div>
-          <div><p className={editorialStyles.footerLabel}>Navigate</p><nav>{FOOTER_NAV_LINKS.map((link) => <Link href={link.href} key={link.href}>{link.label}</Link>)}</nav></div>
-          <div><p className={editorialStyles.footerLabel}>Connect</p><nav>{PROFESSIONAL_LINKS.map((link) => <a href={link.href} target="_blank" rel="noreferrer" key={link.id}>{link.label}</a>)}</nav></div>
-          <div><p className={editorialStyles.footerLabel}>Education</p><p className={editorialStyles.footerEducation}>{currentEducation.detail}<br />Mobile &amp; Web Applications</p></div>
+      <section className={`${editorialStyles.section} ${editorialStyles.contactSection}`} id="contact" aria-labelledby="contact-title">
+        <div className={`${editorialStyles.container} ${editorialStyles.contactInner}`}>
+          <div className={editorialStyles.contactCopy}>
+            <p className={editorialStyles.sectionNumber}>07 — Contact</p>
+            <h2 id="contact-title" className={editorialStyles.contactTitle}>
+              Have something in mind? <em>Let&apos;s talk.</em>
+            </h2>
+          </div>
+          <div className={editorialStyles.contactActions}>
+            <p className={editorialStyles.contactLead}>
+              I&apos;m open to internships and new roles, and always happy to talk about web and mobile work.
+            </p>
+            <Link className={styles.primaryButton} href="/contact">
+              Start a Conversation <span aria-hidden="true">→</span>
+            </Link>
+            <ul className={editorialStyles.contactLinksRow} aria-label="Social links">
+              {CONTACT_LINKS.map((link) => (
+                <li key={link.id}>
+                  <a href={link.href} target="_blank" rel="noreferrer" aria-label={`${link.label} (opens in a new tab)`}>
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
-        <div className={editorialStyles.footerBottom}><span>© 2026 Fatima Sierra</span><span>Designed &amp; developed by Fatima Sierra</span></div>
-      </footer>
+      </section>
     </div>
   );
 }
