@@ -1,0 +1,95 @@
+/* ==========================================================================
+   Phone mockup — a CSS handset around a real screenshot.
+   The wrapper is a size container, so every frame measurement (cqw) scales
+   with the width the parent gives it.
+   ========================================================================== */
+
+.phone {
+  position: relative;
+  display: block;
+  width: 100%;
+  container-type: inline-size;
+  /* Own stacking context so the side keys (z-index: -1) tuck behind the body, not the page. */
+  isolation: isolate;
+}
+
+/* The body lives in a child so its padding/radius can use the container's units. */
+.screen {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border: 3.4cqw solid #1d151a;
+  border-radius: 14cqw;
+  background: #fff;
+  isolation: isolate;
+  box-shadow:
+    0 0 0 0.6cqw #4a3a43,
+    0 0 0 1cqw rgba(255, 255, 255, 0.12),
+    0 3cqw 6cqw rgba(59, 42, 52, 0.18),
+    0 18cqw 32cqw -10cqw rgba(59, 42, 52, 0.5);
+}
+
+/* Side keys: power on the right, volume rocker on the left. */
+.phone::before,
+.phone::after {
+  position: absolute;
+  z-index: -1;
+  width: 1.4cqw;
+  border-radius: 1cqw;
+  background: #3b2d35;
+  content: "";
+}
+
+.phone::before {
+  top: 24%;
+  right: -1.2cqw;
+  height: 12%;
+}
+
+.phone::after {
+  top: 17%;
+  left: -1.2cqw;
+  height: 19%;
+  background:
+    linear-gradient(#3b2d35, #3b2d35) top / 100% 44% no-repeat,
+    linear-gradient(#3b2d35, #3b2d35) bottom / 100% 44% no-repeat;
+}
+
+.image {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* Punch-hole camera, centred in the status bar's empty middle. */
+.camera {
+  position: absolute;
+  top: 2.4cqw;
+  left: 50%;
+  z-index: 1;
+  width: 3.6cqw;
+  height: 3.6cqw;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #3d4a66 0 18%, #0c0a10 32%);
+  transform: translateX(-50%);
+}
+
+/* Soft glass reflection across the display. */
+.glare {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(115deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0) 30%);
+  pointer-events: none;
+}
+
+.redact {
+  position: absolute;
+  z-index: 1;
+  border-radius: 999px;
+  background: rgba(236, 232, 238, 0.94);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}

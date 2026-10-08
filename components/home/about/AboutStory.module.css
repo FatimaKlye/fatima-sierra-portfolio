@@ -909,7 +909,14 @@
 }
 
 .plate1 .plateImage { aspect-ratio: 1897 / 985; }
-.plate2 .plateImage { aspect-ratio: 416 / 456; }
+/* Full-height phone screenshot: narrower than its column so it stands as tall as plate 1. */
+.plate2 .plateImage {
+  width: 48%;
+  aspect-ratio: 922 / 2048;
+  margin-inline: auto;
+  border: 1px solid var(--color-border);
+  border-radius: 18px;
+}
 .plate3 .plateImage { aspect-ratio: 1440 / 900; }
 
 .plateDevice {

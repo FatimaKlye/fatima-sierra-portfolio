@@ -8,6 +8,8 @@ import {
 } from "@/data/projectDetailsData";
 import BackToProjects from "@/components/project-details/BackToProjects";
 import ProjectChallenges from "@/components/project-details/ProjectChallenges";
+import ProjectDownload from "@/components/project-details/ProjectDownload";
+import ProjectEcosystem from "@/components/project-details/ProjectEcosystem";
 import ProjectFeatures from "@/components/project-details/ProjectFeatures";
 import ProjectGallery from "@/components/project-details/ProjectGallery";
 import ProjectHero from "@/components/project-details/ProjectHero";
@@ -77,6 +79,18 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
         {project.features.length > 0 && <ProjectFeatures features={project.features} number={nextNumber()} />}
 
         {project.gallery.length > 0 && <ProjectGallery items={project.gallery} number={nextNumber()} />}
+
+        {project.download && (
+          <ProjectDownload
+            download={project.download}
+            number={nextNumber()}
+            phone={project.gallery.find((item) => item.frame === "phone" && !item.redact)}
+          />
+        )}
+
+        {project.ecosystem && (
+          <ProjectEcosystem ecosystem={project.ecosystem} currentSlug={project.slug} number={nextNumber()} />
+        )}
 
         {project.journey && (
           <ProjectTimeline

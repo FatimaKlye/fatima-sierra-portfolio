@@ -1,5 +1,7 @@
 import Image from "next/image";
+import { Lock } from "lucide-react";
 import type { ProjectMedia } from "@/data/projectDetailsData";
+import PhoneMockup from "./PhoneMockup";
 import styles from "./ProjectDetails.module.css";
 
 type MediaFrameProps = {
@@ -10,8 +12,20 @@ type MediaFrameProps = {
   className?: string;
 };
 
-/** Renders a real project image inside a browser window or a soft rounded frame. */
+/** Renders a real project image inside a browser window, a phone, or a soft rounded frame. */
 export default function MediaFrame({ media, sizes, priority, quality = 82, className }: MediaFrameProps) {
+  if (media.frame === "phone") {
+    return (
+      <PhoneMockup
+        media={media}
+        sizes={sizes}
+        priority={priority}
+        quality={Math.max(quality, 85)}
+        className={className}
+      />
+    );
+  }
+
   const image = (
     <Image
       src={media.src}
@@ -33,6 +47,12 @@ export default function MediaFrame({ media, sizes, priority, quality = 82, class
           <span />
           <span />
           <span />
+          {media.url && (
+            <em className={styles.browserUrl}>
+              <Lock size={10} strokeWidth={2.5} />
+              {media.url}
+            </em>
+          )}
         </div>
         {image}
       </div>

@@ -8,7 +8,9 @@ export default function ProjectOutcomes({ project, number }: { project: ProjectD
   const outcomes = project.outcomes ?? [];
   const stats = outcomes.filter((outcome) => outcome.stat);
   const statements = outcomes.filter((outcome) => !outcome.stat);
-  const hasLinks = Boolean(project.links.liveUrl || project.links.videoUrl || project.links.repoUrl);
+  const hasLinks = Boolean(
+    project.links.liveUrl || project.links.videoUrl || project.links.repoUrl || project.links.apkUrl
+  );
 
   return (
     <section className={styles.outcomes} aria-labelledby="outcomes-title">
@@ -43,7 +45,7 @@ export default function ProjectOutcomes({ project, number }: { project: ProjectD
         {hasLinks && (
           <div className={styles.outcomeLinks} data-reveal>
             <p className={styles.outcomeLinksLabel}>Explore the project</p>
-            <ProjectLinks links={project.links} tone="onDark" />
+            <ProjectLinks links={project.links} tone="onDark" apkSize={project.download?.size} />
           </div>
         )}
       </div>

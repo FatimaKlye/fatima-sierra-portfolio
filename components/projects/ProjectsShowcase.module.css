@@ -249,6 +249,57 @@
   transform: translateY(-6px);
 }
 
+/* Two real app screens, the front one leaning forward over the back one. */
+.phonePair {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  padding: clamp(12px, 3vw, 40px) 0;
+}
+
+.phonePairFront,
+.phonePairBack {
+  display: block;
+  transition:
+    translate 700ms cubic-bezier(0.22, 1, 0.36, 1),
+    rotate 700ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.phonePairFront {
+  position: relative;
+  z-index: 1;
+  width: clamp(140px, 17vw, 250px);
+  rotate: 3deg;
+}
+
+.phonePairBack {
+  width: clamp(116px, 14vw, 204px);
+  margin-right: -9%;
+  rotate: -7deg;
+  translate: 0 -6%;
+  filter: saturate(0.9);
+}
+
+.mediaLink:hover .phonePairFront,
+.mediaLink:focus-visible .phonePairFront {
+  translate: 0 -10px;
+  rotate: 1deg;
+}
+
+.mediaLink:hover .phonePairBack,
+.mediaLink:focus-visible .phonePairBack {
+  translate: -10% -8%;
+  rotate: -10deg;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .phonePairFront,
+  .phonePairBack {
+    transition: none;
+  }
+}
+
 .secondary {
   position: absolute;
   right: -4%;

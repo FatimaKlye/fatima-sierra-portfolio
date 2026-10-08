@@ -1,18 +1,14 @@
 import type { CSSProperties } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { ArrowUpRight, Download } from "lucide-react";
+import PhoneMockup from "@/components/project-details/PhoneMockup";
 import { PROJECTS } from "@/components/projects/projectsData";
-import { getProjectDetailBySlug } from "@/data/projectDetailsData";
+import { getProjectDetailBySlug, type ProjectMedia } from "@/data/projectDetailsData";
 import ProjectsIndex, { type ProjectIndexItem } from "./ProjectsIndex";
 import styles from "./ProjectsShowcase.module.css";
 
-type ShowcaseMedia = {
-  src: string;
-  alt: string;
-  width: number;
-  height: number;
-  frame: "browser" | "plain";
-  caption?: string;
+type ShowcaseMedia = Pick<ProjectMedia, "src" | "alt" | "width" | "height" | "frame" | "caption" | "redact"> & {
   /** True for the illustrated previews used where no public screenshot exists. */
   illustrated?: boolean;
 };
@@ -25,7 +21,10 @@ export const SHOWCASE_PROJECTS = PROJECTS.map((project) => {
   const media: ShowcaseMedia = detail?.hero
     ? { ...detail.hero }
     : { src: fallback.src, alt: fallback.alt, width: 960, height: 720, frame: "plain", illustrated: true };
-  const secondary = detail?.gallery.find((item) => item.src !== media.src);
+  const isPhone = media.frame === "phone";
+  // Phone heroes pair with a second real screen inside the frame instead of the floating thumbnail.
+  const companion = isPhone ? detail?.heroCompanions?.[0] : undefined;
+  const secondary = isPhone ? undefined : detail?.gallery.find((item) => item.src !== media.src);
 
   const stack = Array.from(
     new Set([...(detail?.stack.flatMap((group) => group.items) ?? []), ...project.technologies])
@@ -44,7 +43,10 @@ export const SHOWCASE_PROJECTS = PROJECTS.map((project) => {
     stack,
     media,
     secondary,
+    companion,
     liveUrl: detail?.links.liveUrl,
+    apkUrl: detail?.links.apkUrl,
+    apkSize: detail?.download?.size,
     repoUrl: detail?.links.repoUrl ?? project.repoUrl ?? project.externalUrl,
   };
 });
@@ -57,7 +59,22 @@ export const INDEX_ITEMS: ProjectIndexItem[] = SHOWCASE_PROJECTS.map((project) =
   image: { src: project.media.src, alt: project.media.alt },
 }));
 
-function Frame({ media, sizes }: { media: ShowcaseMedia; sizes: string }) {
+function Frame({ media, companion, sizes }: { media: ShowcaseMedia; companion?: ProjectMedia; sizes: string }) {
+  if (media.frame === "phone") {
+    return (
+      <span className={styles.phonePair}>
+        {companion && (
+          <span className={styles.phonePairBack}>
+            <PhoneMockup media={companion} sizes="(max-width: 900px) 34vw, 16vw" decorative />
+          </span>
+        )}
+        <span className={styles.phonePairFront}>
+          <PhoneMockup media={media} sizes="(max-width: 900px) 42vw, 20vw" />
+        </span>
+      </span>
+    );
+  }
+
   const image = (
     <span className={styles.frameImage} style={{ aspectRatio: `${media.width} / ${media.height}` }}>
       <Image src={media.src} alt={media.alt} fill sizes={sizes} />
@@ -116,7 +133,7 @@ export default function ProjectsShowcase() {
                     data-reveal
                   >
                     <span className={styles.mediaParallax} data-parallax="4">
-                      <Frame media={project.media} sizes="(max-width: 900px) 92vw, 58vw" />
+                      <Frame media={project.media} companion={project.companion} sizes="(max-width: 900px) 92vw, 58vw" />
                     </span>
                   </Link>
                   {project.secondary && (
@@ -188,15 +205,28 @@ export default function ProjectsShowcase() {
                     <Link className="ui-btn ui-btn--primary" href={`/projects/${project.slug}`}>
                       Read the Case Study
                     </Link>
+                    {project.apkUrl && (
+                      <a
+                        className="ui-btn ui-btn--secondary"
+                        href={project.apkUrl}
+                        type="application/vnd.android.package-archive"
+                        download
+                        aria-label={`Download the ${project.title} APK for Android${project.apkSize ? ` (${project.apkSize})` : ""}`}
+                      >
+                        <Download size={16} aria-hidden="true" />
+                        Download APK
+                      </a>
+                    )}
                     {project.liveUrl && (
                       <a
                         className="ui-btn ui-btn--secondary"
                         href={project.liveUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        aria-label={`Visit the live ${project.title} site (opens in a new tab)`}
+                        aria-label={`Visit the live ${project.title} (opens in a new tab)`}
                       >
-                        Live Site
+                        Visit Live Website
+                        <ArrowUpRight size={16} aria-hidden="true" />
                       </a>
                     )}
                     {project.repoUrl && (

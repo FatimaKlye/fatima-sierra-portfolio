@@ -155,8 +155,8 @@ export const PROJECT_PLATES = [
   },
   {
     slug: "ignis-safe-mobile",
-    src: "/assets/projects/ignis-safe-mobile/app-preview.png",
-    alt: "IGNIS SAFE mobile application splash and learning materials screens",
+    src: "/assets/projects/ignis-safe-mobile/LEARNING MATERIALS.jpg",
+    alt: "IGNIS SAFE mobile application Learning Materials screen",
     sizes: "(max-width: 820px) 60vw, 24vw",
   },
   {

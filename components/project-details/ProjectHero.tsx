@@ -2,6 +2,7 @@ import { Fragment } from "react";
 import Link from "next/link";
 import type { ProjectDetail } from "@/data/projectDetailsData";
 import MediaFrame from "./MediaFrame";
+import PhoneMockup from "./PhoneMockup";
 import ProjectLinks from "./ProjectLinks";
 import styles from "./ProjectDetails.module.css";
 
@@ -88,12 +89,27 @@ export default function ProjectHero({ project, index, total }: ProjectHeroProps)
               </dl>
             )}
 
-            <ProjectLinks links={project.links} />
+            <ProjectLinks links={project.links} apkSize={project.download?.size} />
           </div>
 
           <div className={styles.heroVisual} data-intro-visual>
             <span className={styles.heroGlow} aria-hidden="true" />
-            {project.hero ? (
+            {project.hero?.frame === "phone" ? (
+              <div className={styles.phoneStack}>
+                {project.heroCompanions?.slice(0, 2).map((media, companionIndex) => (
+                  <div
+                    key={media.src}
+                    className={`${styles.phoneStackItem} ${companionIndex === 0 ? styles.phoneBackLeft : styles.phoneBackRight}`}
+                    data-parallax={companionIndex === 0 ? 9 : 12}
+                  >
+                    <PhoneMockup media={media} sizes="(min-width: 1024px) 15vw, 34vw" decorative />
+                  </div>
+                ))}
+                <div className={`${styles.phoneStackItem} ${styles.phoneFront}`} data-parallax="4">
+                  <PhoneMockup media={project.hero} priority sizes="(min-width: 1024px) 20vw, 52vw" />
+                </div>
+              </div>
+            ) : project.hero ? (
               <div data-parallax="5">
                 <MediaFrame
                   media={project.hero}

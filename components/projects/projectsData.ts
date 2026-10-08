@@ -38,7 +38,7 @@ export const PROJECTS: Project[] = [
       },
       {
         src: "/assets/projects/ignis-safe-website/landing_mobile.png",
-        alt: "IGNIS SAFE website landing page on mobile",
+        alt: "IGNIS SAFE website download page for the Android app",
       },
     ],
     repoUrl: "https://github.com/paulosierra797/ignis-safe",
@@ -54,15 +54,12 @@ export const PROJECTS: Project[] = [
     image: "/assets/projects/ignis-safe-mobile.svg",
     imageAlt: "IGNIS SAFE mobile application interface preview",
     screenshots: [
-      { src: "/assets/projects/ignis-safe-mobile/hero.svg", alt: "IGNIS SAFE mobile home screen preview" },
       {
-        src: "/assets/projects/ignis-safe-mobile/screen-dashboard.svg",
-        alt: "IGNIS SAFE mobile lesson dashboard screen",
+        src: "/assets/projects/ignis-safe-mobile/LEARNING MATERIALS.jpg",
+        alt: "IGNIS SAFE mobile Learning Materials screen with module progress and fire-safety modules",
       },
-      {
-        src: "/assets/projects/ignis-safe-mobile/screen-detail.svg",
-        alt: "IGNIS SAFE mobile assessment screen",
-      },
+      { src: "/assets/projects/ignis-safe-mobile/LOGIN.jpg", alt: "IGNIS SAFE mobile login screen" },
+      { src: "/assets/projects/ignis-safe-mobile/ONBOADING.jpg", alt: "IGNIS SAFE mobile splash screen" },
     ],
     repoUrl: "https://github.com/FatimaKlye/ignis_safe_mobile",
   },

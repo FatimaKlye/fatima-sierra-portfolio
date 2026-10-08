@@ -11,14 +11,30 @@
  * hides the matching section instead of filling it with guesses.
  */
 
+/** A rectangle (in % of the image) hidden behind a blurred patch, e.g. a personal email in a screenshot. */
+export type MediaRedaction = {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+};
+
 export type ProjectMedia = {
   src: string;
   alt: string;
   width: number;
   height: number;
   caption?: string;
-  /** "browser" wraps the image in a browser window; "plain" is a soft rounded frame. */
-  frame: "browser" | "plain";
+  /** Short screen name used by the device gallery, e.g. "Sign in". */
+  label?: string;
+  /**
+   * "browser" wraps the image in a browser window; "plain" is a soft rounded frame;
+   * "phone" places a full-height phone screenshot inside a handset mockup.
+   */
+  frame: "browser" | "plain" | "phone";
+  /** Domain shown in the browser frame's address bar. */
+  url?: string;
+  redact?: MediaRedaction[];
 };
 
 export type ProjectFeature = {
@@ -52,6 +68,40 @@ export type ProjectLinks = {
   liveUrl?: string;
   repoUrl?: string;
   videoUrl?: string;
+  /** Direct link to a released Android package. */
+  apkUrl?: string;
+};
+
+/** A downloadable build, described only with facts read from the released file. */
+export type ProjectDownload = {
+  url: string;
+  host: string;
+  version: string;
+  size: string;
+  platform: string;
+  architecture: string;
+  format: string;
+  steps: string[];
+  note: string;
+  /** Where the download is published (e.g. the website's download page). */
+  preview?: ProjectMedia;
+};
+
+export type EcosystemSurface = {
+  slug: string;
+  kind: string;
+  name: string;
+  role: string;
+  media: ProjectMedia;
+};
+
+/** How two projects form one system: the surfaces and the verified links between them. */
+export type ProjectEcosystem = {
+  title: string;
+  intro: string;
+  hub: string;
+  surfaces: [EcosystemSurface, EcosystemSurface];
+  connections: ProjectFeature[];
 };
 
 export type ProjectDetail = {
@@ -66,6 +116,8 @@ export type ProjectDetail = {
   status?: string;
   /** Real hero visual. When absent the hero is purely typographic. */
   hero?: ProjectMedia;
+  /** Extra phone screens fanned behind a "phone" hero. */
+  heroCompanions?: ProjectMedia[];
   overview: {
     what: string;
     purpose?: string;
@@ -83,9 +135,122 @@ export type ProjectDetail = {
   outcomes?: ProjectOutcome[];
   stack: ProjectStackGroup[];
   links: ProjectLinks;
+  download?: ProjectDownload;
+  ecosystem?: ProjectEcosystem;
 };
 
 const NU = "National University – Dasmariñas";
+
+/* ---------- IGNIS SAFE: shared, verified facts ---------- */
+
+const IGNIS_LIVE_URL = "https://bfp-dasmacfs.com/";
+/** Served by the live site as application/vnd.android.package-archive (234,270,526 bytes). */
+const IGNIS_APK_URL = "https://bfp-dasmacfs.com/downloads/ignis-safe.apk";
+
+const IGNIS_SCREENS = {
+  onboarding: {
+    src: "/assets/projects/ignis-safe-mobile/ONBOADING.jpg",
+    alt: "IGNIS SAFE splash screen: the fire-truck shield badge with the words 'IGNIS SAFE — Learn, Prepare, Protect'.",
+    width: 922,
+    height: 2048,
+    label: "Onboarding",
+    caption: "The splash screen: the IGNIS SAFE badge and its promise to learn, prepare and protect.",
+    frame: "phone",
+  },
+  login: {
+    src: "/assets/projects/ignis-safe-mobile/LOGIN.jpg",
+    alt: "IGNIS SAFE login screen with email and password fields, Forgot Password, Sign Up and an English / Filipino language toggle.",
+    width: 922,
+    height: 2048,
+    label: "Sign in",
+    caption: "Sign in with email and password, reset a forgotten password or sign up — in English or Filipino.",
+    frame: "phone",
+  },
+  learning: {
+    src: "/assets/projects/ignis-safe-mobile/LEARNING MATERIALS.jpg",
+    alt: "IGNIS SAFE Learning Materials screen with a module progress card (0 of 5) and modules for fire extinguishers, house fires, electrical fires and kitchen fires.",
+    width: 922,
+    height: 2048,
+    label: "Learning Materials",
+    caption: "Module progress at a glance and the fire-safety modules, each with its own colour and icon.",
+    frame: "phone",
+  },
+  profile: {
+    src: "/assets/projects/ignis-safe-mobile/PROFILE.jpg",
+    alt: "IGNIS SAFE My Profile screen showing training progress, recent activity, achievements (0 of 6 medals) and account settings.",
+    width: 922,
+    height: 2048,
+    label: "My Profile",
+    caption: "Training progress, recent simulation activity, achievement medals and account settings.",
+    frame: "phone",
+    // The screenshot shows a real person's email address; keep it unreadable on the portfolio.
+    redact: [{ left: 34.6, top: 26.8, width: 40.4, height: 2.6 }],
+  },
+} satisfies Record<string, ProjectMedia>;
+
+const IGNIS_WEB_LANDING: ProjectMedia = {
+  src: "/assets/projects/ignis-safe-website/ignis_safe_landing.png",
+  alt: "IGNIS SAFE website home page: the official BFP Dasmariñas City Fire Station portal with the headline 'Protecting lives, property and community'.",
+  width: 1897,
+  height: 985,
+  caption: "Home — service shortcuts for FSIC & FSEC, advisories and station contact.",
+  frame: "browser",
+  url: "bfp-dasmacfs.com",
+};
+
+const IGNIS_WEB_DOWNLOAD: ProjectMedia = {
+  src: "/assets/projects/ignis-safe-website/landing_mobile.png",
+  alt: "Download IGNIS SAFE page on the website showing the Android app on two phones, version details, a QR code and install steps.",
+  width: 1897,
+  height: 987,
+  caption: "Download page — version details, a QR code and install steps for the Android app.",
+  frame: "browser",
+  url: "bfp-dasmacfs.com",
+};
+
+/** Every connection below is traceable to both codebases (same Supabase project and tables). */
+const IGNIS_ECOSYSTEM: ProjectEcosystem = {
+  title: "One system, two surfaces",
+  intro:
+    "IGNIS SAFE is a single fire-safety system. The website is the fire station's public portal and management side; the mobile app is where learners study, test themselves and practise.",
+  hub: "Supabase",
+  surfaces: [
+    {
+      slug: "ignis-safe-website",
+      kind: "Web platform",
+      name: "IGNIS SAFE Website",
+      role: "Public portal for the BFP Dasmariñas City Fire Station — services, advisories and the app download.",
+      media: IGNIS_WEB_LANDING,
+    },
+    {
+      slug: "ignis-safe-mobile",
+      kind: "Mobile application",
+      name: "IGNIS SAFE Mobile",
+      role: "Android app for learners — modules, assessments, 3D simulations, progress and medals.",
+      media: IGNIS_SCREENS.learning,
+    },
+  ],
+  connections: [
+    {
+      title: "One shared backend",
+      description: "The website and the app both connect to the same Supabase project, so they work from the same data.",
+    },
+    {
+      title: "Content managed on the web",
+      description:
+        "Learning materials and assessment questions are maintained through the website and loaded by the app's modules.",
+    },
+    {
+      title: "Progress flows back",
+      description:
+        "Module progress and assessment attempts recorded on the phone are stored in the shared tables the website reads.",
+    },
+    {
+      title: "Distributed by the website",
+      description: "The Android APK is published on the website's download page, with a QR code and install steps.",
+    },
+  ],
+};
 
 const IGNIS_PROCESS: ProjectStep[] = [
   {
@@ -117,14 +282,8 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
     period: "2025 – Present",
     role: "Systems Analyst, Mobile & Web Developer",
     organization: NU,
-    status: "Live on Vercel",
-    hero: {
-      src: "/assets/projects/ignis-safe-website/ignis_safe_landing.png",
-      alt: "IGNIS SAFE website home page: the official BFP Dasmariñas City Fire Station portal with the headline 'Protecting lives, property and community'.",
-      width: 1897,
-      height: 985,
-      frame: "browser",
-    },
+    status: "Live at bfp-dasmacfs.com",
+    hero: IGNIS_WEB_LANDING,
     overview: {
       what: "IGNIS SAFE is a fire-safety learning and 3D simulation system built around requirements from the Bureau of Fire Protection. The website is its public face: it presents the fire station's services and distributes the mobile app.",
       purpose:
@@ -157,7 +316,7 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
       {
         title: "Android app download",
         description:
-          "A download page with version, size and platform details, a QR code and step-by-step install instructions for IGNIS SAFE v1.0.0.",
+          "A download page with version, size and platform details, a QR code and step-by-step install instructions for the IGNIS SAFE app.",
       },
       {
         title: "Built into the header",
@@ -165,34 +324,17 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
       },
     ],
     process: IGNIS_PROCESS,
-    gallery: [
-      {
-        src: "/assets/projects/ignis-safe-website/ignis_safe_landing.png",
-        alt: "IGNIS SAFE website home page with service shortcuts for FSIC & FSEC, public advisories and station contact.",
-        width: 1897,
-        height: 985,
-        caption: "Home — service shortcuts for FSIC & FSEC, advisories and station contact.",
-        frame: "browser",
-      },
-      {
-        src: "/assets/projects/ignis-safe-website/landing_mobile.png",
-        alt: "Download IGNIS SAFE page showing the Android app on two phones, version details, a QR code and install steps.",
-        width: 1897,
-        height: 987,
-        caption: "Download page — version details, QR code and install steps for the Android app.",
-        frame: "browser",
-      },
-    ],
+    gallery: [IGNIS_WEB_LANDING, IGNIS_WEB_DOWNLOAD],
     outcomes: [
       {
         stat: "Live",
-        label: "Deployed on Vercel",
-        detail: "Publicly available at ignis-safe.vercel.app.",
+        label: "Publicly available",
+        detail: "Online at bfp-dasmacfs.com.",
       },
       {
-        stat: "v1.0.0",
+        stat: "APK",
         label: "Android app distributed",
-        detail: "The download page lists the APK for Android 7.1+, released September 1, 2026.",
+        detail: "Hosts the IGNIS SAFE APK (v1.0.6, Android 7.1+) for direct download.",
       },
     ],
     stack: [
@@ -203,9 +345,10 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
       { label: "Quality", items: ["ESLint", "Lighthouse"] },
     ],
     links: {
-      liveUrl: "https://ignis-safe.vercel.app",
+      liveUrl: IGNIS_LIVE_URL,
       repoUrl: "https://github.com/paulosierra797/ignis-safe",
     },
+    ecosystem: IGNIS_ECOSYSTEM,
   },
   {
     slug: "ignis-safe-mobile",
@@ -217,14 +360,9 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
     period: "2025 – Present",
     role: "Systems Analyst, Mobile & Web Developer",
     organization: NU,
-    status: "v1.0.0 released for Android",
-    hero: {
-      src: "/assets/projects/ignis-safe-mobile/app-preview.png",
-      alt: "The IGNIS SAFE app on two phones: the splash screen and the Learning Materials screen listing Pre-Assessment, Learning Materials, Post-Assessment and 3D Simulation.",
-      width: 416,
-      height: 456,
-      frame: "plain",
-    },
+    status: "v1.0.6 · Android APK available",
+    hero: IGNIS_SCREENS.learning,
+    heroCompanions: [IGNIS_SCREENS.login, IGNIS_SCREENS.onboarding],
     overview: {
       what: "IGNIS SAFE Mobile is the learner-facing half of the IGNIS SAFE system. It brings focused fire-safety lessons, guided simulations, learning progress and achievement badges into one mobile experience.",
       purpose:
@@ -281,24 +419,7 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
       ],
     },
     process: IGNIS_PROCESS,
-    gallery: [
-      {
-        src: "/assets/projects/ignis-safe-mobile/app-preview.png",
-        alt: "The IGNIS SAFE app on two phones: the splash screen and the Learning Materials screen.",
-        width: 416,
-        height: 456,
-        caption: "The app: splash screen and the Learning Materials list.",
-        frame: "plain",
-      },
-      {
-        src: "/assets/projects/ignis-safe-website/landing_mobile.png",
-        alt: "The IGNIS SAFE website's download page for the Android app, with a QR code and install steps.",
-        width: 1897,
-        height: 987,
-        caption: "How the app is distributed — the download page on the IGNIS SAFE website.",
-        frame: "browser",
-      },
-    ],
+    gallery: [IGNIS_SCREENS.onboarding, IGNIS_SCREENS.login, IGNIS_SCREENS.learning, IGNIS_SCREENS.profile],
     challenges: [
       {
         challenge:
@@ -314,9 +435,9 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
     ],
     outcomes: [
       {
-        stat: "v1.0.0",
+        stat: "v1.0.6",
         label: "Android release",
-        detail: "Distributed as an APK for Android 7.1+ (64-bit ARM), released September 1, 2026.",
+        detail: "Distributed as an APK for Android 7.1+ (64-bit ARM) through bfp-dasmacfs.com.",
       },
       { stat: "5", label: "Learning modules" },
       { stat: "2", label: "Languages", detail: "English and Tagalog." },
@@ -327,8 +448,28 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
       { label: "3D & media", items: ["Unity", "model_viewer_plus", "video_player"] },
     ],
     links: {
+      apkUrl: IGNIS_APK_URL,
       repoUrl: "https://github.com/FatimaKlye/ignis_safe_mobile",
     },
+    // Read from the released file: versionName and minSdk from its manifest, size from the file itself.
+    download: {
+      url: IGNIS_APK_URL,
+      host: "bfp-dasmacfs.com",
+      version: "1.0.6",
+      size: "223.4 MB",
+      platform: "Android 7.1+",
+      architecture: "64-bit ARM",
+      format: "APK",
+      steps: [
+        "Select Download APK on your Android phone.",
+        "Open the downloaded ignis-safe.apk file.",
+        "If Android asks, allow your browser or file manager to install unknown apps.",
+        "Select Install, then open IGNIS SAFE. Turn that install permission off again afterward.",
+      ],
+      note: "Only install this APK from the official IGNIS SAFE website. Keep Google Play Protect enabled.",
+      preview: IGNIS_WEB_DOWNLOAD,
+    },
+    ecosystem: IGNIS_ECOSYSTEM,
   },
   {
     slug: "itso-id-tracker",

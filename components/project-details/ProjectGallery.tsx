@@ -7,6 +7,7 @@ import gsap from "gsap";
 import { ChevronLeft, ChevronRight, Maximize2, X } from "lucide-react";
 import type { ProjectMedia } from "@/data/projectDetailsData";
 import MediaFrame from "./MediaFrame";
+import { Redactions } from "./PhoneMockup";
 import SectionHead from "./SectionHead";
 import styles from "./ProjectDetails.module.css";
 
@@ -30,6 +31,8 @@ export default function ProjectGallery({ items, number }: ProjectGalleryProps) {
 
   const total = items.length;
   const current = items[active] ?? items[0];
+  // Phone screenshots get a handset stage with a screen list instead of the browser thumbnails.
+  const isDevice = total > 0 && items.every((item) => item.frame === "phone");
 
   const step = useCallback((delta: number) => setActive((index) => (index + delta + total) % total), [total]);
 
@@ -145,65 +148,123 @@ export default function ProjectGallery({ items, number }: ProjectGalleryProps) {
     return null;
   }
 
+  const stage = (
+    <div className={`${styles.galleryStage} ${isDevice ? styles.deviceStage : ""}`}>
+      {isDevice && <span className={styles.deviceHalo} aria-hidden="true" />}
+      <div ref={stageRef} className={styles.galleryStageInner}>
+        <div ref={tiltRef} className={styles.galleryTilt}>
+          <button
+            ref={triggerRef}
+            type="button"
+            className={styles.galleryOpen}
+            style={{ width: `min(100%, ${isDevice ? 320 : current.frame === "plain" ? 440 : 1100}px)` }}
+            aria-label={`Open larger preview: ${current.alt}`}
+            onClick={() => setOpen(true)}
+          >
+            <MediaFrame
+              media={current}
+              sizes={isDevice ? "320px" : "(min-width: 1440px) 1100px, (min-width: 1024px) 78vw, 100vw"}
+            />
+            <span className={styles.galleryExpand} aria-hidden="true">
+              <Maximize2 size={15} />
+              Expand
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <section className={styles.gallery} aria-labelledby="gallery-title">
       <div className={styles.container}>
-        <SectionHead id="gallery-title" number={number} eyebrow="Screens" title="See it in action" tone="onDark" />
+        <SectionHead
+          id="gallery-title"
+          number={number}
+          eyebrow="Screens"
+          title={isDevice ? "Inside the app" : "See it in action"}
+          tone="onDark"
+        />
 
-        <div className={styles.galleryStage}>
-          <div ref={stageRef} className={styles.galleryStageInner}>
-            <div ref={tiltRef} className={styles.galleryTilt}>
-              <button
-                ref={triggerRef}
-                type="button"
-                className={styles.galleryOpen}
-                style={{ width: `min(100%, ${current.frame === "plain" ? 440 : 1100}px)` }}
-                aria-label={`Open larger preview: ${current.alt}`}
-                onClick={() => setOpen(true)}
-              >
-                <MediaFrame media={current} sizes="(min-width: 1440px) 1100px, (min-width: 1024px) 78vw, 100vw" />
-                <span className={styles.galleryExpand} aria-hidden="true">
-                  <Maximize2 size={15} />
-                  Expand
+        {isDevice ? (
+          <div className={styles.deviceLayout}>
+            {stage}
+            <div className={styles.screenPanel}>
+              <p className={styles.srOnly} aria-live="polite">
+                Screen {active + 1} of {total}: {current.label ?? current.alt}
+              </p>
+              <ol className={styles.screenList} data-stagger>
+                {items.map((item, itemIndex) => (
+                  <li key={item.src}>
+                    <button
+                      type="button"
+                      className={styles.screenItem}
+                      aria-pressed={itemIndex === active}
+                      onClick={() => setActive(itemIndex)}
+                    >
+                      <span className={styles.screenIndex}>{String(itemIndex + 1).padStart(2, "0")}</span>
+                      <span className={styles.screenCopy}>
+                        <span className={styles.screenLabel}>{item.label ?? `Screen ${itemIndex + 1}`}</span>
+                        {item.caption && <span className={styles.screenCaption}>{item.caption}</span>}
+                      </span>
+                      <span className={styles.screenThumb} aria-hidden="true">
+                        <Image src={item.src} alt="" width={item.width} height={item.height} sizes="48px" quality={60} />
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ol>
+              <div className={styles.screenNav}>
+                <button type="button" className={styles.screenNavBtn} aria-label="Previous screen" onClick={() => step(-1)}>
+                  <ChevronLeft size={20} aria-hidden="true" />
+                </button>
+                <span className={styles.galleryCount} aria-hidden="true">
+                  {String(active + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
                 </span>
-              </button>
+                <button type="button" className={styles.screenNavBtn} aria-label="Next screen" onClick={() => step(1)}>
+                  <ChevronRight size={20} aria-hidden="true" />
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <>
+            {stage}
+            <div className={styles.galleryBar}>
+              <p className={styles.galleryCaption} aria-live="polite">
+                <span className={styles.galleryCount}>
+                  {String(active + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
+                </span>
+                {current.caption ?? current.alt}
+              </p>
 
-        <div className={styles.galleryBar}>
-          <p className={styles.galleryCaption} aria-live="polite">
-            <span className={styles.galleryCount}>
-              {String(active + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
-            </span>
-            {current.caption ?? current.alt}
-          </p>
-
-          {total > 1 && (
-            <ul className={styles.thumbs}>
-              {items.map((item, itemIndex) => (
-                <li key={item.src}>
-                  <button
-                    type="button"
-                    className={styles.thumb}
-                    aria-pressed={itemIndex === active}
-                    aria-label={`Show screen ${itemIndex + 1} of ${total}: ${item.caption ?? item.alt}`}
-                    onClick={() => setActive(itemIndex)}
-                  >
-                    <Image
-                      src={item.src}
-                      alt=""
-                      width={item.width}
-                      height={item.height}
-                      sizes="120px"
-                      quality={60}
-                    />
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+              {total > 1 && (
+                <ul className={styles.thumbs}>
+                  {items.map((item, itemIndex) => (
+                    <li key={item.src}>
+                      <button
+                        type="button"
+                        className={styles.thumb}
+                        aria-pressed={itemIndex === active}
+                        aria-label={`Show screen ${itemIndex + 1} of ${total}: ${item.caption ?? item.alt}`}
+                        onClick={() => setActive(itemIndex)}
+                      >
+                        <Image
+                          src={item.src}
+                          alt=""
+                          width={item.width}
+                          height={item.height}
+                          sizes="120px"
+                          quality={60}
+                        />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </>
+        )}
       </div>
 
       {open &&
@@ -221,16 +282,21 @@ export default function ProjectGallery({ items, number }: ProjectGalleryProps) {
               data-lightbox-figure
               onClick={(event) => event.stopPropagation()}
             >
-              <Image
-                className={styles.lightboxImage}
-                src={current.src}
-                alt={current.alt}
-                width={current.width}
-                height={current.height}
-                sizes="100vw"
-                quality={88}
-              />
-              <figcaption>{current.caption ?? current.alt}</figcaption>
+              <span className={styles.lightboxMedia}>
+                <Image
+                  className={styles.lightboxImage}
+                  src={current.src}
+                  alt={current.alt}
+                  width={current.width}
+                  height={current.height}
+                  sizes="100vw"
+                  quality={88}
+                />
+                <Redactions regions={current.redact} />
+              </span>
+              <figcaption>
+                {current.label && current.caption ? `${current.label} — ${current.caption}` : (current.caption ?? current.alt)}
+              </figcaption>
             </figure>
 
             <button
