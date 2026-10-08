@@ -1,6 +1,34 @@
+/**
+ * Single source of truth for the /projects/[slug] case-study pages.
+ *
+ * Every statement here is traceable to one of:
+ *  - the résumé (public/assets/resume/Fatima-Klye-Sierra-Resume-2026.pdf)
+ *  - the project's own repository / package files
+ *  - the project's live site or the real screenshots in /public/assets/projects
+ *
+ * Do not add achievements, metrics, images or links that cannot be verified.
+ * Optional fields are simply omitted when nothing verified exists — the page
+ * hides the matching section instead of filling it with guesses.
+ */
+
+export type ProjectMedia = {
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
+  caption?: string;
+  /** "browser" wraps the image in a browser window; "plain" is a soft rounded frame. */
+  frame: "browser" | "plain";
+};
+
 export type ProjectFeature = {
   title: string;
   description: string;
+};
+
+export type ProjectStep = {
+  title: string;
+  description?: string;
 };
 
 export type ProjectChallenge = {
@@ -8,19 +36,21 @@ export type ProjectChallenge = {
   solution: string;
 };
 
-export type ProjectMedia = {
-  src: string;
-  alt: string;
+export type ProjectOutcome = {
+  /** Short headline value, e.g. "v1.0.0". Omit for text-only outcomes. */
+  stat?: string;
+  label: string;
+  detail?: string;
 };
 
-export type ProjectVideo = {
-  src: string;
-  poster?: string;
+export type ProjectStackGroup = {
+  label: string;
+  items: string[];
 };
 
 export type ProjectLinks = {
-  repoUrl: string;
   liveUrl?: string;
+  repoUrl?: string;
   videoUrl?: string;
 };
 
@@ -28,129 +58,152 @@ export type ProjectDetail = {
   slug: string;
   category: string;
   title: string;
+  tagline: string;
   summary: string;
-  technologies: string[];
-  status: string;
-  role: string;
-  heroImage: ProjectMedia;
+  period?: string;
+  role?: string;
+  organization?: string;
+  status?: string;
+  /** Real hero visual. When absent the hero is purely typographic. */
+  hero?: ProjectMedia;
   overview: {
-    whatItIs: string;
-    createdFor: string;
-    problem: string;
-    whyNeeded: string;
+    what: string;
+    purpose?: string;
+    audience?: string;
+    solves?: string;
   };
-  problemAndSolution: {
-    problem: string;
-    solution: string;
-  };
-  contributions: string[];
+  contributions?: string[];
   features: ProjectFeature[];
+  /** A user-facing journey (e.g. a booking flow) shown as its own timeline. */
+  journey?: { title: string; eyebrow: string; steps: ProjectStep[] };
+  /** How the project was built. */
+  process?: ProjectStep[];
   gallery: ProjectMedia[];
-  video?: ProjectVideo;
-  impact: string[];
-  challenges: ProjectChallenge[];
-  skills: string[];
+  challenges?: ProjectChallenge[];
+  outcomes?: ProjectOutcome[];
+  stack: ProjectStackGroup[];
   links: ProjectLinks;
 };
+
+const NU = "National University – Dasmariñas";
+
+const IGNIS_PROCESS: ProjectStep[] = [
+  {
+    title: "Analyze",
+    description: "Study the Bureau of Fire Protection's requirements for the system.",
+  },
+  {
+    title: "Translate",
+    description: "Turn those requirements into workflows, database structures and functional features.",
+  },
+  {
+    title: "Build",
+    description: "Develop the web and mobile features with Flutter, React.js and Supabase.",
+  },
+  {
+    title: "Test & debug",
+    description: "Test and debug each feature to improve reliability, usability and performance.",
+  },
+];
 
 export const PROJECT_DETAILS: ProjectDetail[] = [
   {
     slug: "ignis-safe-website",
     category: "Web Application · Public Safety",
     title: "IGNIS SAFE Website",
+    tagline: "The official online portal for the BFP Dasmariñas City Fire Station.",
     summary:
-      "A companion web platform for the IGNIS SAFE fire-safety program, giving administrators and the public a reliable place to manage and access fire-safety information.",
-    technologies: ["Next.js", "TypeScript", "Supabase"],
-    status: "Completed · Academic Capstone Project",
-    role: "Contributing Web Developer",
-    heroImage: {
-      src: "/assets/projects/ignis-safe-website/hero.svg",
-      alt: "IGNIS SAFE website dashboard preview",
+      "The web side of IGNIS SAFE: a city fire station portal for fire-safety services, public advisories and FSIC / FSEC application guidance, plus the download page for the IGNIS SAFE Android app.",
+    period: "2025 – Present",
+    role: "Systems Analyst, Mobile & Web Developer",
+    organization: NU,
+    status: "Live on Vercel",
+    hero: {
+      src: "/assets/projects/ignis-safe-website/ignis_safe_landing.png",
+      alt: "IGNIS SAFE website home page: the official BFP Dasmariñas City Fire Station portal with the headline 'Protecting lives, property and community'.",
+      width: 1897,
+      height: 985,
+      frame: "browser",
     },
     overview: {
-      whatItIs:
-        "IGNIS SAFE Website is the web-based companion to the IGNIS SAFE fire-safety learning system. It gives program coordinators a central place to publish resources, manage content, and support the mobile learning experience.",
-      createdFor:
-        "Built for the coordinators and administrators of the IGNIS SAFE fire-safety education program, and for community members seeking accessible fire-safety information.",
-      problem:
-        "Fire-safety information for the program was scattered across static documents and manual processes, making it hard to keep resources current or manage them at scale.",
-      whyNeeded:
-        "A structured web platform was needed so program content could be updated, organized, and delivered consistently, in step with the mobile learning application.",
-    },
-    problemAndSolution: {
-      problem:
-        "Program staff had no centralized system to publish and maintain fire-safety resources, which meant updates were slow, inconsistent, and hard to track across the team.",
-      solution:
-        "The team built a Next.js and Supabase powered platform with structured content management, giving staff a straightforward interface to publish and update resources without touching code, while keeping the data in sync with the broader IGNIS SAFE program.",
+      what: "IGNIS SAFE is a fire-safety learning and 3D simulation system built around requirements from the Bureau of Fire Protection. The website is its public face: it presents the fire station's services and distributes the mobile app.",
+      purpose:
+        "Give people one place to reach fire-safety services, public advisories, contact details and FSIC / FSEC application guidance.",
+      audience:
+        "Community members who need the Dasmariñas City Fire Station's services, including anyone preparing an FSIC or FSEC application.",
+      solves:
+        "Puts station services, advisories, application requirements, hotlines and the app download in a single portal.",
     },
     contributions: [
-      "Contributed to building and styling responsive page layouts using Next.js and TypeScript.",
-      "Helped implement Supabase data queries for displaying program resources and content.",
-      "Assisted in testing page functionality and fixing layout and interaction issues across devices.",
-      "Collaborated with teammates on documentation to support future maintenance of the platform.",
+      "Developed web and mobile features using Flutter, React.js and Supabase for fire-safety learning, assessments, tracking and administration.",
+      "Analyzed BFP requirements and translated them into system workflows, database structures and functional features.",
+      "Tested and debugged system features to improve reliability, usability and overall performance.",
     ],
     features: [
       {
-        title: "Program Resource Hub",
+        title: "FSIC & FSEC guidance",
         description:
-          "A structured library of fire-safety resources that keeps information organized and easy for both staff and the public to find.",
+          "Requirements and the application process, with a 'Start online application' entry point and a 'View requirements' path.",
       },
       {
-        title: "Administrative Tools",
-        description:
-          "Interfaces that let coordinators manage and update program content without needing developer support.",
+        title: "Public advisories",
+        description: "A home-page shortcut to the station's latest announcements and updates.",
       },
       {
-        title: "Supabase-Backed Data Layer",
+        title: "Station contact",
         description:
-          "A managed backend that keeps content consistent and reliably synced across the website and mobile experience.",
+          "Hotlines and official channels, with an emergency banner pointing visitors to call 911 immediately.",
       },
       {
-        title: "Responsive Interface",
+        title: "Android app download",
         description:
-          "A layout that adapts cleanly across desktop and mobile browsers, so the platform is usable in any setting.",
+          "A download page with version, size and platform details, a QR code and step-by-step install instructions for IGNIS SAFE v1.0.0.",
+      },
+      {
+        title: "Built into the header",
+        description: "Resources, About Us and Contact menus, a language selector and sign-in are available on every page.",
       },
     ],
+    process: IGNIS_PROCESS,
     gallery: [
       {
-        src: "/assets/projects/ignis-safe-website/hero.svg",
-        alt: "IGNIS SAFE website home preview",
+        src: "/assets/projects/ignis-safe-website/ignis_safe_landing.png",
+        alt: "IGNIS SAFE website home page with service shortcuts for FSIC & FSEC, public advisories and station contact.",
+        width: 1897,
+        height: 985,
+        caption: "Home — service shortcuts for FSIC & FSEC, advisories and station contact.",
+        frame: "browser",
       },
       {
-        src: "/assets/projects/ignis-safe-website/screen-dashboard.svg",
-        alt: "IGNIS SAFE website dashboard screen",
-      },
-      {
-        src: "/assets/projects/ignis-safe-website/screen-detail.svg",
-        alt: "IGNIS SAFE website content management screen",
+        src: "/assets/projects/ignis-safe-website/landing_mobile.png",
+        alt: "Download IGNIS SAFE page showing the Android app on two phones, version details, a QR code and install steps.",
+        width: 1897,
+        height: 987,
+        caption: "Download page — version details, QR code and install steps for the Android app.",
+        frame: "browser",
       },
     ],
-    impact: [
-      "Gives program coordinators a faster way to publish and maintain accurate fire-safety information.",
-      "Provides the community with an accessible reference point for fire-safety resources alongside the mobile app.",
-      "Reduces the manual effort needed to keep program content current across the team.",
-    ],
-    challenges: [
+    outcomes: [
       {
-        challenge:
-          "Keeping content structure flexible enough for non-technical staff to manage without breaking page layouts.",
-        solution:
-          "Worked with the team to design a predictable content schema in Supabase and reusable components so new resources could be added safely.",
+        stat: "Live",
+        label: "Deployed on Vercel",
+        detail: "Publicly available at ignis-safe.vercel.app.",
       },
       {
-        challenge:
-          "Coordinating the website's data model with the separate mobile application team.",
-        solution:
-          "Communicated closely with the mobile team to align on shared data structures in Supabase, reducing integration issues later in the project.",
+        stat: "v1.0.0",
+        label: "Android app distributed",
+        detail: "The download page lists the APK for Android 7.1+, released September 1, 2026.",
       },
     ],
-    skills: [
-      "Practical experience building with Next.js and TypeScript in a team setting.",
-      "Working with Supabase for structured content and data management.",
-      "Coordinating technical decisions across a multi-platform project (web and mobile).",
-      "Testing and refining responsive layouts across devices.",
+    stack: [
+      { label: "Interface", items: ["React 19", "Vite", "React Router"] },
+      { label: "Data & backend", items: ["Supabase"] },
+      { label: "Visuals & documents", items: ["Chart.js", "jsPDF", "QR codes"] },
+      { label: "Motion", items: ["GSAP"] },
+      { label: "Quality", items: ["ESLint", "Lighthouse"] },
     ],
     links: {
+      liveUrl: "https://ignis-safe.vercel.app",
       repoUrl: "https://github.com/paulosierra797/ignis-safe",
     },
   },
@@ -158,99 +211,120 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
     slug: "ignis-safe-mobile",
     category: "Mobile Application · Educational Technology",
     title: "IGNIS SAFE Mobile Application",
+    tagline: "Learn. Practice. Stay prepared.",
     summary:
-      "A mobile fire-safety learning app that combines structured lessons, assessments, and interactive Unity-based simulations to make fire-safety education more engaging.",
-    technologies: ["Flutter", "Dart", "Supabase", "Unity"],
-    status: "Completed · Academic Capstone Project",
-    role: "Lead Mobile Developer",
-    heroImage: {
-      src: "/assets/projects/ignis-safe-mobile/hero.svg",
-      alt: "IGNIS SAFE mobile application interface preview",
+      "A Flutter app that teaches fire safety through five learning modules that pair assessments and learning materials with 3D simulations, backed by Supabase and tracked per learner.",
+    period: "2025 – Present",
+    role: "Systems Analyst, Mobile & Web Developer",
+    organization: NU,
+    status: "v1.0.0 released for Android",
+    hero: {
+      src: "/assets/projects/ignis-safe-mobile/app-preview.png",
+      alt: "The IGNIS SAFE app on two phones: the splash screen and the Learning Materials screen listing Pre-Assessment, Learning Materials, Post-Assessment and 3D Simulation.",
+      width: 416,
+      height: 456,
+      frame: "plain",
     },
     overview: {
-      whatItIs:
-        "IGNIS SAFE Mobile is a Flutter-based learning application that teaches fire-safety concepts through structured lessons, knowledge assessments, and hands-on Unity simulations.",
-      createdFor:
-        "Designed for students and community members who need an engaging, practical way to learn fire-safety procedures rather than relying on static reading materials.",
-      problem:
-        "Traditional fire-safety instruction is often passive, text-heavy, and difficult to retain, leaving learners underprepared for real emergency scenarios.",
-      whyNeeded:
-        "An interactive, mobile-first learning tool was needed to make fire-safety concepts easier to understand, practice, and remember.",
-    },
-    problemAndSolution: {
-      problem:
-        "Learners frequently disengage from conventional fire-safety materials, which limits how much of the content they actually retain or can apply in an emergency.",
-      solution:
-        "IGNIS SAFE Mobile pairs structured lesson content with short assessments and Unity-built simulations, so learners can practice decision-making in a realistic, low-stakes environment while progress is tracked through Supabase.",
+      what: "IGNIS SAFE Mobile is the learner-facing half of the IGNIS SAFE system. It brings focused fire-safety lessons, guided simulations, learning progress and achievement badges into one mobile experience.",
+      purpose:
+        "Make fire-safety learning active: learners are assessed, study the material, are assessed again, then practise in a 3D simulation.",
+      audience:
+        "Learners with an IGNIS SAFE account, who sign in with email or Google and have their module progress tracked.",
+      solves:
+        "Combines lessons, assessments, simulations, progress tracking and medals in a single app.",
     },
     contributions: [
-      "Led the design and development of the Flutter application, including navigation, lesson flows, and assessment screens.",
-      "Designed and implemented the Supabase schema for storing lessons, quiz results, and learner progress.",
-      "Integrated the Unity-based simulation modules into the Flutter application.",
-      "Personally tested lesson flows and simulation triggers across Android devices and resolved usability issues found during testing.",
-      "Wrote setup and usage documentation to support continued development of the app.",
+      "Developed mobile and web features using Flutter, React.js and Supabase for fire-safety learning, assessments, tracking and administration.",
+      "Analyzed BFP requirements and translated them into system workflows, database structures and functional features.",
+      "Tested and debugged system features to improve reliability, usability and overall performance.",
+      "Authored 107 of the 138 commits in the app's repository (git history, October 2026).",
     ],
     features: [
       {
-        title: "Structured Lesson Modules",
+        title: "Five learning modules",
         description:
-          "Fire-safety topics broken into clear, digestible lessons that guide learners step by step.",
+          "Fire extinguisher, house fire, electrical fire, kitchen fire and tenement fire — each a self-contained module with its own materials.",
       },
       {
-        title: "Knowledge Assessments",
+        title: "3D simulations with Unity",
         description:
-          "Short quizzes after each module that reinforce learning and give learners a way to check their understanding.",
+          "Simulations are Unity scenes launched from the Flutter app through a platform channel, then hand control back to the app on completion.",
       },
       {
-        title: "Unity-Based Simulations",
+        title: "Progress & history",
         description:
-          "Interactive scenarios that let learners practice fire-safety responses in a realistic, hands-on way instead of just reading about them.",
+          "A module progress overview and per-module history, stored in Supabase so a learner's results follow their account.",
       },
       {
-        title: "Progress Tracking",
+        title: "Achievement medals",
+        description: "Virtual medals earned per module, plus a completion medal for finishing every module.",
+      },
+      {
+        title: "English & Tagalog",
+        description: "The app ships with English and Tagalog locales.",
+      },
+      {
+        title: "Accounts, feedback & help",
         description:
-          "Supabase-backed tracking of lesson completion and quiz scores, so learners and instructors can see progress over time.",
+          "Sign-up with email verification, password reset, Google sign-in, in-app feedback and an FAQ page.",
       },
     ],
+    journey: {
+      eyebrow: "Learning journey",
+      title: "How a module unfolds",
+      steps: [
+        { title: "Pre-Assessment", description: "Check what you already know before starting." },
+        { title: "Learning Materials", description: "Work through the lesson content for the module." },
+        { title: "Post-Assessment", description: "Test what you have learned." },
+        { title: "3D Simulation", description: "Practise the response in an interactive scene." },
+      ],
+    },
+    process: IGNIS_PROCESS,
     gallery: [
       {
-        src: "/assets/projects/ignis-safe-mobile/hero.svg",
-        alt: "IGNIS SAFE mobile home screen preview",
+        src: "/assets/projects/ignis-safe-mobile/app-preview.png",
+        alt: "The IGNIS SAFE app on two phones: the splash screen and the Learning Materials screen.",
+        width: 416,
+        height: 456,
+        caption: "The app: splash screen and the Learning Materials list.",
+        frame: "plain",
       },
       {
-        src: "/assets/projects/ignis-safe-mobile/screen-dashboard.svg",
-        alt: "IGNIS SAFE mobile lesson dashboard screen",
+        src: "/assets/projects/ignis-safe-website/landing_mobile.png",
+        alt: "The IGNIS SAFE website's download page for the Android app, with a QR code and install steps.",
+        width: 1897,
+        height: 987,
+        caption: "How the app is distributed — the download page on the IGNIS SAFE website.",
+        frame: "browser",
       },
-      {
-        src: "/assets/projects/ignis-safe-mobile/screen-detail.svg",
-        alt: "IGNIS SAFE mobile assessment screen",
-      },
-    ],
-    impact: [
-      "Helps students and community members build fire-safety knowledge through active practice rather than passive reading.",
-      "Gives educators a structured tool for teaching fire-safety procedures with measurable outcomes.",
-      "Makes fire-safety simulations more accessible by delivering them on everyday mobile devices.",
     ],
     challenges: [
       {
         challenge:
-          "Embedding Unity simulations inside a Flutter application without disrupting app performance or navigation.",
+          "Returning from a Unity simulation to Flutter reliably. Leaving the Unity process alive caused a black screen on the next scene launch, and several scripts could trigger a return at the same time, risking a freeze.",
         solution:
-          "Researched and implemented a Flutter-Unity integration approach, carefully managing simulation load and transitions to keep the app responsive.",
+          "A ReturnToFlutter helper finishes the Android activity so the Unity process is destroyed and Flutter receives the result, with a guard flag so only one return call ever runs.",
       },
       {
-        challenge:
-          "Structuring learner progress data so lessons, quizzes, and simulation results stayed consistent.",
+        challenge: "Keeping a Unity-integrated Android build compatible with current Flutter packages.",
         solution:
-          "Designed a normalized Supabase schema that linked learner records to lesson and assessment results, then validated it through repeated test runs.",
+          "Pinned package_info_plus to 8.0.2, because version 9 needs a newer Kotlin Gradle plugin than the project's Unity-integrated build uses.",
       },
     ],
-    skills: [
-      "Cross-platform mobile development with Flutter and Dart.",
-      "Integrating Unity simulations into a mobile application shell.",
-      "Designing a Supabase data schema for learning progress and assessments.",
-      "End-to-end testing of interactive, multi-module mobile experiences.",
-      "Writing technical documentation for future collaborators.",
+    outcomes: [
+      {
+        stat: "v1.0.0",
+        label: "Android release",
+        detail: "Distributed as an APK for Android 7.1+ (64-bit ARM), released September 1, 2026.",
+      },
+      { stat: "5", label: "Learning modules" },
+      { stat: "2", label: "Languages", detail: "English and Tagalog." },
+    ],
+    stack: [
+      { label: "Mobile", items: ["Flutter", "Dart", "Provider"] },
+      { label: "Data & auth", items: ["Supabase", "Google Sign-In"] },
+      { label: "3D & media", items: ["Unity", "model_viewer_plus", "video_player"] },
     ],
     links: {
       repoUrl: "https://github.com/FatimaKlye/ignis_safe_mobile",
@@ -260,97 +334,50 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
     slug: "itso-id-tracker",
     category: "Web Application · Campus System",
     title: "ITSO ID Tracker",
+    tagline: "Status monitoring and record management for ID issuance.",
     summary:
-      "An ID processing and tracking system built for a campus ITSO office to streamline issuance, status updates, and record-keeping.",
-    technologies: ["Next.js", "TypeScript", "Supabase"],
-    status: "Completed · Academic Team Project",
-    role: "Contributing Developer",
-    heroImage: {
-      src: "/assets/projects/itso-id-tracker/hero.svg",
-      alt: "ITSO ID Tracker interface preview",
-    },
+      "An ID processing and tracking system that simplifies how ID issuance is monitored and recorded for the ITSO office.",
+    period: "2024 – 2025",
+    role: "Web Developer",
+    organization: NU,
     overview: {
-      whatItIs:
-        "ITSO ID Tracker is a web application that digitizes the process of issuing and tracking campus IDs, replacing manual logbooks with a searchable, status-driven system.",
-      createdFor:
-        "Built for the campus ITSO (Information Technology Services Office) staff who process ID requests, and for students who need visibility into their ID request status.",
-      problem:
-        "ID issuance was previously tracked manually, making it slow to look up a request's status and easy to lose track of pending or completed IDs.",
-      whyNeeded:
-        "The office needed a reliable digital system to record requests, update statuses, and keep an accurate, searchable history of issued IDs.",
-    },
-    problemAndSolution: {
-      problem:
-        "Manual, paper-based tracking made it difficult for staff to quickly check a request's status or maintain accurate records as request volume grew.",
-      solution:
-        "The team built a Next.js and Supabase system that logs each ID request, tracks its status through the issuance workflow, and keeps a searchable digital record for staff to reference.",
+      what: "ITSO ID Tracker is a web system for processing and tracking IDs, built with Next.js, TypeScript and Supabase.",
+      purpose: "Simplify ID issuance and tracking workflows.",
+      audience: "The ITSO office, which processes and tracks ID issuance.",
+      solves: "Brings status monitoring and record management into one tracking system.",
     },
     contributions: [
-      "Contributed to building interface components for viewing and updating ID request records.",
-      "Helped implement Supabase queries for filtering and searching ID records by status.",
-      "Assisted with testing the request workflow to confirm status updates behaved correctly.",
-      "Worked with teammates to refine the interface based on feedback from ITSO staff.",
+      "Developed an ID processing and tracking system using Next.js, TypeScript and Supabase.",
+      "Implemented status monitoring and record management, simplifying ID issuance and tracking workflows.",
+      "Tested and refined system functions and interfaces, improving usability and data accuracy.",
     ],
     features: [
       {
-        title: "Request Status Tracking",
-        description:
-          "A clear view of where each ID request stands, from submission through issuance.",
+        title: "Status monitoring",
+        description: "Follow each ID through the issuance process by its current status.",
       },
       {
-        title: "Searchable Records",
-        description:
-          "Fast lookup of ID records by name or status, replacing manual logbook searches.",
+        title: "Record management",
+        description: "Keep ID records organised in one place instead of scattered across the process.",
       },
       {
-        title: "Centralized Record-Keeping",
-        description:
-          "A single digital source of truth for ID issuance history, reducing lost or duplicated records.",
-      },
-      {
-        title: "Staff-Focused Interface",
-        description:
-          "A straightforward layout built around how ITSO staff actually process requests day to day.",
+        title: "Streamlined workflow",
+        description: "Issuance and tracking steps simplified into a clearer, more consistent flow.",
       },
     ],
-    gallery: [
-      {
-        src: "/assets/projects/itso-id-tracker/hero.svg",
-        alt: "ITSO ID Tracker home preview",
-      },
-      {
-        src: "/assets/projects/itso-id-tracker/screen-dashboard.svg",
-        alt: "ITSO ID Tracker records dashboard screen",
-      },
-      {
-        src: "/assets/projects/itso-id-tracker/screen-detail.svg",
-        alt: "ITSO ID Tracker request detail screen",
-      },
+    process: [
+      { title: "Build", description: "Develop the ID processing and tracking system with Next.js, TypeScript and Supabase." },
+      { title: "Implement", description: "Add status monitoring and record management to the issuance workflow." },
+      { title: "Test & refine", description: "Test system functions and refine the interfaces for usability and data accuracy." },
     ],
-    impact: [
-      "Gives ITSO staff a faster, more reliable way to process and track ID requests.",
-      "Reduces the risk of lost or inconsistent records compared to manual logbooks.",
-      "Improves the experience for students by making ID status easier to check and confirm.",
+    gallery: [],
+    outcomes: [
+      { label: "Simplified ID issuance and tracking workflows." },
+      { label: "Improved usability and data accuracy through testing and refinement." },
     ],
-    challenges: [
-      {
-        challenge:
-          "Modeling a request-status workflow that matched the office's actual issuance process.",
-        solution:
-          "Worked closely with teammates to map out the real ITSO workflow before implementing the status states in Supabase, reducing rework later on.",
-      },
-      {
-        challenge:
-          "Making record search fast and dependable as the number of ID entries grew.",
-        solution:
-          "Helped refine Supabase queries and indexing so searches stayed responsive as test data volume increased.",
-      },
-    ],
-    skills: [
-      "Building record-management interfaces with Next.js and TypeScript.",
-      "Writing and refining Supabase queries for search and filtering.",
-      "Translating a real office workflow into a working software system.",
-      "Collaborating with a team on iterative feedback and testing.",
+    stack: [
+      { label: "Framework & language", items: ["Next.js", "TypeScript"] },
+      { label: "Data & backend", items: ["Supabase"] },
     ],
     links: {
       repoUrl: "https://github.com/seandrodejo/itso-id-tracker1",
@@ -360,106 +387,149 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
     slug: "beautiverse",
     category: "Web Application · Beauty & Commerce",
     title: "Beautiverse",
+    tagline: "A beauty storefront and community in one place.",
     summary:
-      "A digital storefront and community platform connecting beauty enthusiasts with products, services, and content in one place.",
-    technologies: ["Next.js", "TypeScript", "Supabase"],
-    status: "Completed · Academic Team Project",
-    role: "Contributing Developer",
-    heroImage: {
-      src: "/assets/projects/beautiverse/hero.svg",
-      alt: "Beautiverse interface preview",
-    },
+      "A digital beauty storefront and community platform for products, services and user content.",
+    period: "2025 – 2026",
+    role: "Web Developer",
+    organization: NU,
     overview: {
-      whatItIs:
-        "Beautiverse is a web platform that brings together a product storefront and community content for beauty enthusiasts, built as a combined commerce and content experience.",
-      createdFor:
-        "Created for beauty enthusiasts and small beauty businesses who want a shared space to discover products and services alongside community content.",
-      problem:
-        "Beauty enthusiasts often have to jump between separate shopping sites and content platforms, with no unified place to browse products and related content together.",
-      whyNeeded:
-        "A combined platform was needed so users could discover products and engage with beauty-related content without switching between disconnected tools.",
-    },
-    problemAndSolution: {
-      problem:
-        "Existing options split shopping and community content across different platforms, making the experience fragmented for users interested in both.",
-      solution:
-        "The team built Beautiverse as a single Next.js and Supabase application that combines a product storefront with community-facing content, giving users one place to browse and engage.",
+      what: "Beautiverse is a digital beauty storefront and community platform where products, services and user content live together.",
+      purpose: "Create a clearer, more accessible browsing experience for beauty products, services and content.",
+      solves: "Puts products, services and user content on one platform with a clear browsing flow.",
     },
     contributions: [
-      "Contributed to building storefront and content page components in Next.js and TypeScript.",
-      "Helped structure Supabase tables for products and related content.",
-      "Assisted in testing the storefront browsing experience across desktop and mobile breakpoints.",
-      "Collaborated with the team on UI refinements based on peer feedback during development.",
+      "Developed a digital beauty storefront and community platform for products, services and user content.",
+      "Designed responsive interfaces and user flows, creating a clearer and more accessible browsing experience.",
+      "Integrated application features and data management, supporting reliable interaction across the platform.",
     ],
     features: [
       {
-        title: "Product Storefront",
-        description:
-          "A browsable catalog of beauty products and services, organized for easy discovery.",
+        title: "Products & services storefront",
+        description: "A storefront for browsing beauty products and services.",
       },
       {
-        title: "Community Content Space",
-        description:
-          "A section for beauty-related content that keeps users engaged beyond just shopping.",
+        title: "Community content",
+        description: "A space for user content alongside the storefront.",
       },
       {
-        title: "Unified Browsing Experience",
-        description:
-          "One platform for products and content, reducing the need to switch between separate sites.",
+        title: "Responsive interfaces",
+        description: "Layouts and user flows designed to stay clear and accessible across screen sizes.",
       },
       {
-        title: "Responsive Storefront Layout",
-        description:
-          "A layout that adapts across devices so browsing feels natural on both desktop and mobile.",
+        title: "Integrated data management",
+        description: "Application features connected to managed data for reliable interaction across the platform.",
       },
     ],
-    gallery: [
+    process: [
+      { title: "Design", description: "Shape responsive interfaces and user flows for browsing." },
+      { title: "Build", description: "Develop the storefront and community platform." },
+      { title: "Integrate", description: "Connect application features with data management." },
+    ],
+    gallery: [],
+    outcomes: [
+      { label: "A clearer, more accessible browsing experience across products, services and content." },
+      { label: "Reliable interaction across the platform through integrated features and data management." },
+    ],
+    stack: [
+      { label: "Framework & language", items: ["Next.js", "TypeScript"] },
+      { label: "Data & backend", items: ["Supabase"] },
+    ],
+    links: {},
+  },
+  {
+    slug: "maddy-cassy",
+    category: "Web Application · Equipment Rental & Commerce",
+    title: "Maddy & Cassy Rentals",
+    tagline: "Rent the gear. Create the moment.",
+    summary:
+      "A rental platform for cameras and iPhones that handles bookings, manual GCash payment verification, and automatically generated invoices and rental agreements.",
+    status: "Live on Vercel",
+    hero: {
+      src: "/assets/projects/maddy-cassy/screenshot-1.webp",
+      alt: "Maddy & Cassy Rentals home page: 'Rent the Gear. Create the Moment.' with a carousel of rental gear including the DJI Osmo Action 6.",
+      width: 1440,
+      height: 900,
+      frame: "browser",
+    },
+    overview: {
+      what: "Rental by Maddy & Cassy is a gear rental platform for premium cameras and iPhones, rented by the day with delivery and pickup across Metro Manila.",
+      purpose: "Let customers browse gear, reserve dates, pay and sign their rental agreement online.",
+      audience: "Customers in Metro Manila renting cameras and iPhones for trips, events and content.",
+      solves:
+        "Handles booking, GCash payment verification, invoices and rental agreements in one rental platform.",
+    },
+    features: [
       {
-        src: "/assets/projects/beautiverse/hero.svg",
-        alt: "Beautiverse storefront preview",
+        title: "Live catalog",
+        description: "Cameras and iPhones organised by category, with a daily rate on every listing.",
       },
       {
-        src: "/assets/projects/beautiverse/screen-dashboard.svg",
-        alt: "Beautiverse storefront catalog screen",
+        title: "GCash checkout",
+        description: "Pay a 50% deposit or the full amount through GCash, with manual payment verification.",
       },
       {
-        src: "/assets/projects/beautiverse/screen-detail.svg",
-        alt: "Beautiverse product detail screen",
+        title: "Invoices & agreements",
+        description: "Invoices and rental agreements are generated automatically; agreements are signed electronically.",
+      },
+      {
+        title: "Booking tracking",
+        description: "A Track Booking action in the hero for following a reservation after it is placed.",
+      },
+      {
+        title: "Customer tools",
+        description: "Favorites, a rental cart and in-app messages for each account.",
+      },
+      {
+        title: "Rewards",
+        description: "A birthday-month discount and loyalty rewards for repeat renters.",
       },
     ],
-    impact: [
-      "Gives beauty enthusiasts a single place to discover products and related content.",
-      "Supports small beauty businesses and creators by giving their offerings more visibility.",
-      "Reduces friction for users who previously had to use multiple disconnected platforms.",
-    ],
-    challenges: [
+    journey: {
+      eyebrow: "Booking journey",
+      title: "From gear to confirmation",
+      steps: [
+        { title: "Select gear" },
+        { title: "Set reservation dates" },
+        { title: "Pay via GCash" },
+        { title: "Submit verification documents" },
+        { title: "Sign the rental agreement" },
+        { title: "Receive confirmation" },
+      ],
+    },
+    gallery: [],
+    outcomes: [
       {
-        challenge:
-          "Designing a data model that could support both storefront products and community content without becoming overly complex.",
-        solution:
-          "Worked with the team to separate product and content concerns into distinct, related Supabase tables, keeping queries manageable as features grew.",
+        stat: "Live",
+        label: "Deployed on Vercel",
+        detail: "Publicly available at maddyandcassyrentals-nine.vercel.app.",
       },
       {
-        challenge:
-          "Keeping the storefront layout consistent and readable across a wide range of screen sizes.",
-        solution:
-          "Iterated on responsive layouts through peer testing, adjusting breakpoints until browsing felt natural on both mobile and desktop.",
+        stat: "15+",
+        label: "Catalog listings",
+        detail: "Cameras and iPhones available to browse and reserve.",
       },
     ],
-    skills: [
-      "Building commerce-style interfaces with Next.js and TypeScript.",
-      "Structuring Supabase data models for combined commerce and content use cases.",
-      "Responsive UI development and cross-device testing.",
-      "Iterating on design based on team and peer feedback.",
+    stack: [
+      { label: "Framework & language", items: ["Next.js", "TypeScript"] },
+      { label: "Data & backend", items: ["Supabase"] },
     ],
     links: {
-      repoUrl: "https://github.com/andreii2404/Beautiverse-digi",
+      liveUrl: "https://maddyandcassyrentals-nine.vercel.app/",
+      repoUrl: "https://github.com/andreii2404/maddyandcassyrentals",
     },
   },
 ];
 
 export function getProjectDetailBySlug(slug: string): ProjectDetail | undefined {
   return PROJECT_DETAILS.find((project) => project.slug === slug);
+}
+
+export function getProjectPosition(slug: string): { index: number; total: number } {
+  return {
+    index: PROJECT_DETAILS.findIndex((project) => project.slug === slug),
+    total: PROJECT_DETAILS.length,
+  };
 }
 
 export function getAdjacentProjects(slug: string): {
@@ -472,8 +542,7 @@ export function getAdjacentProjects(slug: string): {
     return { previous: null, next: null };
   }
 
-  const previous =
-    PROJECT_DETAILS[(index - 1 + PROJECT_DETAILS.length) % PROJECT_DETAILS.length];
+  const previous = PROJECT_DETAILS[(index - 1 + PROJECT_DETAILS.length) % PROJECT_DETAILS.length];
   const next = PROJECT_DETAILS[(index + 1) % PROJECT_DETAILS.length];
 
   return { previous, next };

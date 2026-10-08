@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import type { Project } from "@/components/projects/projectsData";
 import { PerspectiveCarousel } from "./PerspectiveCarousel";
 import styles from "./ProjectShowcaseCarousel.module.css";
@@ -42,6 +43,7 @@ function useCarouselSize() {
 
 export default function ProjectShowcaseCarousel({ projects }: ProjectShowcaseCarouselProps) {
   const { slideWidth, height } = useCarouselSize();
+  const router = useRouter();
 
   const items = React.useMemo(
     () =>
@@ -51,9 +53,25 @@ export default function ProjectShowcaseCarousel({ projects }: ProjectShowcaseCar
           src: preview?.src ?? project.image,
           alt: preview?.alt ?? project.imageAlt,
           title: project.title,
+          actionLabel: "View case study",
         };
       }),
     [projects]
+  );
+
+  // Warm the case-study routes so the click feels instant.
+  React.useEffect(() => {
+    projects.forEach((project) => router.prefetch(`/projects/${project.slug}`));
+  }, [projects, router]);
+
+  const openProject = React.useCallback(
+    (index: number) => {
+      const project = projects[index];
+      if (project) {
+        router.push(`/projects/${project.slug}`);
+      }
+    },
+    [projects, router]
   );
 
   return (
@@ -61,6 +79,7 @@ export default function ProjectShowcaseCarousel({ projects }: ProjectShowcaseCar
       <PerspectiveCarousel
         items={items}
         loop
+        onActiveClick={openProject}
         slideWidth={slideWidth}
         className={styles.carousel}
         imageClassName={styles.carouselImage}

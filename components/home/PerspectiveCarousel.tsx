@@ -10,6 +10,8 @@ export interface PerspectiveCarouselItem {
   src: string;
   title: string;
   alt?: string;
+  /** Short call to action shown under the active slide's title (needs onActiveClick). */
+  actionLabel?: string;
 }
 
 export interface PerspectiveCarouselProps
@@ -18,6 +20,8 @@ export interface PerspectiveCarouselProps
   activeIndex?: number;
   defaultActiveIndex?: number;
   onActiveIndexChange?: (index: number) => void;
+  /** Called when the already-active slide is clicked. Inactive slides still just take focus. */
+  onActiveClick?: (index: number) => void;
   loop?: boolean;
   slideWidth?: number;
   rotationStep?: number;
@@ -45,6 +49,7 @@ export function PerspectiveCarousel({
   activeIndex,
   defaultActiveIndex = 0,
   onActiveIndexChange,
+  onActiveClick,
   loop = false,
   slideWidth = 200,
   rotationStep = 60,
@@ -134,6 +139,7 @@ export function PerspectiveCarousel({
         >
           {items.map((item, index) => {
             const isActive = currentIndex === index;
+            const opensOnClick = isActive && Boolean(onActiveClick);
 
             return (
               <div
@@ -152,10 +158,14 @@ export function PerspectiveCarousel({
                 >
                   <button
                     type="button"
-                    aria-label={`Show ${item.title}`}
+                    aria-label={
+                      opensOnClick
+                        ? `${item.actionLabel ?? "Open"}: ${item.title}`
+                        : `Show ${item.title}`
+                    }
                     aria-current={isActive ? "true" : undefined}
-                    className={styles.slideButton}
-                    onClick={() => selectSlide(index)}
+                    className={cn(styles.slideButton, opensOnClick && styles.slideButtonActionable)}
+                    onClick={() => (opensOnClick ? onActiveClick?.(index) : selectSlide(index))}
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
@@ -175,6 +185,11 @@ export function PerspectiveCarousel({
                     transition={transition}
                   >
                     {item.title}
+                    {onActiveClick && item.actionLabel && (
+                      <span className={styles.actionHint} aria-hidden="true">
+                        {item.actionLabel} <span className={styles.actionArrow}>↗</span>
+                      </span>
+                    )}
                   </motion.p>
                 </motion.div>
               </div>

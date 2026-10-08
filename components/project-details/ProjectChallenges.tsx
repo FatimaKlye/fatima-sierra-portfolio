@@ -1,35 +1,42 @@
-import type { ProjectDetail } from "@/data/projectDetailsData";
+import { ArrowRight } from "lucide-react";
+import type { ProjectChallenge } from "@/data/projectDetailsData";
+import SectionHead from "./SectionHead";
 import styles from "./ProjectDetails.module.css";
 
-export default function ProjectChallenges({ project }: { project: ProjectDetail }) {
+export default function ProjectChallenges({
+  challenges,
+  number,
+}: {
+  challenges: ProjectChallenge[];
+  number: string;
+}) {
   return (
-    <section className={styles.section} aria-labelledby="challenges-title">
+    <section className={styles.challenges} aria-labelledby="challenges-title">
       <div className={styles.container}>
-        <header className={styles.sectionHeader}>
-          <p className={styles.eyebrow}>Challenges &amp; Solutions</p>
-          <h2 id="challenges-title" className={styles.sectionTitle}>
-            Working Through the Hard Parts
-          </h2>
-        </header>
+        <SectionHead
+          id="challenges-title"
+          number={number}
+          eyebrow="Challenges & solutions"
+          title="Problems worth solving"
+        />
 
-        <div className={styles.challengeGrid}>
-          {project.challenges.map((item) => (
-            <div key={item.challenge} className={styles.challengeCard}>
-              <div>
-                <p className={`${styles.challengeLabel} ${styles.challengeLabelProblem}`}>
-                  Challenge
-                </p>
+        <ol className={styles.challengeList}>
+          {challenges.map((item, itemIndex) => (
+            <li key={item.challenge} className={styles.challenge} data-reveal>
+              <div className={styles.challengeProblem}>
+                <p className={styles.tag}>Challenge {itemIndex + 1}</p>
                 <p className={styles.challengeText}>{item.challenge}</p>
               </div>
-              <div>
-                <p className={`${styles.challengeLabel} ${styles.challengeLabelSolution}`}>
-                  Solution
-                </p>
+              <span className={styles.challengeArrow} aria-hidden="true">
+                <ArrowRight size={22} />
+              </span>
+              <div className={styles.challengeSolution}>
+                <p className={`${styles.tag} ${styles.tagSolution}`}>Solution</p>
                 <p className={styles.challengeText}>{item.solution}</p>
               </div>
-            </div>
+            </li>
           ))}
-        </div>
+        </ol>
       </div>
     </section>
   );

@@ -4,19 +4,20 @@ import {
   PROJECT_DETAILS,
   getAdjacentProjects,
   getProjectDetailBySlug,
+  getProjectPosition,
 } from "@/data/projectDetailsData";
-import ProjectHero from "@/components/project-details/ProjectHero";
-import ProjectOverview from "@/components/project-details/ProjectOverview";
-import ProjectProblemSolution from "@/components/project-details/ProjectProblemSolution";
-import ProjectContribution from "@/components/project-details/ProjectContribution";
-import ProjectFeatures from "@/components/project-details/ProjectFeatures";
-import ProjectMediaGallery from "@/components/project-details/ProjectMediaGallery";
-import ProjectImpact from "@/components/project-details/ProjectImpact";
+import BackToProjects from "@/components/project-details/BackToProjects";
 import ProjectChallenges from "@/components/project-details/ProjectChallenges";
-import ProjectSkills from "@/components/project-details/ProjectSkills";
-import ProjectLinks from "@/components/project-details/ProjectLinks";
-import ProjectNavigation from "@/components/project-details/ProjectNavigation";
-import styles from "@/components/project-details/ProjectDetails.module.css";
+import ProjectFeatures from "@/components/project-details/ProjectFeatures";
+import ProjectGallery from "@/components/project-details/ProjectGallery";
+import ProjectHero from "@/components/project-details/ProjectHero";
+import ProjectMotion from "@/components/project-details/ProjectMotion";
+import ProjectNext from "@/components/project-details/ProjectNext";
+import ProjectOutcomes from "@/components/project-details/ProjectOutcomes";
+import ProjectOverview from "@/components/project-details/ProjectOverview";
+import ProjectRole from "@/components/project-details/ProjectRole";
+import ProjectStack from "@/components/project-details/ProjectStack";
+import ProjectTimeline from "@/components/project-details/ProjectTimeline";
 
 type ProjectPageProps = {
   params: Promise<{ slug: string }>;
@@ -31,12 +32,16 @@ export async function generateMetadata({ params }: ProjectPageProps): Promise<Me
   const project = getProjectDetailBySlug(slug);
 
   if (!project) {
-    return { title: "Project Not Found | Fatima Sierra" };
+    return { title: "Project not found | Fatima Sierra" };
   }
 
   return {
-    title: `${project.title} | Fatima Sierra`,
+    title: `${project.title} — Case Study | Fatima Sierra`,
     description: project.summary,
+    openGraph: {
+      title: `${project.title} — Case Study`,
+      description: project.summary,
+    },
   };
 }
 
@@ -49,20 +54,66 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
   }
 
   const { previous, next } = getAdjacentProjects(slug);
+  const { index, total } = getProjectPosition(slug);
+
+  // Section numbers follow whichever sections this project actually has.
+  let counter = 0;
+  const nextNumber = () => String(++counter).padStart(2, "0");
 
   return (
-    <main className={styles.page}>
-      <ProjectHero project={project} />
-      <ProjectOverview project={project} />
-      <ProjectProblemSolution project={project} />
-      <ProjectContribution project={project} />
-      <ProjectFeatures project={project} />
-      <ProjectMediaGallery project={project} />
-      <ProjectImpact project={project} />
-      <ProjectChallenges project={project} />
-      <ProjectSkills project={project} />
-      <ProjectLinks project={project} />
-      <ProjectNavigation previous={previous} next={next} />
-    </main>
+    <ProjectMotion key={project.slug}>
+      <noscript>
+        <style>{`[data-motion="pending"] [data-reveal],[data-motion="pending"] [data-intro],[data-motion="pending"] [data-intro-visual],[data-motion="pending"] [data-stagger] > *{opacity:1!important;transform:none!important}[data-motion="pending"] [data-word]{transform:none!important}`}</style>
+      </noscript>
+
+      <main>
+        <ProjectHero project={project} index={index} total={total} />
+        <ProjectOverview project={project} number={nextNumber()} />
+
+        {project.contributions && project.contributions.length > 0 && (
+          <ProjectRole project={project} number={nextNumber()} />
+        )}
+
+        {project.features.length > 0 && <ProjectFeatures features={project.features} number={nextNumber()} />}
+
+        {project.gallery.length > 0 && <ProjectGallery items={project.gallery} number={nextNumber()} />}
+
+        {project.journey && (
+          <ProjectTimeline
+            id="journey-title"
+            number={nextNumber()}
+            eyebrow={project.journey.eyebrow}
+            title={project.journey.title}
+            steps={project.journey.steps}
+            variant="journey"
+          />
+        )}
+
+        {project.process && project.process.length > 0 && (
+          <ProjectTimeline
+            id="process-title"
+            number={nextNumber()}
+            eyebrow="Development process"
+            title="How it was built"
+            steps={project.process}
+            variant="process"
+          />
+        )}
+
+        {project.stack.length > 0 && <ProjectStack stack={project.stack} number={nextNumber()} />}
+
+        {project.challenges && project.challenges.length > 0 && (
+          <ProjectChallenges challenges={project.challenges} number={nextNumber()} />
+        )}
+
+        {project.outcomes && project.outcomes.length > 0 && (
+          <ProjectOutcomes project={project} number={nextNumber()} />
+        )}
+
+        <ProjectNext next={next} previous={previous} />
+      </main>
+
+      <BackToProjects />
+    </ProjectMotion>
   );
 }

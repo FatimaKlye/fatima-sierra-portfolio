@@ -1,52 +1,51 @@
-import type { ProjectDetail } from "@/data/projectDetailsData";
+import { ArrowUpRight, Code, Play } from "lucide-react";
+import type { ProjectLinks as ProjectLinksData } from "@/data/projectDetailsData";
 import styles from "./ProjectDetails.module.css";
 
-export default function ProjectLinks({ project }: { project: ProjectDetail }) {
-  const { links } = project;
+type ProjectLinksProps = {
+  links: ProjectLinksData;
+  /** "onDark" switches the secondary buttons to a light outline. */
+  tone?: "light" | "onDark";
+};
+
+/** Only verified URLs are ever passed in; each button renders only when its URL exists. */
+export default function ProjectLinks({ links, tone = "light" }: ProjectLinksProps) {
+  const { liveUrl, videoUrl, repoUrl } = links;
+
+  if (!liveUrl && !videoUrl && !repoUrl) {
+    return null;
+  }
+
+  const secondary = tone === "onDark" ? `${styles.btn} ${styles.btnGhostDark}` : `${styles.btn} ${styles.btnGhost}`;
 
   return (
-    <section className={styles.section} aria-labelledby="links-title">
-      <div className={styles.container}>
-        <header className={styles.sectionHeader}>
-          <p className={styles.eyebrow}>Project Links</p>
-          <h2 id="links-title" className={styles.sectionTitle}>
-            Explore Further
-          </h2>
-        </header>
-
-        <div className={styles.linksRow}>
-          <a
-            className={styles.linkButton}
-            href={links.repoUrl}
-            target="_blank"
-            rel="noreferrer noopener"
-          >
-            View GitHub Repository
-          </a>
-
-          {links.liveUrl && (
-            <a
-              className={`${styles.linkButton} ${styles.linkButtonPrimary}`}
-              href={links.liveUrl}
-              target="_blank"
-              rel="noreferrer noopener"
-            >
-              View Live Project
-            </a>
-          )}
-
-          {links.videoUrl && (
-            <a
-              className={styles.linkButton}
-              href={links.videoUrl}
-              target="_blank"
-              rel="noreferrer noopener"
-            >
-              Watch Demonstration
-            </a>
-          )}
-        </div>
-      </div>
-    </section>
+    <div className={styles.linkRow}>
+      {liveUrl && (
+        <a
+          className={`${styles.btn} ${styles.btnPrimary}`}
+          href={liveUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Live Website
+          <ArrowUpRight size={18} aria-hidden="true" />
+          <span className={styles.srOnly}> (opens in a new tab)</span>
+        </a>
+      )}
+      {videoUrl && (
+        <a className={secondary} href={videoUrl} target="_blank" rel="noopener noreferrer">
+          <Play size={16} aria-hidden="true" />
+          Watch Demo
+          <span className={styles.srOnly}> (opens in a new tab)</span>
+        </a>
+      )}
+      {repoUrl && (
+        <a className={secondary} href={repoUrl} target="_blank" rel="noopener noreferrer">
+          <Code size={16} aria-hidden="true" />
+          GitHub Repository
+          <span className={styles.srOnly}> (opens in a new tab)</span>
+        </a>
+      )}
+    </div>
   );
 }

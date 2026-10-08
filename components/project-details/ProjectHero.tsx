@@ -1,57 +1,123 @@
+import { Fragment } from "react";
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import type { ProjectDetail } from "@/data/projectDetailsData";
+import MediaFrame from "./MediaFrame";
+import ProjectLinks from "./ProjectLinks";
 import styles from "./ProjectDetails.module.css";
 
-export default function ProjectHero({ project }: { project: ProjectDetail }) {
+type ProjectHeroProps = {
+  project: ProjectDetail;
+  index: number;
+  total: number;
+};
+
+const pad = (value: number) => String(value).padStart(2, "0");
+
+/** Each word sits in a clipped mask so GSAP can slide it up on load. */
+function SplitTitle({ text }: { text: string }) {
+  const words = text.split(" ");
+
   return (
-    <section className={styles.hero} aria-labelledby="project-hero-title">
-      <div className={styles.container}>
-        <div className={styles.backRow}>
-          <Link href="/#projects" className={styles.backLink}>
-            <span className={styles.backArrow} aria-hidden="true">
-              ←
+    <>
+      {words.map((word, wordIndex) => (
+        <Fragment key={`${word}-${wordIndex}`}>
+          <span className={styles.word}>
+            <span className={styles.wordInner} data-word>
+              {word}
             </span>
-            Back to All Projects
+          </span>
+          {wordIndex < words.length - 1 ? " " : null}
+        </Fragment>
+      ))}
+    </>
+  );
+}
+
+export default function ProjectHero({ project, index, total }: ProjectHeroProps) {
+  const meta = [
+    { label: "Role", value: project.role },
+    { label: "Period", value: project.period },
+    { label: "Organization", value: project.organization },
+    { label: "Status", value: project.status },
+  ].filter((item): item is { label: string; value: string } => Boolean(item.value));
+
+  return (
+    <header className={styles.hero} aria-labelledby="project-title">
+      {/* Text-only heroes already show the index inside their panel. */}
+      {project.hero && (
+        <span className={styles.heroNumeral} aria-hidden="true">
+          {pad(index + 1)}
+        </span>
+      )}
+
+      <div className={styles.container}>
+        <nav className={styles.crumbs} aria-label="Project navigation" data-intro>
+          <Link href="/#projects" className={styles.backLink}>
+            <ArrowLeft size={16} aria-hidden="true" />
+            Back to Projects
           </Link>
+          <span className={styles.crumbCount}>
+            Project {pad(index + 1)} <span aria-hidden="true">/</span>
+            <span className={styles.srOnly}> of </span> {pad(total)}
+          </span>
+        </nav>
+
+        <div className={styles.heroTop}>
+          <p className={styles.heroCategory} data-intro>
+            {project.category}
+          </p>
+          <h1 id="project-title" className={styles.title}>
+            <SplitTitle text={project.title} />
+          </h1>
+          <p className={styles.tagline} data-intro>
+            {project.tagline}
+          </p>
         </div>
 
-        <div className={styles.heroGrid}>
-          <div className={styles.heroCopy}>
-            <p className={styles.category}>{project.category}</p>
-            <h1 id="project-hero-title" className={styles.title}>
-              {project.title}
-            </h1>
-            <p className={styles.summary}>{project.summary}</p>
+        <div className={styles.heroBody}>
+          <div className={styles.heroAside} data-intro>
+            <p className={styles.heroSummary}>{project.summary}</p>
 
-            <ul className={styles.tagList} aria-label="Technologies used">
-              {project.technologies.map((tech) => (
-                <li key={tech} className={styles.tag}>
-                  {tech}
-                </li>
-              ))}
-            </ul>
+            {meta.length > 0 && (
+              <dl className={styles.meta}>
+                {meta.map((item) => (
+                  <div key={item.label} className={styles.metaRow}>
+                    <dt>{item.label}</dt>
+                    <dd>{item.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            )}
 
-            <div className={styles.metaRow}>
-              <div className={styles.metaCard}>
-                <p className={styles.metaLabel}>Status</p>
-                <p className={styles.metaValue}>{project.status}</p>
-              </div>
-              <div className={styles.metaCard}>
-                <p className={styles.metaLabel}>My Role</p>
-                <p className={styles.metaValue}>{project.role}</p>
-              </div>
-            </div>
+            <ProjectLinks links={project.links} />
           </div>
 
-          <div className={styles.heroImageFrame}>
-            <img
-              className={styles.heroImage}
-              src={project.heroImage.src}
-              alt={project.heroImage.alt}
-            />
+          <div className={styles.heroVisual} data-intro-visual>
+            <span className={styles.heroGlow} aria-hidden="true" />
+            {project.hero ? (
+              <div data-parallax="5">
+                <MediaFrame
+                  media={project.hero}
+                  priority
+                  sizes="(min-width: 1440px) 760px, (min-width: 1024px) 56vw, 100vw"
+                />
+              </div>
+            ) : (
+              <div className={styles.typePanel} data-parallax="5">
+                <span className={styles.typeIndex} aria-hidden="true">
+                  {pad(index + 1)}
+                </span>
+                <ul className={styles.typeStack} aria-label="Technologies used">
+                  {project.stack.flatMap((group) => group.items).map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         </div>
       </div>
-    </section>
+    </header>
   );
 }

@@ -28,7 +28,7 @@ export const PROJECTS: Project[] = [
     title: "IGNIS SAFE Website",
     description:
       "The companion web platform for IGNIS SAFE, delivering fire-safety resources, program information, and administrative tools.",
-    technologies: ["Next.js", "TypeScript", "Supabase"],
+    technologies: ["React", "Vite", "Supabase"],
     image: "/assets/projects/ignis-safe-website.svg",
     imageAlt: "IGNIS SAFE website interface preview",
     screenshots: [
@@ -121,19 +121,11 @@ export const PROJECTS: Project[] = [
       "A Next.js and Supabase rental platform for camera and mobile gear, handling bookings, manual GCash payment verification, and automatically generated invoices and rental agreements.",
     technologies: ["Next.js", "TypeScript", "Supabase"],
     image: "/assets/projects/maddy-cassy/screenshot-1.webp",
-    imageAlt: "Maddy & Cassy Rentals placeholder preview",
+    imageAlt: "Maddy & Cassy Rentals home page with a carousel of rental gear",
     screenshots: [
       {
         src: "/assets/projects/maddy-cassy/screenshot-1.webp",
-        alt: "Maddy & Cassy Rentals placeholder preview 1",
-      },
-      {
-        src: "/assets/projects/maddy-cassy/screenshot-2.webp",
-        alt: "Maddy & Cassy Rentals placeholder preview 2",
-      },
-      {
-        src: "/assets/projects/maddy-cassy/screenshot-3.webp",
-        alt: "Maddy & Cassy Rentals placeholder preview 3",
+        alt: "Maddy & Cassy Rentals home page with a carousel of rental gear",
       },
     ],
     externalUrl: "https://github.com/andreii2404/maddyandcassyrentals",
