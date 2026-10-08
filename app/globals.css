@@ -15,6 +15,8 @@
   --shadow-soft: 0 24px 80px rgba(59, 42, 52, 0.12);
   --shadow-card: 0 16px 36px rgba(166, 61, 104, 0.1);
   --page-max-width: 1440px;
+  /* Global navbar height — the fixed header, body offset and anchor offset all read this. */
+  --header-height: 72px;
 }
 
 * {
@@ -37,7 +39,7 @@ body {
   background: var(--color-background);
   color: var(--color-text-primary);
   font-family: var(--font-poppins), sans-serif;
-  padding-top: 58px;
+  padding-top: var(--header-height);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
@@ -47,7 +49,7 @@ body:has([data-home-page]) {
 }
 
 html {
-  scroll-padding-top: 72px;
+  scroll-padding-top: var(--header-height);
 }
 
 @media (prefers-reduced-motion: reduce) {

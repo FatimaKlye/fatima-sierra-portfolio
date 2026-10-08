@@ -33,35 +33,12 @@ function isActive(item: NavItem, pathname: string): boolean {
 
 export default function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
   const [resumeOpen, setResumeOpen] = useState(false);
   const menuId = useId();
   const pathname = usePathname();
   const toggleRef = useRef<HTMLButtonElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const isHome = pathname === "/";
-
-  useEffect(() => {
-    let frame = 0;
-
-    const update = () => {
-      frame = 0;
-      setScrolled(window.scrollY > 24);
-    };
-    const onScroll = () => {
-      if (!frame) frame = window.requestAnimationFrame(update);
-    };
-
-    update();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
-
-    return () => {
-      if (frame) window.cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-    };
-  }, [pathname]);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -110,7 +87,7 @@ export default function SiteHeader() {
 
   return (
     <>
-      <header className={`${styles.header}${scrolled ? ` ${styles.scrolled}` : ""}`} data-site-header>
+      <header className={styles.header} data-site-header>
         <div className={styles.container}>
           <Link
             className={styles.brand}

@@ -1,19 +1,19 @@
+/* One fixed state on every page and at every scroll position — no resizing or restyling on scroll. */
 .header {
   position: fixed;
   inset-inline: 0;
   top: 0;
   z-index: 1000;
-  height: 72px;
-  border-bottom: 1px solid transparent;
-  background: transparent;
-  transition: background-color 300ms ease, border-color 300ms ease, box-shadow 300ms ease;
+  height: var(--header-height, 72px);
+  border-bottom: 1px solid var(--color-border);
+  background: rgba(255, 249, 251, 0.95);
+  box-shadow: 0 12px 28px rgba(59, 42, 52, 0.06);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
-.header.scrolled {
-  border-bottom-color: var(--color-border);
-  background: rgba(255, 249, 251, 0.95);
-  backdrop-filter: blur(12px);
-  box-shadow: 0 12px 28px rgba(59, 42, 52, 0.06);
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .header { background: var(--color-background); }
 }
 
 .container {
@@ -236,7 +236,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .header,
   .desktopNav a,
   .menuToggle span,
   .drawerNav a {
