@@ -16,7 +16,8 @@ const achievementsTitled = (title: string) => ACHIEVEMENTS.filter((entry) => ent
 const visibleRole = (role: string) => LEADERSHIP.filter((entry) => !entry.hidden && entry.role === role);
 
 export const ABOUT_PORTRAIT = {
-  src: "/assets/about/fatima-sierra-professional.jpg",
+  // Same asset as the homepage hero portrait — reused, not duplicated.
+  src: "/assets/profile/profile_picture.jpg",
   alt: "Portrait of Fatima Klye M. Sierra in a black blazer",
 };
 

@@ -193,21 +193,22 @@
 .portraitInner {
   position: absolute;
   inset: -7% 0;
+  /* Matches the studio backdrop of the portrait so the headroom below reads as one seamless photo */
+  background: #fdfdfd;
 }
 
+/* The hero headshot is framed tight at the crown; lowering it keeps the head clear of
+   the arch apex through the full ±5% parallax drift. */
 .portraitImage {
   object-fit: cover;
-  object-position: 50% 22%;
-}
-
-.stickerRecipe,
-.stickerCode {
-  position: absolute;
-  z-index: 2;
-  box-shadow: var(--shadow-card);
+  object-position: 50% 0;
+  translate: 0 8%;
 }
 
 .stickerRecipe {
+  position: absolute;
+  z-index: 2;
+  box-shadow: var(--shadow-card);
   bottom: 9%;
   left: -14%;
   display: grid;
@@ -241,20 +242,7 @@
   line-height: 1.45;
 }
 
-.stickerCode {
-  top: 9%;
-  right: -3%;
-  padding: 12px 16px;
-  border-radius: 12px;
-  background: var(--about-plum);
-  color: var(--about-code-text);
-  font-size: 0.76rem;
-  font-weight: 500;
-  white-space: nowrap;
-  rotate: 3deg;
-}
-
-/* Syntax colours, shared by the sticker and the recipe panel */
+/* Syntax colours for the recipe panel */
 .tok_keyword { color: #f3a6c6; }
 .tok_fn { color: #f6dde7; font-weight: 600; }
 .tok_string { color: #e9b8a8; }
@@ -1196,7 +1184,6 @@
   }
 
   .stickerRecipe { left: -16%; max-width: 200px; }
-  .stickerCode { right: -12%; }
 
   .chapter {
     grid-template-columns: 1fr;
@@ -1247,13 +1234,6 @@
     left: -10%;
     max-width: 180px;
     padding: 12px 14px;
-  }
-
-  .stickerCode {
-    top: 4%;
-    right: -8%;
-    padding: 10px 12px;
-    font-size: 0.66rem;
   }
 
   .method,

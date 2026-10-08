@@ -102,12 +102,6 @@ export default function AboutOpening({ headingLevel, eyebrow, variant }: AboutOp
             <span>{MEDALS.map((medal) => medal.label).join(" · ")}</span>
           </div>
         )}
-
-        <div className={styles.stickerCode} aria-hidden="true">
-          <span className={styles.tok_tag}>&lt;Developer</span>{" "}
-          <span className={styles.tok_fn}>focus</span>=<span className={styles.tok_string}>&quot;web · mobile&quot;</span>{" "}
-          <span className={styles.tok_tag}>/&gt;</span>
-        </div>
       </div>
     </div>
   );
