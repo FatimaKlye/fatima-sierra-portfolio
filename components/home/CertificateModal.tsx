@@ -97,15 +97,16 @@ export default function CertificateModal({
           )}
         </div>
 
-        <a
-          className={styles.newTabLink}
-          href={certificate.fileUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Open in a new tab
-          <span aria-hidden="true">↗</span>
-        </a>
+        <div className={styles.footer}>
+          <a
+            className="ui-btn ui-btn--secondary ui-btn--sm"
+            href={certificate.fileUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Open in a New Tab
+          </a>
+        </div>
       </div>
     </div>,
     document.body,

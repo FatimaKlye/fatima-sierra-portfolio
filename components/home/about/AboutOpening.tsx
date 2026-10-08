@@ -66,8 +66,8 @@ export default function AboutOpening({ headingLevel, eyebrow, variant }: AboutOp
             </div>
           </dl>
         ) : (
-          <Link className={styles.inlineCta} href="/about" data-reveal>
-            Explore My Story <span aria-hidden="true">→</span>
+          <Link className={`ui-btn ui-btn--primary ${styles.inlineCta}`} href="/about" data-reveal>
+            Explore My Story
           </Link>
         )}
       </div>

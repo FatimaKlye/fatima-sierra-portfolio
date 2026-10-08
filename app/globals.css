@@ -129,3 +129,147 @@ svg {
   outline: 3px solid rgba(166, 61, 104, 0.32);
   outline-offset: 4px;
 }
+
+/* Buttons — one system for every call to action.
+   .ui-btn + a tone (--primary, --secondary; --light / --ghost-light on pink
+   or dark sections) + an optional size (--sm, --lg).
+   The hover lift uses `translate`, not `transform`, so it never fights the
+   GSAP reveal animations that drive `transform` on [data-reveal] elements. */
+.ui-btn {
+  --ui-btn-bg: transparent;
+  --ui-btn-fg: var(--color-primary);
+  --ui-btn-border: var(--color-primary);
+  --ui-btn-bg-hover: var(--color-soft-blush);
+  --ui-btn-fg-hover: var(--color-primary-hover);
+  --ui-btn-border-hover: var(--color-primary-hover);
+  --ui-btn-shadow-hover: 0 14px 28px -14px rgba(166, 61, 104, 0.45);
+
+  display: inline-flex;
+  flex: 0 0 auto;
+  max-width: 100%;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 26px;
+  border: 1px solid var(--ui-btn-border);
+  border-radius: 999px;
+  background: var(--ui-btn-bg);
+  color: var(--ui-btn-fg);
+  font-family: var(--font-poppins), sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1.25;
+  text-align: center;
+  text-decoration: none;
+  text-transform: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    translate 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 220ms ease,
+    color 220ms ease,
+    border-color 220ms ease,
+    box-shadow 320ms ease;
+}
+
+.ui-btn svg {
+  flex-shrink: 0;
+}
+
+.ui-btn:not(:disabled):hover,
+.ui-btn:focus-visible {
+  border-color: var(--ui-btn-border-hover);
+  background: var(--ui-btn-bg-hover);
+  color: var(--ui-btn-fg-hover);
+}
+
+@media (hover: hover) {
+  .ui-btn:not(:disabled):hover {
+    translate: 0 -2px;
+    box-shadow: var(--ui-btn-shadow-hover);
+  }
+}
+
+.ui-btn:not(:disabled):active {
+  translate: 0 0;
+  box-shadow: none;
+  transition-duration: 80ms;
+}
+
+.ui-btn:focus-visible {
+  outline: 3px solid rgba(166, 61, 104, 0.32);
+  outline-offset: 3px;
+}
+
+.ui-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Tones */
+.ui-btn--primary {
+  --ui-btn-bg: var(--color-primary);
+  --ui-btn-fg: var(--color-white);
+  --ui-btn-border: var(--color-primary);
+  --ui-btn-bg-hover: var(--color-primary-hover);
+  --ui-btn-fg-hover: var(--color-white);
+  --ui-btn-border-hover: var(--color-primary-hover);
+  --ui-btn-shadow-hover: 0 16px 32px -14px rgba(166, 61, 104, 0.6);
+}
+
+.ui-btn--secondary {
+  --ui-btn-bg: transparent;
+  --ui-btn-fg: var(--color-primary);
+  --ui-btn-border: rgba(166, 61, 104, 0.45);
+}
+
+.ui-btn--light {
+  --ui-btn-bg: var(--color-white);
+  --ui-btn-fg: var(--color-primary);
+  --ui-btn-border: var(--color-white);
+  --ui-btn-bg-hover: var(--color-soft-blush);
+  --ui-btn-fg-hover: var(--color-primary-hover);
+  --ui-btn-border-hover: var(--color-soft-blush);
+  --ui-btn-shadow-hover: 0 16px 32px -14px rgba(40, 18, 30, 0.45);
+}
+
+.ui-btn--ghost-light {
+  --ui-btn-bg: transparent;
+  --ui-btn-fg: var(--color-white);
+  --ui-btn-border: rgba(255, 255, 255, 0.55);
+  --ui-btn-bg-hover: rgba(255, 255, 255, 0.14);
+  --ui-btn-fg-hover: var(--color-white);
+  --ui-btn-border-hover: var(--color-white);
+  --ui-btn-shadow-hover: 0 16px 32px -14px rgba(40, 18, 30, 0.45);
+}
+
+.ui-btn--light:focus-visible,
+.ui-btn--ghost-light:focus-visible {
+  outline-color: rgba(255, 255, 255, 0.75);
+}
+
+/* Sizes */
+.ui-btn--sm {
+  min-height: 40px;
+  gap: 8px;
+  padding: 0 18px;
+  font-size: 0.76rem;
+}
+
+.ui-btn--lg {
+  min-height: 56px;
+  padding: 0 34px;
+  font-size: 0.9rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-btn {
+    transition: none;
+  }
+
+  .ui-btn:not(:disabled):hover {
+    translate: none;
+  }
+}

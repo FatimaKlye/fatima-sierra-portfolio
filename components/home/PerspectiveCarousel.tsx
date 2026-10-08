@@ -187,7 +187,7 @@ export function PerspectiveCarousel({
                     {item.title}
                     {onActiveClick && item.actionLabel && (
                       <span className={styles.actionHint} aria-hidden="true">
-                        {item.actionLabel} <span className={styles.actionArrow}>↗</span>
+                        {item.actionLabel}
                       </span>
                     )}
                   </motion.p>

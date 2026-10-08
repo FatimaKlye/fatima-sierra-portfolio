@@ -60,10 +60,10 @@ export default async function HeroSection() {
               reliable functionality, and user-centered experiences.
             </p>
             <div className={styles.actions}>
-              <Link className={styles.primaryButton} href="#projects">
+              <Link className="ui-btn ui-btn--primary" href="#projects">
                 View Projects
               </Link>
-              <Link className={styles.secondaryButton} href="#about">
+              <Link className="ui-btn ui-btn--secondary" href="#about">
                 About Me
               </Link>
             </div>
@@ -173,8 +173,8 @@ export default async function HeroSection() {
           <div className={editorialStyles.githubHeader}>
             <p className={editorialStyles.eyebrow} id="github-title">06 — GitHub activity</p>
             {githubLink && (
-              <a className={editorialStyles.githubHandle} href={githubLink.href} target="_blank" rel="noreferrer" aria-label={`Open ${githubLink.handle} on GitHub in a new tab`}>
-                {githubLink.handle}<span className={editorialStyles.externalArrow} aria-hidden="true">↗</span>
+              <a className="ui-btn ui-btn--secondary ui-btn--sm" href={githubLink.href} target="_blank" rel="noreferrer" aria-label={`Open ${githubLink.handle} on GitHub in a new tab`}>
+                {githubLink.handle}
               </a>
             )}
           </div>
@@ -214,13 +214,13 @@ export default async function HeroSection() {
             <p className={editorialStyles.contactLead}>
               I&apos;m open to internships and new roles, and always happy to talk about web and mobile work.
             </p>
-            <Link className={styles.primaryButton} href="/contact">
-              Start a Conversation <span aria-hidden="true">→</span>
+            <Link className="ui-btn ui-btn--primary" href="/contact">
+              Start a Conversation
             </Link>
             <ul className={editorialStyles.contactLinksRow} aria-label="Social links">
               {CONTACT_LINKS.map((link) => (
                 <li key={link.id}>
-                  <a href={link.href} target="_blank" rel="noreferrer" aria-label={`${link.label} (opens in a new tab)`}>
+                  <a className="ui-btn ui-btn--secondary ui-btn--sm" href={link.href} target="_blank" rel="noreferrer" aria-label={`${link.label} (opens in a new tab)`}>
                     {link.label}
                   </a>
                 </li>

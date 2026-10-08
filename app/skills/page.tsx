@@ -102,8 +102,8 @@ export default function SkillsPage() {
                 Concepts I&apos;ve explored through workshops, webinars and training — each one backed by a
                 certificate.
               </p>
-              <Link className={styles.textLink} href="/certifications" data-reveal>
-                See the certificates <span aria-hidden="true">→</span>
+              <Link className={`ui-btn ui-btn--secondary ${styles.textLink}`} href="/certifications" data-reveal>
+                See the Certificates
               </Link>
             </div>
             <div className={styles.growingLists}>

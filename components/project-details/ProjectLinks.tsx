@@ -1,10 +1,10 @@
-import { ArrowUpRight, Code, Play } from "lucide-react";
+import { Code, Play } from "lucide-react";
 import type { ProjectLinks as ProjectLinksData } from "@/data/projectDetailsData";
 import styles from "./ProjectDetails.module.css";
 
 type ProjectLinksProps = {
   links: ProjectLinksData;
-  /** "onDark" switches the secondary buttons to a light outline. */
+  /** "onDark" switches to the light button tones for the pink/dark bands. */
   tone?: "light" | "onDark";
 };
 
@@ -16,19 +16,20 @@ export default function ProjectLinks({ links, tone = "light" }: ProjectLinksProp
     return null;
   }
 
-  const secondary = tone === "onDark" ? `${styles.btn} ${styles.btnGhostDark}` : `${styles.btn} ${styles.btnGhost}`;
+  const onDark = tone === "onDark";
+  const primary = onDark ? "ui-btn ui-btn--light" : "ui-btn ui-btn--primary";
+  const secondary = onDark ? "ui-btn ui-btn--ghost-light" : "ui-btn ui-btn--secondary";
 
   return (
     <div className={styles.linkRow}>
       {liveUrl && (
         <a
-          className={`${styles.btn} ${styles.btnPrimary}`}
+          className={primary}
           href={liveUrl}
           target="_blank"
           rel="noopener noreferrer"
         >
           Live Website
-          <ArrowUpRight size={18} aria-hidden="true" />
           <span className={styles.srOnly}> (opens in a new tab)</span>
         </a>
       )}

@@ -83,8 +83,8 @@ export default function ExperiencePage() {
                     <p className={styles.journeyPeriod}>{role.period}</p>
                     <h3 className={styles.journeyRole}>{role.role}</h3>
                     <p className={styles.journeyProject}>
-                      <Link href={`/projects/${role.slug}`}>
-                        {role.project} <span aria-hidden="true">→</span>
+                      <Link className="ui-btn ui-btn--secondary ui-btn--sm" href={`/projects/${role.slug}`}>
+                        {role.project}
                       </Link>
                     </p>
                     <p className={styles.journeyMeta}>{role.category}</p>
@@ -117,8 +117,8 @@ export default function ExperiencePage() {
                 </li>
               ))}
             </ol>
-            <Link className={styles.textLink} href="/about" data-reveal>
-              Read how cooking led to coding <span aria-hidden="true">→</span>
+            <Link className={`ui-btn ui-btn--secondary ${styles.textLink}`} href="/about" data-reveal>
+              Read How Cooking Led to Coding
             </Link>
           </div>
         </section>
@@ -195,8 +195,8 @@ export default function ExperiencePage() {
                   </li>
                 ))}
               </ul>
-              <Link className={styles.credentialsLink} href="/certifications" data-reveal>
-                Explore all certifications <span aria-hidden="true">→</span>
+              <Link className={`ui-btn ui-btn--light ${styles.credentialsLink}`} href="/certifications" data-reveal>
+                Explore All Certifications
               </Link>
             </div>
 

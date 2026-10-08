@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight } from "lucide-react";
 import type { ProjectDetail } from "@/data/projectDetailsData";
 import styles from "./ProjectDetails.module.css";
 
@@ -19,6 +18,9 @@ export default function ProjectNext({ next, previous }: ProjectNextProps) {
               <span className={styles.eyebrow}>Next project</span>
               <span className={styles.nextTitle}>{next.title}</span>
               <span className={styles.nextCategory}>{next.category}</span>
+              <span className={`ui-btn ui-btn--primary ${styles.nextCta}`} aria-hidden="true">
+                View Project
+              </span>
             </span>
 
             {next.hero && (
@@ -33,20 +35,15 @@ export default function ProjectNext({ next, previous }: ProjectNextProps) {
                 />
               </span>
             )}
-
-            <span className={styles.nextArrow} aria-hidden="true">
-              <ArrowRight size={26} />
-            </span>
           </Link>
         )}
 
         <div className={styles.nextFoot} data-reveal>
-          <Link href="/projects" className={`${styles.btn} ${styles.btnPrimary}`}>
-            <ArrowLeft size={16} aria-hidden="true" />
+          <Link href="/projects" className="ui-btn ui-btn--primary">
             Back to Projects
           </Link>
           {previous && (
-            <Link href={`/projects/${previous.slug}`} className={`${styles.btn} ${styles.btnGhost}`}>
+            <Link href={`/projects/${previous.slug}`} className="ui-btn ui-btn--secondary">
               Previous: {previous.title}
             </Link>
           )}

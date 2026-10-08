@@ -1,6 +1,5 @@
 import { Fragment } from "react";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
 import type { ProjectDetail } from "@/data/projectDetailsData";
 import MediaFrame from "./MediaFrame";
 import ProjectLinks from "./ProjectLinks";
@@ -53,8 +52,7 @@ export default function ProjectHero({ project, index, total }: ProjectHeroProps)
 
       <div className={styles.container}>
         <nav className={styles.crumbs} aria-label="Project navigation" data-intro>
-          <Link href="/projects" className={styles.backLink}>
-            <ArrowLeft size={16} aria-hidden="true" />
+          <Link href="/projects" className={`ui-btn ui-btn--secondary ui-btn--sm ${styles.backLink}`}>
             Back to Projects
           </Link>
           <span className={styles.crumbCount}>

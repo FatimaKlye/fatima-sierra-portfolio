@@ -109,70 +109,12 @@
   color: var(--pd-blush);
 }
 
-/* ---------- Buttons ---------- */
+/* ---------- Buttons (look comes from the global .ui-btn system) ---------- */
 
 .linkRow {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-}
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-height: 48px;
-  padding: 0 24px;
-  border: 1.5px solid transparent;
-  border-radius: 999px;
-  font-size: 0.92rem;
-  font-weight: 600;
-  line-height: 1.2;
-  text-align: center;
-  transition:
-    transform 300ms var(--pd-ease),
-    background-color 250ms ease,
-    color 250ms ease,
-    border-color 250ms ease,
-    box-shadow 300ms ease;
-}
-
-.btn:hover {
-  transform: translateY(-2px);
-}
-
-.btnPrimary {
-  background: var(--pd-rose);
-  color: #fff;
-  box-shadow: 0 12px 28px rgba(166, 61, 104, 0.28);
-}
-
-.btnPrimary:hover {
-  background: var(--pd-rose-deep);
-  box-shadow: 0 16px 34px rgba(166, 61, 104, 0.36);
-}
-
-.btnGhost {
-  border-color: rgba(166, 61, 104, 0.4);
-  background: transparent;
-  color: var(--pd-rose-deep);
-}
-
-.btnGhost:hover {
-  border-color: var(--pd-rose);
-  background: var(--pd-blush);
-}
-
-.btnGhostDark {
-  border-color: rgba(255, 255, 255, 0.6);
-  background: transparent;
-  color: #fff;
-}
-
-.btnGhostDark:hover {
-  border-color: #fff;
-  background: rgba(255, 255, 255, 0.14);
 }
 
 /* ---------- Hero ---------- */
@@ -211,36 +153,9 @@
   margin-bottom: clamp(24px, 3.6vw, 48px);
 }
 
+/* Look comes from .ui-btn; this only keeps it legible over the hero art. */
 .backLink {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 44px;
-  padding: 0 18px 0 14px;
-  border: 1px solid rgba(166, 61, 104, 0.3);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.65);
-  color: var(--pd-rose-deep);
-  font-size: 0.85rem;
-  font-weight: 600;
   backdrop-filter: blur(6px);
-  transition:
-    background-color 250ms ease,
-    transform 300ms var(--pd-ease),
-    box-shadow 300ms ease;
-}
-
-.backLink svg {
-  transition: transform 300ms var(--pd-ease);
-}
-
-.backLink:hover {
-  background: #fff;
-  box-shadow: 0 10px 24px rgba(166, 61, 104, 0.16);
-}
-
-.backLink:hover svg {
-  transform: translateX(-4px);
 }
 
 .crumbCount {
@@ -1421,17 +1336,6 @@
   text-transform: uppercase;
 }
 
-/* On the rose band the primary button inverts so it keeps its contrast. */
-.outcomes .btnPrimary {
-  background: #fff;
-  color: var(--pd-rose-deep);
-  box-shadow: 0 14px 30px rgba(59, 42, 52, 0.28);
-}
-
-.outcomes .btnPrimary:hover {
-  background: var(--pd-blush);
-}
-
 /* ---------- Next project ---------- */
 
 .next {
@@ -1503,22 +1407,15 @@
   transform: scale(1.06);
 }
 
-.nextArrow {
-  display: grid;
-  place-items: center;
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background: var(--pd-rose);
-  color: #fff;
-  transition:
-    transform 500ms var(--pd-ease),
-    background-color 250ms ease;
+/* Visual cue only — the whole card is the link. */
+.nextCta {
+  justify-self: start;
+  margin-top: 6px;
 }
 
-.nextLink:hover .nextArrow {
+.nextLink:hover .nextCta {
+  border-color: var(--pd-rose-deep);
   background: var(--pd-rose-deep);
-  transform: translateX(6px) rotate(-45deg);
 }
 
 .nextFoot {
@@ -1530,7 +1427,7 @@
 
 @media (min-width: 900px) {
   .nextLink {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 0.7fr) auto;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.7fr);
     gap: clamp(24px, 4vw, 56px);
   }
 }
@@ -1544,9 +1441,8 @@
   z-index: 40;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
   min-height: 46px;
-  padding: 0 20px 0 16px;
+  padding: 0 22px;
   border: 1px solid rgba(166, 61, 104, 0.32);
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.92);
@@ -1586,7 +1482,6 @@
     animation-duration: 0.01ms !important;
   }
 
-  .btn:hover,
   .featureCard:hover,
   .nextLink:hover,
   .thumb:hover {

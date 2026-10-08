@@ -70,7 +70,6 @@ export default function ProjectsIndex({ items }: { items: ProjectIndexItem[] }) 
               <span className={styles.indexTitle}>{item.title}</span>
               <span className={styles.indexCategory}>{item.category}</span>
               <span className={styles.indexPeriod}>{item.period ?? ""}</span>
-              <span className={styles.indexArrow} aria-hidden="true">→</span>
             </Link>
           </li>
         ))}

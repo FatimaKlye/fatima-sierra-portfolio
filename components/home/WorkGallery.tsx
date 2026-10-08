@@ -30,9 +30,8 @@ export default function WorkGallery({
           </p>
         </div>
 
-        <Link className={styles.viewMoreButton} href="/projects">
+        <Link className={`ui-btn ui-btn--secondary ${styles.viewMoreButton}`} href="/projects">
           View All Projects
-          <span className={styles.arrow} aria-hidden="true">→</span>
         </Link>
       </header>
 

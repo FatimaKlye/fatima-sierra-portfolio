@@ -302,7 +302,7 @@ export default function ContactForm() {
         <p className={styles.successText}>
           Thanks for reaching out &mdash; I&apos;ll get back to you within 24 hours.
         </p>
-        <button className={styles.submit} type="button" onClick={sendAnother}>
+        <button className="ui-btn ui-btn--secondary" type="button" onClick={sendAnother}>
           Send another
         </button>
       </div>
@@ -473,7 +473,7 @@ export default function ContactForm() {
           </p>
         )}
 
-        <button className={styles.submit} type="submit" disabled={isSending}>
+        <button className={`ui-btn ui-btn--primary ui-btn--lg ${styles.submit}`} type="submit" disabled={isSending}>
           {isSending ? "Sending…" : "Submit"}
         </button>
       </div>

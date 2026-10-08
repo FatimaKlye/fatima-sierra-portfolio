@@ -795,39 +795,12 @@
   overflow-wrap: anywhere;
 }
 
+/* Layout only — the look comes from the global .ui-btn system. */
 .certLink {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  width: max-content;
+  align-self: flex-start;
   margin-top: 18px;
-  padding-top: 2px;
-  border-radius: 8px;
-  color: var(--color-primary);
-  font-size: 0.86rem;
-  font-weight: 700;
-  transition: color 180ms ease;
 }
 
-.linkArrow {
-  display: inline-block;
-  transition: transform 200ms ease;
-}
-
-.certLink:hover .linkArrow,
-.certLink:focus-visible .linkArrow,
-.viewAllButton:hover .linkArrow,
-.viewAllButton:focus-visible .linkArrow {
-  transform: translateX(5px);
-}
-
-.certLink:hover,
-.viewAllButton:hover {
-  color: var(--color-primary-hover);
-}
-
-.certLink:focus-visible,
-.viewAllButton:focus-visible,
 .filterButton:focus-visible {
   outline: 3px solid rgba(166, 61, 104, 0.32);
   outline-offset: 3px;
@@ -837,30 +810,6 @@
   display: flex;
   justify-content: center;
   margin-top: 32px;
-}
-
-.viewAllButton {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  min-height: 52px;
-  padding: 0 28px;
-  border: 1px solid rgba(166, 61, 104, 0.22);
-  border-radius: 999px;
-  background: var(--color-white);
-  color: var(--color-primary);
-  font-size: 0.9rem;
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: 0 14px 32px rgba(166, 61, 104, 0.12);
-  transition: transform 200ms ease, background 200ms ease, box-shadow 200ms ease, color 200ms ease;
-}
-
-.viewAllButton:hover {
-  transform: translateY(-2px);
-  background: var(--color-primary);
-  color: var(--color-white);
-  box-shadow: 0 18px 38px rgba(166, 61, 104, 0.24);
 }
 
 /* Achievements / Leadership / References (shared record cards) ------------ */
@@ -1106,9 +1055,6 @@
   .recordCard,
   .certPreviewImage,
   .filterButton,
-  .viewAllButton,
-  .certLink,
-  .linkArrow,
   .storyImageFrame,
   .storyImage,
   .certPreviewHint {

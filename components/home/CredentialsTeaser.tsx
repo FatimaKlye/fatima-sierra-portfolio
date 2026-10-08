@@ -17,9 +17,8 @@ export default function CredentialsTeaser({
     <>
       <div className={styles.header}>
         <p className={styles.eyebrow} id="credentials-title">05 — Certifications</p>
-        <Link href="/certifications" className={styles.viewAllLink}>
-          VIEW ALL CERTIFICATIONS
-          <span aria-hidden="true">→</span>
+        <Link href="/certifications" className="ui-btn ui-btn--secondary ui-btn--sm">
+          View All Certifications
         </Link>
       </div>
 
@@ -43,9 +42,8 @@ export default function CredentialsTeaser({
               <div className={styles.cardBody}>
                 <h3 className={styles.cardTitle}>{certificate.title}</h3>
                 <p className={styles.cardIssuer}>{certificate.issuer}</p>
-                <span className={styles.viewLink}>
-                  VIEW CERTIFICATE
-                  <span aria-hidden="true">→</span>
+                <span className={styles.viewAction}>
+                  <span className="ui-btn ui-btn--secondary ui-btn--sm">View Certificate</span>
                 </span>
               </div>
             </button>

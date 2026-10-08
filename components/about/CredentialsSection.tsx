@@ -126,16 +126,13 @@ function CertificateCard({
         </dl>
 
         <a
-          className={styles.certLink}
+          className={`ui-btn ui-btn--secondary ui-btn--sm ${styles.certLink}`}
           href={record.fileUrl}
           target="_blank"
           rel="noopener noreferrer"
           aria-label={`View credential for ${record.title} (opens in a new tab)`}
         >
           View Credential
-          <span className={styles.linkArrow} aria-hidden="true">
-            →
-          </span>
         </a>
       </div>
     </article>
@@ -241,13 +238,10 @@ export default function CredentialsSection({
           <div className={styles.viewAllRow}>
             <button
               type="button"
-              className={styles.viewAllButton}
+              className="ui-btn ui-btn--secondary"
               onClick={() => setExpanded((value) => !value)}
             >
               {expanded ? "Show Fewer" : "View All Credentials"}
-              <span className={styles.linkArrow} aria-hidden="true">
-                →
-              </span>
             </button>
           </div>
         )}

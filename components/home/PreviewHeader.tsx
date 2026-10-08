@@ -25,11 +25,8 @@ export default function PreviewHeader({ number, headingId, title, intro, href, l
           </h2>
           <p className={styles.sectionIntro}>{intro}</p>
         </div>
-        <Link className={styles.exploreLink} href={href}>
+        <Link className="ui-btn ui-btn--secondary" href={href}>
           {linkLabel}
-          <span className={styles.exploreArrow} aria-hidden="true">
-            →
-          </span>
         </Link>
       </div>
     </header>

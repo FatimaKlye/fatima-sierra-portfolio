@@ -185,29 +185,29 @@ export default function ProjectsShowcase() {
                   </p>
 
                   <div className={styles.actions} data-reveal>
-                    <Link className={styles.primaryAction} href={`/projects/${project.slug}`}>
-                      Read the case study <span aria-hidden="true">→</span>
+                    <Link className="ui-btn ui-btn--primary" href={`/projects/${project.slug}`}>
+                      Read the Case Study
                     </Link>
                     {project.liveUrl && (
                       <a
-                        className={styles.textAction}
+                        className="ui-btn ui-btn--secondary"
                         href={project.liveUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         aria-label={`Visit the live ${project.title} site (opens in a new tab)`}
                       >
-                        Live site <span aria-hidden="true">↗</span>
+                        Live Site
                       </a>
                     )}
                     {project.repoUrl && (
                       <a
-                        className={styles.textAction}
+                        className="ui-btn ui-btn--secondary"
                         href={project.repoUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         aria-label={`View the ${project.title} repository on GitHub (opens in a new tab)`}
                       >
-                        Repository <span aria-hidden="true">↗</span>
+                        Repository
                       </a>
                     )}
                   </div>

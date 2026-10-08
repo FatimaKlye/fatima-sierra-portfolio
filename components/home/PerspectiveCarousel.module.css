@@ -98,14 +98,6 @@
   text-transform: uppercase;
 }
 
-.actionArrow {
-  display: inline-block;
-  transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.slideInner:hover .actionArrow {
-  transform: translate(2px, -2px);
-}
 
 .controls {
   position: absolute;

@@ -52,31 +52,9 @@
 .countLine span:nth-child(2) { color: var(--color-secondary); }
 
 .viewMoreButton {
-  display: inline-flex;
-  min-height: 46px;
-  align-items: center;
-  gap: 9px;
-  padding: 0 18px;
-  border: 1px solid var(--color-primary);
-  border-radius: 2px;
-  color: var(--color-primary);
-  font-size: 0.76rem;
-  font-weight: 600;
+  justify-self: start;
   white-space: nowrap;
-  transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease;
 }
-
-.viewMoreButton:hover,
-.viewMoreButton:focus-visible {
-  border-color: var(--color-primary-hover);
-  background: var(--color-soft-blush);
-  color: var(--color-primary-hover);
-}
-
-.arrow { transition: transform 200ms ease; }
-
-.viewMoreButton:hover .arrow,
-.viewMoreButton:focus-visible .arrow { transform: translate(2px, -2px); }
 
 /* Desktop: the title stays on a single line. The size scales with the
    viewport so it always fits beside the "View All Projects" button. */
@@ -90,14 +68,8 @@
 
 @media (max-width: 820px) {
   .header { grid-template-columns: 1fr; align-items: start; }
-  .viewMoreButton { width: max-content; }
 }
 
 @media (max-width: 640px) {
   .heading { font-size: clamp(2rem, 10.5vw, 3rem); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .viewMoreButton,
-  .arrow { transition: none; }
 }

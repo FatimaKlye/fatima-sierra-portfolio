@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
 import styles from "./ProjectDetails.module.css";
 
 /** Floating shortcut back to the projects page; appears once the hero has scrolled away. */
@@ -30,10 +29,8 @@ export default function BackToProjects() {
     <Link
       href="/projects"
       className={`${styles.floatingBack} ${visible ? styles.floatingBackShown : ""}`}
-      aria-label="Back to Projects"
     >
-      <ArrowLeft size={16} aria-hidden="true" />
-      <span>Projects</span>
+      Back to Projects
     </Link>
   );
 }

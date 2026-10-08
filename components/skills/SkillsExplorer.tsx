@@ -77,9 +77,8 @@ export default function SkillsExplorer({ groups }: SkillsExplorerProps) {
             <ul className={styles.detailProjects}>
               {selected.projects.map((project) => (
                 <li key={project.slug}>
-                  <Link href={`/projects/${project.slug}`}>
+                  <Link className="ui-btn ui-btn--ghost-light ui-btn--sm" href={`/projects/${project.slug}`}>
                     {project.title}
-                    <span aria-hidden="true">→</span>
                   </Link>
                 </li>
               ))}

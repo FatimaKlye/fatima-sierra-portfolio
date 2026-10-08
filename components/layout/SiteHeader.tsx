@@ -184,13 +184,13 @@ export default function SiteHeader() {
               ))}
               <button
                 type="button"
-                className={styles.drawerResume}
+                className={`ui-btn ui-btn--primary ${styles.drawerResume}`}
                 onClick={() => {
                   closeMenu();
                   setResumeOpen(true);
                 }}
               >
-                Resume <span aria-hidden="true">↗</span>
+                Resume
               </button>
             </nav>
           </aside>

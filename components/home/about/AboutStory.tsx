@@ -252,7 +252,6 @@ export default function AboutStory() {
                       <span className={styles.plateCaption}>
                         <strong>{plate.title}</strong>
                         <span>{plate.category}</span>
-                        <span className={styles.plateArrow} aria-hidden="true">↗</span>
                       </span>
                     </Link>
                   </li>
@@ -260,8 +259,8 @@ export default function AboutStory() {
               })}
             </ul>
 
-            <Link className={styles.inlineCta} href="/projects" data-reveal>
-              See every project <span aria-hidden="true">→</span>
+            <Link className={`ui-btn ui-btn--secondary ${styles.inlineCta}`} href="/projects" data-reveal>
+              See Every Project
             </Link>
           </div>
         </article>
@@ -335,8 +334,8 @@ export default function AboutStory() {
               </li>
             ))}
           </ol>
-          <Link className={styles.inlineCta} href="/experience" data-reveal>
-            Follow the full journey <span aria-hidden="true">→</span>
+          <Link className={`ui-btn ui-btn--secondary ${styles.inlineCta}`} href="/experience" data-reveal>
+            Follow the Full Journey
           </Link>
         </div>
 
@@ -352,11 +351,11 @@ export default function AboutStory() {
               good.
             </p>
             <div className={styles.finaleActions} data-reveal>
-              <Link className={styles.finalePrimary} href="/projects">
-                See my projects
+              <Link className="ui-btn ui-btn--light" href="/projects">
+                See My Projects
               </Link>
-              <Link className={styles.finaleSecondary} href="/contact">
-                Let&apos;s work together <span aria-hidden="true">→</span>
+              <Link className="ui-btn ui-btn--ghost-light" href="/contact">
+                Let&apos;s Work Together
               </Link>
             </div>
           </div>

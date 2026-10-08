@@ -946,15 +946,9 @@
   font-weight: 600;
 }
 
-.plateCaption > span:not(.plateArrow) {
+.plateCaption > span {
   color: var(--color-text-muted);
   font-size: 0.74rem;
-}
-
-.plateArrow {
-  margin-left: auto;
-  color: var(--color-primary);
-  transition: transform 0.3s ease;
 }
 
 .plateLink:hover .plateBrowser,
@@ -968,27 +962,9 @@
   transform: translateY(-6px) rotate(-1deg);
 }
 
-.plateLink:hover .plateArrow,
-.plateLink:focus-visible .plateArrow {
-  transform: translate(3px, -3px);
-}
-
+/* Layout only — the look comes from the global .ui-btn system. */
 .inlineCta {
-  display: inline-flex;
-  gap: 10px;
-  align-items: center;
   margin-top: clamp(32px, 4vw, 48px);
-  padding-bottom: 4px;
-  border-bottom: 1.5px solid var(--color-primary);
-  color: var(--color-primary);
-  font-size: 0.86rem;
-  font-weight: 600;
-  transition: gap 0.3s ease, color 0.3s ease;
-}
-
-.inlineCta:hover {
-  gap: 14px;
-  color: var(--color-primary-hover);
 }
 
 /* What I bring to the table ------------------------------------------------- */
@@ -1103,45 +1079,10 @@
 .finaleActions {
   display: flex;
   flex-wrap: wrap;
-  gap: 14px 28px;
+  gap: 12px;
   align-items: center;
   justify-content: center;
   margin-top: 32px;
-}
-
-.finalePrimary {
-  display: inline-flex;
-  min-height: 48px;
-  align-items: center;
-  padding: 0 26px;
-  border-radius: 999px;
-  background: var(--color-white);
-  color: var(--color-primary);
-  font-size: 0.86rem;
-  font-weight: 600;
-  transition: background-color 0.25s ease, transform 0.25s ease;
-}
-
-.finalePrimary:hover {
-  background: var(--color-soft-blush);
-  transform: translateY(-2px);
-}
-
-.finaleSecondary {
-  display: inline-flex;
-  gap: 8px;
-  min-height: 48px;
-  align-items: center;
-  color: var(--color-white);
-  font-size: 0.86rem;
-  font-weight: 600;
-  text-decoration: underline;
-  text-decoration-color: rgba(255, 255, 255, 0.5);
-  text-underline-offset: 6px;
-}
-
-.finaleSecondary:hover {
-  text-decoration-color: var(--color-white);
 }
 
 .finale :focus-visible {
@@ -1212,10 +1153,6 @@
 
 .preview .inlineCta {
   margin-top: clamp(28px, 3.4vw, 40px);
-}
-
-.inlineCta:focus-visible {
-  outline-offset: 6px;
 }
 
 @media (max-width: 820px) {
@@ -1352,8 +1289,5 @@
 
   .plateBrowser,
   .plateDevice,
-  .plateArrow,
-  .inlineCta,
-  .rollItem,
-  .finalePrimary { transition: none; }
+  .rollItem { transition: none; }
 }

@@ -39,11 +39,11 @@ export default function ProjectsPage() {
             Have a problem worth <em>building for?</em>
           </h2>
           <div className={styles.closingActions} data-reveal>
-            <Link className={styles.closingPrimary} href="/contact">
-              Let&apos;s work together
+            <Link className="ui-btn ui-btn--light" href="/contact">
+              Let&apos;s Work Together
             </Link>
-            <Link className={styles.closingSecondary} href="/skills">
-              See the toolkit <span aria-hidden="true">→</span>
+            <Link className="ui-btn ui-btn--ghost-light" href="/skills">
+              See the Toolkit
             </Link>
           </div>
         </section>
