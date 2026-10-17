@@ -19,11 +19,11 @@ const FEATURED_INTERESTS = LEARNING_EXPOSURE.slice(0, 4);
 // UI flavor (not resume facts) — image paths are isolated here for easy swaps.
 const INTRO_HOVER_TERMS = {
   interfaceDevelopment: {
-    image: "/assets/projects/beautiverse/hero.svg",
+    image: "/assets/projects/beautiverse/beautiverse_2.png",
     description: "Designing clean interfaces that are simple to use.",
   },
   databaseIntegration: {
-    image: "/assets/projects/itso-id-tracker/screen-dashboard.svg",
+    image: "/assets/projects/itso-id-tracker/ITSO ID TRACKER - FINALS PRESENTATION VERSION 1 (4).png",
     description: "Connecting features to structured, reliable data.",
   },
   applicationTesting: {
@@ -31,7 +31,7 @@ const INTRO_HOVER_TERMS = {
     description: "Testing features to catch issues before launch.",
   },
   systemDocumentation: {
-    image: "/assets/projects/itso-id-tracker/screen-detail.svg",
+    image: "/assets/projects/itso-id-tracker/ITSO ID TRACKER - FINALS PRESENTATION VERSION 1 (2).png",
     description: "Writing clear docs so systems stay easy to maintain.",
   },
   aiAssistedDevelopment: {

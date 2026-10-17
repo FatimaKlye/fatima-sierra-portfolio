@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { Lock } from "lucide-react";
 import type { ProjectMedia } from "@/data/projectDetailsData";
-import PhoneMockup from "./PhoneMockup";
+import PhoneMockup, { Redactions } from "./PhoneMockup";
 import styles from "./ProjectDetails.module.css";
 
 type MediaFrameProps = {
@@ -59,5 +59,12 @@ export default function MediaFrame({ media, sizes, priority, quality = 82, class
     );
   }
 
-  return <div className={[styles.plain, className].filter(Boolean).join(" ")}>{image}</div>;
+  return (
+    <div className={[styles.plain, className].filter(Boolean).join(" ")}>
+      <span className={styles.plainMedia}>
+        {image}
+        <Redactions regions={media.redact} />
+      </span>
+    </div>
+  );
 }

@@ -157,7 +157,7 @@ export default function ProjectGallery({ items, number }: ProjectGalleryProps) {
             ref={triggerRef}
             type="button"
             className={styles.galleryOpen}
-            style={{ width: `min(100%, ${isDevice ? 320 : current.frame === "plain" ? 440 : 1100}px)` }}
+            style={{ width: `min(100%, ${isDevice ? 320 : current.frame === "plain" ? 760 : 1100}px)` }}
             aria-label={`Open larger preview: ${current.alt}`}
             onClick={() => setOpen(true)}
           >

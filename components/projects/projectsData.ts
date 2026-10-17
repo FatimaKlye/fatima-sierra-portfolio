@@ -20,6 +20,38 @@ export type Project = {
   rel?: string;
 };
 
+const ITSO_DIR = "/assets/projects/itso-id-tracker";
+const ITSO_SCREENS = {
+  home: {
+    src: `${ITSO_DIR}/ITSO ID TRACKER - FINALS PRESENTATION VERSION 1 (1).png`,
+    alt: "ITSO ID Tracker home page: a welcome headline beside an NU Dasmariñas student ID card on a lanyard",
+  },
+  calendar: {
+    src: `${ITSO_DIR}/ITSO ID TRACKER - FINALS PRESENTATION VERSION 1 (2).png`,
+    alt: "ITSO ID Tracker public calendar showing available appointment slots for August 2025",
+  },
+  booking: {
+    src: `${ITSO_DIR}/ITSO ID TRACKER - FINALS PRESENTATION VERSION 1 (3).png`,
+    alt: "ITSO ID Tracker student dashboard for booking an appointment, with a calendar and an appointments panel",
+  },
+  admin: {
+    src: `${ITSO_DIR}/ITSO ID TRACKER - FINALS PRESENTATION VERSION 1 (4).png`,
+    alt: "ITSO ID Tracker admin dashboard with user accounts, pending and completed appointments and analytics",
+  },
+};
+
+const BEAUTIVERSE_DIR = "/assets/projects/beautiverse";
+const BEAUTIVERSE_SCREENS = {
+  admin: {
+    src: `${BEAUTIVERSE_DIR}/beautiverse_2.png`,
+    alt: "Beautiverse admin dashboard with system statistics for users, employees, products, stock, orders and revenue",
+  },
+  profile: {
+    src: `${BEAUTIVERSE_DIR}/beautiverse.png`,
+    alt: "Beautiverse customer dashboard with profile information and order history",
+  },
+};
+
 export const PROJECTS: Project[] = [
   {
     id: "ignis-safe-website",
@@ -71,19 +103,9 @@ export const PROJECTS: Project[] = [
     description:
       "An ID processing and tracking system built for the ITSO office to streamline issuance, status updates, and record-keeping.",
     technologies: ["Next.js", "TypeScript", "Supabase"],
-    image: "/assets/projects/itso-id-tracker.svg",
-    imageAlt: "ITSO ID Tracker interface preview",
-    screenshots: [
-      { src: "/assets/projects/itso-id-tracker/hero.svg", alt: "ITSO ID Tracker home preview" },
-      {
-        src: "/assets/projects/itso-id-tracker/screen-dashboard.svg",
-        alt: "ITSO ID Tracker records dashboard screen",
-      },
-      {
-        src: "/assets/projects/itso-id-tracker/screen-detail.svg",
-        alt: "ITSO ID Tracker request detail screen",
-      },
-    ],
+    image: ITSO_SCREENS.home.src,
+    imageAlt: ITSO_SCREENS.home.alt,
+    screenshots: [ITSO_SCREENS.home, ITSO_SCREENS.calendar, ITSO_SCREENS.booking, ITSO_SCREENS.admin],
     repoUrl: "https://github.com/seandrodejo/itso-id-tracker1",
   },
   {
@@ -94,19 +116,9 @@ export const PROJECTS: Project[] = [
     description:
       "A digital storefront and community platform connecting beauty enthusiasts with products, services, and content.",
     technologies: ["Next.js", "TypeScript", "Supabase"],
-    image: "/assets/projects/beautiverse.svg",
-    imageAlt: "Beautiverse interface preview",
-    screenshots: [
-      { src: "/assets/projects/beautiverse/hero.svg", alt: "Beautiverse storefront preview" },
-      {
-        src: "/assets/projects/beautiverse/screen-dashboard.svg",
-        alt: "Beautiverse storefront catalog screen",
-      },
-      {
-        src: "/assets/projects/beautiverse/screen-detail.svg",
-        alt: "Beautiverse product detail screen",
-      },
-    ],
+    image: BEAUTIVERSE_SCREENS.admin.src,
+    imageAlt: BEAUTIVERSE_SCREENS.admin.alt,
+    screenshots: [BEAUTIVERSE_SCREENS.admin, BEAUTIVERSE_SCREENS.profile],
     repoUrl: "https://github.com/andreii2404/Beautiverse-digi",
   },
   {

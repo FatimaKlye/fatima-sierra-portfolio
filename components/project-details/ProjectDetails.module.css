@@ -335,13 +335,24 @@
   background: var(--pd-dusty);
 }
 
+/* Screenshots that already carry their own window chrome (e.g. the ITSO exports). */
 .plain {
-  max-width: 440px;
+  max-width: 760px;
   margin-inline: auto;
   overflow: hidden;
-  border-radius: clamp(20px, 3vw, 32px);
+  border: 1px solid var(--pd-line);
+  border-radius: 16px;
   background: #eef0f5;
-  box-shadow: 0 40px 80px -24px rgba(59, 42, 52, 0.35);
+  box-shadow:
+    0 40px 90px -20px rgba(59, 42, 52, 0.35),
+    0 12px 30px rgba(166, 61, 104, 0.12);
+}
+
+/* Anchors redaction patches to the image. */
+.plainMedia {
+  position: relative;
+  display: block;
+  line-height: 0;
 }
 
 .frameImage {

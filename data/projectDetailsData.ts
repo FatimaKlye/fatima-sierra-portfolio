@@ -252,6 +252,74 @@ const IGNIS_ECOSYSTEM: ProjectEcosystem = {
   ],
 };
 
+/* ---------- ITSO ID Tracker & Beautiverse: real screenshots ---------- */
+
+const ITSO_DIR = "/assets/projects/itso-id-tracker";
+// These exports already include the browser's own window chrome, so they use the "plain" frame
+// instead of a second, drawn browser bar.
+const ITSO_SCREENS = {
+  home: {
+    src: `${ITSO_DIR}/ITSO ID TRACKER - FINALS PRESENTATION VERSION 1 (1).png`,
+    alt: "ITSO ID Tracker home page: a 'Welcome to ITSO ID Tracker' headline with a Get Started button beside an NU Dasmariñas student ID card on a lanyard.",
+    width: 606,
+    height: 339,
+    label: "Home",
+    caption: "Home — a welcome page that points NU Dasmariñas students to ID appointments.",
+    frame: "plain",
+  },
+  calendar: {
+    src: `${ITSO_DIR}/ITSO ID TRACKER - FINALS PRESENTATION VERSION 1 (2).png`,
+    alt: "ITSO ID Tracker public calendar page showing August 2025 with available appointment slots for the ITSO office.",
+    width: 603,
+    height: 339,
+    label: "Public calendar",
+    caption: "Public calendar — available appointment slots, visible before signing in.",
+    frame: "plain",
+  },
+  booking: {
+    src: `${ITSO_DIR}/ITSO ID TRACKER - FINALS PRESENTATION VERSION 1 (3).png`,
+    alt: "ITSO ID Tracker student dashboard titled 'Book an Appointment' with a calendar marking days that have appointments or are closed, and a panel for the student's appointments.",
+    width: 628,
+    height: 335,
+    label: "Book an appointment",
+    caption: "Student dashboard — book a slot, manage the schedule and track ID status.",
+    frame: "plain",
+    // The screenshot shows a real student's ID number and email address; keep them unreadable.
+    redact: [{ left: 66.5, top: 49.5, width: 19, height: 8 }],
+  },
+  admin: {
+    src: `${ITSO_DIR}/ITSO ID TRACKER - FINALS PRESENTATION VERSION 1 (4).png`,
+    alt: "ITSO ID Tracker admin dashboard with user accounts, pending and completed appointment counts and an analytics and reports panel.",
+    width: 628,
+    height: 335,
+    label: "Admin dashboard",
+    caption: "Admin dashboard — account and appointment counts, with analytics and reports.",
+    frame: "plain",
+  },
+} satisfies Record<string, ProjectMedia>;
+
+const BEAUTIVERSE_DIR = "/assets/projects/beautiverse";
+const BEAUTIVERSE_SCREENS = {
+  admin: {
+    src: `${BEAUTIVERSE_DIR}/beautiverse_2.png`,
+    alt: "Beautiverse admin dashboard showing system statistics: total users, employees, products, stock, orders and revenue.",
+    width: 1917,
+    height: 1031,
+    label: "Admin dashboard",
+    caption: "Admin dashboard — system statistics across users, products, stock, orders and revenue.",
+    frame: "browser",
+  },
+  profile: {
+    src: `${BEAUTIVERSE_DIR}/beautiverse.png`,
+    alt: "Beautiverse customer dashboard with profile information and an order history section.",
+    width: 1897,
+    height: 1030,
+    label: "Customer dashboard",
+    caption: "Customer dashboard — profile information and order history.",
+    frame: "browser",
+  },
+} satisfies Record<string, ProjectMedia>;
+
 const IGNIS_PROCESS: ProjectStep[] = [
   {
     title: "Analyze",
@@ -481,6 +549,7 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
     period: "2024 – 2025",
     role: "Web Developer",
     organization: NU,
+    hero: ITSO_SCREENS.home,
     overview: {
       what: "ITSO ID Tracker is a web system for processing and tracking IDs, built with Next.js, TypeScript and Supabase.",
       purpose: "Simplify ID issuance and tracking workflows.",
@@ -511,7 +580,7 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
       { title: "Implement", description: "Add status monitoring and record management to the issuance workflow." },
       { title: "Test & refine", description: "Test system functions and refine the interfaces for usability and data accuracy." },
     ],
-    gallery: [],
+    gallery: [ITSO_SCREENS.home, ITSO_SCREENS.calendar, ITSO_SCREENS.booking, ITSO_SCREENS.admin],
     outcomes: [
       { label: "Simplified ID issuance and tracking workflows." },
       { label: "Improved usability and data accuracy through testing and refinement." },
@@ -534,6 +603,7 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
     period: "2025 – 2026",
     role: "Web Developer",
     organization: NU,
+    hero: BEAUTIVERSE_SCREENS.admin,
     overview: {
       what: "Beautiverse is a digital beauty storefront and community platform where products, services and user content live together.",
       purpose: "Create a clearer, more accessible browsing experience for beauty products, services and content.",
@@ -567,7 +637,7 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
       { title: "Build", description: "Develop the storefront and community platform." },
       { title: "Integrate", description: "Connect application features with data management." },
     ],
-    gallery: [],
+    gallery: [BEAUTIVERSE_SCREENS.admin, BEAUTIVERSE_SCREENS.profile],
     outcomes: [
       { label: "A clearer, more accessible browsing experience across products, services and content." },
       { label: "Reliable interaction across the platform through integrated features and data management." },
