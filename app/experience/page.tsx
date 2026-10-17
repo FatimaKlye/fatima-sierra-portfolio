@@ -8,7 +8,7 @@ import {
   LEADERSHIP,
 } from "@/components/about/aboutData";
 import PageHero from "@/components/editorial/PageHero";
-import { DEVELOPMENT_ROLES } from "@/components/experience/experienceData";
+import { DEVELOPMENT_EXPERIENCE } from "@/components/experience/experienceData";
 import EditorialMotion from "@/components/motion/EditorialMotion";
 import styles from "@/components/experience/Experience.module.css";
 
@@ -47,11 +47,11 @@ export default function ExperiencePage() {
         <PageHero
           label="Experience"
           eyebrow="The complete journey"
-          index={pad(DEVELOPMENT_ROLES.length)}
+          index={pad(DEVELOPMENT_EXPERIENCE.length)}
           title={<>Building, studying, <em>growing.</em></>}
-          intro="The development roles, schools, student service and recognition behind my work — every entry taken from my résumé and verified records."
+          intro="Development roles first, then education, student leadership and recognition — every entry taken from my résumé and verified records."
           meta={[
-            { label: "Dev roles", value: pad(DEVELOPMENT_ROLES.length) },
+            { label: "Dev roles", value: pad(DEVELOPMENT_EXPERIENCE.length) },
             { label: "Schools", value: pad(EDUCATION.length) },
             { label: "Honours", value: pad(ACHIEVEMENTS.length) },
             { label: "Certificates", value: pad(CERTIFICATES.length) },
@@ -67,8 +67,8 @@ export default function ExperiencePage() {
                 Where I&apos;ve <em>built.</em>
               </h2>
               <p className={styles.intro} data-reveal>
-                Project roles at {DEVELOPMENT_ROLES[0]?.organization ?? "university"} — from analysing requirements to
-                shipping and testing.
+                Project roles at {DEVELOPMENT_EXPERIENCE[0]?.organization ?? "university"}, with what I personally
+                did on each — from analysing requirements to building, testing and shipping.
               </p>
             </header>
 
@@ -77,18 +77,31 @@ export default function ExperiencePage() {
                 <span className={styles.journeyFill} data-grow />
               </span>
               <ol className={styles.journeyList}>
-                {DEVELOPMENT_ROLES.map((role) => (
-                  <li className={styles.journeyItem} key={role.slug} data-reveal>
+                {DEVELOPMENT_EXPERIENCE.map((entry) => (
+                  <li className={styles.journeyItem} key={entry.projects.map((project) => project.slug).join("+")} data-reveal>
                     <span className={styles.journeyDot} aria-hidden="true" />
-                    <p className={styles.journeyPeriod}>{role.period}</p>
-                    <h3 className={styles.journeyRole}>{role.role}</h3>
-                    <p className={styles.journeyProject}>
-                      <Link className="ui-btn ui-btn--secondary ui-btn--sm" href={`/projects/${role.slug}`}>
-                        {role.project}
-                      </Link>
+                    <p className={styles.journeyPeriod}>
+                      {entry.period}
+                      {entry.organization && <span className={styles.journeyOrg}> · {entry.organization}</span>}
                     </p>
-                    <p className={styles.journeyMeta}>{role.category}</p>
-                    <p className={styles.journeySummary}>{role.summary}</p>
+                    <h3 className={styles.journeyRole}>{entry.role}</h3>
+                    <ul className={styles.journeyProjects} aria-label="Projects">
+                      {entry.projects.map((project) => (
+                        <li key={project.slug}>
+                          <Link className="ui-btn ui-btn--secondary ui-btn--sm" href={`/projects/${project.slug}`}>
+                            {project.project}
+                          </Link>
+                          <span className={styles.journeyMeta}>{project.category}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    {entry.contributions.length > 0 && (
+                      <ul className={styles.journeyPoints}>
+                        {entry.contributions.map((item) => (
+                          <li key={item.text}>{item.text}</li>
+                        ))}
+                      </ul>
+                    )}
                   </li>
                 ))}
               </ol>

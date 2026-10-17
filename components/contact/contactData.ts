@@ -1,5 +1,10 @@
 const SIMPLE_ICONS_BASE = "https://cdn.jsdelivr.net/npm/simple-icons@15/icons";
 
+/** The one résumé file every "Resume" button and link points to. */
+export const RESUME_URL = "/assets/resume/Fatima-Klye-Sierra-Resume-2026.pdf";
+
+export const CONTACT_EMAIL = "fatimaklyesierra081005@gmail.com";
+
 export type SocialLink = {
   id: "github" | "linkedin" | "facebook" | "instagram" | "email";
   label: string;

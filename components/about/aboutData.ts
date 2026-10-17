@@ -20,7 +20,7 @@ export const HERO_CONTENT = {
     primary: { label: "Explore My Projects", href: "/#projects" },
     secondary: {
       label: "Download Resume",
-      href: "/assets/resume/fatima-sierra-resume.pdf",
+      href: "/assets/resume/Fatima-Klye-Sierra-Resume-2026.pdf",
     },
   },
 };

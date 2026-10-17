@@ -1,30 +1,45 @@
 import type { Metadata } from "next";
-import styles from "@/app/about/AboutPage.module.css";
+import Link from "next/link";
+import { RESUME_URL } from "@/components/contact/contactData";
+import styles from "./Resume.module.css";
 
 export const metadata: Metadata = {
   title: "Resume | Fatima Sierra",
   description:
-    "Download the resume of Fatima Klye M. Sierra, a web and mobile developer building purposeful, reliable digital solutions.",
+    "Resume of Fatima Klye M. Sierra — web and mobile developer working with Next.js, React, TypeScript, Flutter and Supabase.",
 };
 
 export default function ResumePage() {
   return (
-    <main>
-      <section className={styles.section} aria-labelledby="resume-heading">
-        <div className={styles.sectionContainer}>
-          <header className={styles.sectionHeader} style={{ marginBottom: 0 }}>
-            <p className={styles.sectionEyebrow}>RESUME</p>
-            <h1 id="resume-heading" className={styles.sectionTitle}>
-              Fatima Klye M. Sierra
-            </h1>
-            <p className={styles.sectionIntro}>
-              A summary of my experience, skills, and education as a web and
-              mobile developer. Download the full resume for the complete
-              picture.
+    <main className={styles.page}>
+      <div className={styles.container}>
+        <header className={styles.header}>
+          <div>
+            <p className={styles.eyebrow}>Resume</p>
+            <h1 className={styles.title}>Fatima Klye M. Sierra</h1>
+            <p className={styles.intro}>
+              Web &amp; mobile developer — experience, projects, skills and education on one page.
             </p>
-          </header>
+          </div>
+          <div className={styles.actions}>
+            <a className="ui-btn ui-btn--primary" href={RESUME_URL} download>
+              Download PDF
+            </a>
+            <a className="ui-btn ui-btn--secondary" href={RESUME_URL} target="_blank" rel="noreferrer">
+              Open in new tab
+            </a>
+          </div>
+        </header>
+
+        <div className={styles.viewer}>
+          <iframe className={styles.pdf} src={RESUME_URL} title="Fatima Klye M. Sierra resume" />
         </div>
-      </section>
+
+        <p className={styles.note}>
+          Preview not showing? Use <strong>Download PDF</strong> above, or{" "}
+          <Link href="/contact">get in touch</Link> and I&apos;ll send it over.
+        </p>
+      </div>
     </main>
   );
 }

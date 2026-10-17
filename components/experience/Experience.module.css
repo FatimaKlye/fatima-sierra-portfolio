@@ -1,7 +1,7 @@
 /* /experience — split editorial sections with a scroll-drawn journey rail. */
 
 .section {
-  padding: clamp(64px, 8vw, 120px) 0;
+  padding: var(--section-space) 0;
   border-bottom: 1px solid var(--color-border);
 }
 
@@ -126,25 +126,64 @@
   line-height: 1.1;
 }
 
-.journeyProject {
-  margin: 12px 0 6px;
+.journeyOrg {
+  color: var(--color-text-muted);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+
+.journeyProjects {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.journeyProjects li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
 }
 
 .journeyMeta {
-  margin: 4px 0 0;
   color: var(--color-text-muted);
-  font-size: 0.74rem;
+  font-size: 0.7rem;
   font-weight: 500;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
-.journeySummary {
-  max-width: 60ch;
-  margin: 12px 0 0;
+/* What I personally did — short résumé-style points. */
+.journeyPoints {
+  display: grid;
+  gap: 8px;
+  max-width: 64ch;
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.journeyPoints li {
+  position: relative;
+  padding-left: 20px;
   color: var(--color-text-muted);
   font-size: 0.9rem;
-  line-height: 1.75;
+  line-height: 1.65;
+}
+
+.journeyPoints li::before {
+  position: absolute;
+  top: 0.72em;
+  left: 2px;
+  width: 8px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--color-primary);
+  content: "";
 }
 
 /* Schools --------------------------------------------------------------------- */
@@ -269,7 +308,7 @@
 /* Certifications band ------------------------------------------------------------ */
 
 .credentials {
-  padding: clamp(64px, 8vw, 120px) 0;
+  padding: var(--section-space) 0;
   background: #2a1c24;
   color: #efe3e9;
 }

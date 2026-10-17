@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
 import type { MouseEvent } from "react";
-import AnimatedButton from "@/components/ui/AnimatedButton";
 import ResumeModal from "./ResumeModal";
 import styles from "./SiteHeader.module.css";
 
@@ -116,9 +115,9 @@ export default function SiteHeader() {
           </nav>
 
           <div className={styles.resumeCta}>
-            <AnimatedButton type="button" onClick={() => setResumeOpen(true)}>
-              RESUME
-            </AnimatedButton>
+            <button type="button" className="ui-btn ui-btn--primary ui-btn--sm" onClick={() => setResumeOpen(true)}>
+              Resume
+            </button>
           </div>
 
           <button

@@ -14,7 +14,10 @@
 
   --shadow-soft: 0 24px 80px rgba(59, 42, 52, 0.12);
   --shadow-card: 0 16px 36px rgba(166, 61, 104, 0.1);
-  --page-max-width: 1440px;
+  /* One content width for the header, every page section and the footer, so all edges line up. */
+  --page-max-width: 1240px;
+  /* Vertical rhythm between page sections — generous enough to breathe, never a blank screen. */
+  --section-space: clamp(56px, 7vw, 96px);
   /* Global navbar height — the fixed header, body offset and anchor offset all read this. */
   --header-height: 72px;
 }

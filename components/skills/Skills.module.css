@@ -3,7 +3,7 @@
 .section {
   --plum: #2a1c24;
 
-  padding: clamp(64px, 8vw, 120px) 0;
+  padding: var(--section-space) 0;
   border-bottom: 1px solid var(--color-border);
 }
 

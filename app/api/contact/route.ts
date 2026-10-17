@@ -105,7 +105,8 @@ function validatePayload(value: unknown): ContactPayload | null {
     return null;
   }
 
-  if (!isValidPhone(phone)) {
+  // Phone is optional; when one is given it must still be a real number.
+  if (phone.trim() && !isValidPhone(phone)) {
     return null;
   }
 
@@ -240,7 +241,7 @@ export async function POST(request: Request) {
   const payload = validatePayload(body);
   if (!payload) {
     return Response.json(
-      { error: "Please provide a valid name, email address, phone number, and message." },
+      { error: "Please provide a valid name, email address and message (and a valid phone number, if you add one)." },
       { status: 400 },
     );
   }
@@ -287,7 +288,7 @@ export async function POST(request: Request) {
       to: recipient,
       replyTo: `"${payload.name}" <${payload.email}>`,
       subject: `New Portfolio Inquiry — ${payload.name}`,
-      text: `New Portfolio Inquiry\n\nName: ${payload.name}\nEmail: ${payload.email}\nPhone: ${payload.phone}\n\nMessage:\n${payload.message}\n\nSubmitted: ${submittedAt}`,
+      text: `New Portfolio Inquiry\n\nName: ${payload.name}\nEmail: ${payload.email}\nPhone: ${payload.phone || "Not provided"}\n\nMessage:\n${payload.message}\n\nSubmitted: ${submittedAt}`,
       html: buildContactEmailHtml({ ...payload, submittedAt }),
     });
 
@@ -314,7 +315,7 @@ function escapeHtml(value: string) {
 function buildContactEmailHtml(payload: ContactPayload & { submittedAt: string }): string {
   const name = escapeHtml(payload.name);
   const email = escapeHtml(payload.email);
-  const phone = escapeHtml(payload.phone);
+  const phone = escapeHtml(payload.phone || "Not provided");
   const message = escapeHtml(payload.message).replace(/\n/g, "<br />");
   const submittedAt = escapeHtml(payload.submittedAt);
   const replyHref = `mailto:${encodeURIComponent(payload.email)}`;

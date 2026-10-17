@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ACHIEVEMENTS, HERO_CONTENT } from "@/components/about/aboutData";
+import { HERO_CONTENT } from "@/components/about/aboutData";
 import EditorialMotion from "@/components/motion/EditorialMotion";
 import AboutOpening from "./AboutOpening";
 import RecipeToCode from "./RecipeToCode";
@@ -316,27 +316,9 @@ export default function AboutStory() {
               </ul>
             </div>
           </div>
-        </div>
-
-        {/* Recognition: every verified honour, oldest first --------------- */}
-        <div className={`${styles.container} ${styles.roll}`} id="recognition" data-nav-label="Recognition">
-          <header className={styles.rollHead}>
-            <p className={styles.eyebrow} data-reveal>Recognition</p>
-            <h2 className={styles.blockTitle} data-reveal>
-              Honours <em>along the way.</em>
-            </h2>
-          </header>
-          <ol className={styles.rollList} data-stagger>
-            {ACHIEVEMENTS.map((achievement) => (
-              <li className={styles.rollItem} key={`${achievement.institution}-${achievement.title}`}>
-                <span className={styles.rollYears}>{achievement.years}</span>
-                <strong className={styles.rollTitle}>{achievement.title}</strong>
-                <span className={styles.rollPlace}>{achievement.institution}</span>
-              </li>
-            ))}
-          </ol>
+          {/* Honours, leadership and education live in one place: the Experience page. */}
           <Link className={`ui-btn ui-btn--secondary ${styles.inlineCta}`} href="/experience" data-reveal>
-            Follow the Full Journey
+            Honours, Leadership &amp; Education
           </Link>
         </div>
 

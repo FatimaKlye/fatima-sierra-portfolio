@@ -104,9 +104,8 @@ function validate(values: FormValues): FormErrors {
     errors.email = "Please enter a valid email (e.g. name@example.com).";
   }
 
-  if (!values.phone.trim()) {
-    errors.phone = "Please enter your phone number.";
-  } else if (!isValidPhone(values.phone)) {
+  // Optional — checked only when filled in.
+  if (values.phone.trim() && !isValidPhone(values.phone)) {
     errors.phone = "Enter a valid phone number (7–15 digits).";
   }
 
@@ -386,7 +385,7 @@ export default function ContactForm() {
 
       <div className={styles.field} data-invalid={Boolean(displayedErrors.phone)}>
         <label className={styles.label} htmlFor={ids.phone}>
-          Phone <span aria-hidden="true">*</span>
+          Phone <span className={styles.optional}>(optional)</span>
         </label>
         <input
           id={ids.phone}
@@ -399,7 +398,6 @@ export default function ContactForm() {
           onChange={(event) => handleChange("phone", event.target.value)}
           onBlur={() => handleBlur("phone")}
           disabled={isSending}
-          aria-required="true"
           aria-invalid={Boolean(displayedErrors.phone)}
           aria-describedby={displayedErrors.phone ? `${ids.phone}-error` : undefined}
         />
@@ -473,8 +471,8 @@ export default function ContactForm() {
           </p>
         )}
 
-        <button className={`ui-btn ui-btn--primary ui-btn--lg ${styles.submit}`} type="submit" disabled={isSending}>
-          {isSending ? "Sending…" : "Submit"}
+        <button className={`ui-btn ui-btn--primary ${styles.submit}`} type="submit" disabled={isSending}>
+          {isSending ? "Sending…" : "Send Message"}
         </button>
       </div>
     </form>

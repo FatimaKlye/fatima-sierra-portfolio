@@ -139,7 +139,7 @@
 /* Chapters ---------------------------------------------------------------- */
 
 .chapter {
-  padding: clamp(72px, 9vw, 140px) 0;
+  padding: var(--section-space) 0;
   border-bottom: 1px solid var(--color-border);
   overflow: clip;
 }
@@ -466,7 +466,7 @@
 /* Closing call to action ---------------------------------------------------- */
 
 .closing {
-  padding: clamp(64px, 8vw, 112px) 0;
+  padding: var(--section-space) 0;
   background: var(--color-primary);
   color: var(--color-white);
   text-align: center;

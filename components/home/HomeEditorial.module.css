@@ -1,5 +1,5 @@
 .section {
-  padding: clamp(76px, 9vw, 132px) 0;
+  padding: var(--section-space) 0;
   border-bottom: 1px solid var(--color-border);
 }
 
@@ -35,10 +35,11 @@
   max-width: 860px;
   margin: 0;
   color: var(--color-text-primary);
-  font-size: clamp(2.25rem, 5.2vw, 5.2rem);
+  font-size: clamp(2.1rem, 4.4vw, 4rem);
   font-weight: 600;
-  letter-spacing: -0.055em;
-  line-height: 0.98;
+  letter-spacing: -0.05em;
+  line-height: 1;
+  text-wrap: balance;
 }
 
 .sectionTitle em {
@@ -250,18 +251,15 @@
 
 .contactTitle em { color: var(--color-primary); font-style: normal; }
 
-.contactCopy > p {
-  margin: 0 0 28px;
-  color: var(--color-text-muted);
-  font-size: 0.94rem;
-  line-height: 1.8;
+.contactCopy > .sectionNumber {
+  margin-bottom: 18px;
 }
 
 .contactLinksRow {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 10px;
+  gap: 8px 22px;
 }
 
 .contactActions {
@@ -286,73 +284,113 @@
   justify-content: space-between;
 }
 
-.toolStrip {
+/* Skills: one row per area — label on the left, the tools I use on the right. */
+.skillGroups {
+  margin: clamp(32px, 4vw, 48px) 0 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.skillGroup {
   display: grid;
-  grid-template-columns: repeat(8, minmax(0, 1fr));
-  margin: clamp(32px, 4vw, 52px) 0 0;
+  grid-template-columns: minmax(160px, 0.28fr) minmax(0, 1fr);
+  gap: 16px 32px;
+  align-items: center;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.skillGroup dt {
+  color: var(--color-text-primary);
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.skillGroup dd {
+  margin: 0;
+}
+
+.skillList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 26px;
+  margin: 0;
   padding: 0;
   list-style: none;
-  border-top: 1px solid var(--color-border);
-  border-left: 1px solid var(--color-border);
 }
 
-.toolItem {
-  display: flex;
-  flex-direction: column;
+.skillList li {
+  display: inline-flex;
   align-items: center;
-  gap: 14px;
-  padding: clamp(20px, 2.6vw, 32px) 8px;
-  border-right: 1px solid var(--color-border);
-  border-bottom: 1px solid var(--color-border);
-  transition: background-color 250ms ease;
+  gap: 8px;
+  color: var(--color-text-primary);
+  font-size: 0.9rem;
+  font-weight: 500;
 }
 
-.toolItem:hover { background: var(--color-surface); }
-
-.toolIcon {
-  display: grid;
-  width: 30px;
-  height: 30px;
-  place-items: center;
-  transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.toolItem:hover .toolIcon { transform: translateY(-4px); }
-
-.toolIcon img {
-  width: 30px;
-  height: 30px;
+.skillList img {
+  width: 20px;
+  height: 20px;
   object-fit: contain;
+}
+
+.skillCount {
+  display: inline-grid;
+  min-width: 18px;
+  height: 18px;
+  place-items: center;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--color-soft-blush);
+  color: var(--color-primary-hover);
+  font-size: 0.66rem;
+  font-weight: 700;
+  line-height: 1;
 }
 
 .toolFallback {
   color: var(--color-primary);
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   font-weight: 700;
 }
 
-.toolName {
-  color: var(--color-text-primary);
-  font-size: 0.74rem;
+.contactInner { align-items: end; }
+
+.contactEmail {
+  display: inline-flex;
+  max-width: 100%;
+  align-items: center;
+  gap: 10px;
+  color: var(--color-primary);
+  font-size: clamp(1rem, 1.6vw, 1.2rem);
   font-weight: 600;
-  text-align: center;
+  overflow-wrap: anywhere;
+  text-decoration: underline;
+  text-decoration-color: rgba(166, 61, 104, 0.3);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 6px;
+  transition: text-decoration-color 200ms ease;
 }
 
-.verbLine {
+.contactEmail svg { flex-shrink: 0; }
+
+.contactEmail:hover,
+.contactEmail:focus-visible { text-decoration-color: var(--color-primary); }
+
+.contactButtons {
   display: flex;
   flex-wrap: wrap;
-  gap: 0 0.4em;
-  margin: clamp(28px, 3.6vw, 44px) 0 0;
-  color: var(--color-text-primary);
-  font-size: clamp(1.6rem, 3.6vw, 3.2rem);
-  font-weight: 600;
-  letter-spacing: -0.05em;
-  line-height: 1.05;
+  gap: 10px;
 }
 
-.verbLine span:nth-child(even) { color: var(--color-primary); }
+.contactLinksRow a {
+  color: var(--color-text-muted);
+  font-size: 0.84rem;
+  font-weight: 600;
+  transition: color 200ms ease;
+}
 
-.contactInner { align-items: end; }
+.contactLinksRow a:hover,
+.contactLinksRow a:focus-visible { color: var(--color-primary); }
 
 .contactLead {
   max-width: 44ch;
@@ -376,16 +414,15 @@ ul.contactLinksRow {
 
   .capabilityRow { grid-template-columns: 52px minmax(160px, 0.8fr) minmax(0, 1fr); gap: 18px; }
   .timelineRow { grid-template-columns: 82px 160px minmax(0, 1fr); gap: 18px; }
-  .toolStrip { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .skillGroup { grid-template-columns: 1fr; gap: 12px; }
 }
 
 @media (max-width: 640px) {
   .container { width: min(calc(100% - 40px), var(--page-max-width)); }
 
-  .section { padding: 44px 0; }
-  .githubSection { padding: 32px 0; }
+  .githubSection { padding: 40px 0; }
   .sectionTitle,
-  .contactTitle { font-size: clamp(2.35rem, 13vw, 4rem); }
+  .contactTitle { font-size: clamp(2.1rem, 10vw, 3rem); }
 
   .capabilityRow,
   .timelineRow { grid-template-columns: 1fr; gap: 10px; }
@@ -402,6 +439,6 @@ ul.contactLinksRow {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .toolItem,
-  .toolIcon { transition: none; }
+  .contactEmail,
+  .contactLinksRow a { transition: none; }
 }

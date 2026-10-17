@@ -1,0 +1,88 @@
+.page {
+  padding: clamp(40px, 5vw, 64px) 0 var(--section-space);
+}
+
+.container {
+  width: min(calc(100% - 64px), var(--page-max-width));
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px 48px;
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--color-primary);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.title {
+  margin: 12px 0 0;
+  color: var(--color-text-primary);
+  font-size: clamp(2rem, 4.4vw, 3.6rem);
+  font-weight: 600;
+  letter-spacing: -0.045em;
+  line-height: 1.02;
+}
+
+.intro {
+  max-width: 54ch;
+  margin: 12px 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.98rem;
+  line-height: 1.7;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.viewer {
+  height: min(1100px, calc(100vh - var(--header-height) - 120px));
+  min-height: 520px;
+  margin-top: 32px;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-soft-blush);
+}
+
+.pdf {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.note {
+  margin: 16px 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.86rem;
+}
+
+.note a {
+  color: var(--color-primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (max-width: 640px) {
+  .container {
+    width: min(calc(100% - 40px), var(--page-max-width));
+  }
+
+  .actions,
+  .actions > a {
+    width: 100%;
+  }
+}

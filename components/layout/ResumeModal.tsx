@@ -2,9 +2,8 @@
 
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
+import { RESUME_URL } from "@/components/contact/contactData";
 import styles from "./ResumeModal.module.css";
-
-const RESUME_PDF_URL = "/assets/resume/Fatima-Klye-Sierra-Resume-2026.pdf";
 
 export default function ResumeModal({
   open,
@@ -48,21 +47,35 @@ export default function ResumeModal({
             <p className={styles.eyebrow}>Resume</p>
             <h3 className={styles.title}>Fatima Klye M. Sierra</h3>
           </div>
-          <button
-            ref={closeRef}
-            type="button"
-            className={styles.close}
-            aria-label="Close resume preview"
-            onClick={onClose}
-          >
-            ×
-          </button>
+          <div className={styles.actions}>
+            {/* Many mobile browsers can't render a PDF in a frame, so the file is always one tap away. */}
+            <a className="ui-btn ui-btn--primary ui-btn--sm" href={RESUME_URL} download>
+              Download PDF
+            </a>
+            <a
+              className={`ui-btn ui-btn--secondary ui-btn--sm ${styles.openLink}`}
+              href={RESUME_URL}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Open in new tab
+            </a>
+            <button
+              ref={closeRef}
+              type="button"
+              className={styles.close}
+              aria-label="Close resume preview"
+              onClick={onClose}
+            >
+              ×
+            </button>
+          </div>
         </header>
 
         <div className={styles.body}>
           <iframe
             className={styles.pdf}
-            src={RESUME_PDF_URL}
+            src={RESUME_URL}
             title="Fatima Klye M. Sierra resume preview"
           />
         </div>

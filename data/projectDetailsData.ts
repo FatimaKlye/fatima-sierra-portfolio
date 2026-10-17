@@ -371,7 +371,7 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
     contributions: [
       {
         area: "Development",
-        text: "Developed web and mobile features for IGNIS SAFE — React.js for this website, Flutter for the app — on a shared Supabase backend for fire-safety learning, assessments, tracking and administration.",
+        text: "Developed web and mobile features for IGNIS SAFE — React.js for the website, Flutter for the app — on a shared Supabase backend for fire-safety learning, assessments, tracking and administration.",
       },
       ...IGNIS_SHARED_CONTRIBUTIONS,
     ],
@@ -443,7 +443,7 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
     contributions: [
       {
         area: "Development",
-        text: "Developed mobile and web features for IGNIS SAFE — Flutter for this app, React.js for the website — on a shared Supabase backend for fire-safety learning, assessments, tracking and administration.",
+        text: "Developed mobile and web features for IGNIS SAFE — Flutter for the app, React.js for the website — on a shared Supabase backend for fire-safety learning, assessments, tracking and administration.",
       },
       {
         area: "Version control",
