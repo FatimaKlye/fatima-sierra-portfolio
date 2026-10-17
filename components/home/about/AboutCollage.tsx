@@ -16,14 +16,15 @@ const DEFAULT_PRINT_RATIO = 4 / 5;
  * width (w), tilt (r) and whether it lands over or behind the portrait.
  * Overhang is mostly to the left (the gap beside the copy) and stays small on
  * the right so prints never reach the page edge or the section nav.
- * Slot 4 is narrower so a tall (9:16) photo there stays clear of the sticker;
+ * Slot 4 is narrower so a tall (9:16) photo there stays clear of the sticker,
+ * and rides high enough to clear most of the arch's curve it tucks behind;
  * slot 5 sits left of centre so it never runs under the hint line.
  */
 const SLOTS = [
   { x: 2, y: 18, w: 36, r: -8, over: true },
   { x: 88, y: 32, w: 28, r: 7, over: true },
   { x: 82, y: 86, w: 30, r: -5, over: true },
-  { x: 76, y: 2, w: 26, r: 10, over: false },
+  { x: 76, y: -3, w: 26, r: 10, over: false },
   { x: -6, y: 54, w: 24, r: 6, over: false },
   { x: 40, y: 96, w: 28, r: 3, over: true },
 ];
