@@ -222,11 +222,12 @@ export default function AboutStory() {
 
           <div className={styles.chapterBody}>
             <h2 id="chapter-build" className={styles.chapterTitle} data-reveal>
-              Now I build <em>for real people.</em>
+              Same passion. <em>Different recipe.</em>
             </h2>
             <p className={styles.body} data-reveal>
-              Plan it, build it, taste-test, adjust, repeat. The same recipe now goes into responsive web and mobile
-              applications — from interface design to database integration and testing.
+              The kitchen taught me to plan ahead, taste as I go and fix what isn&apos;t working before it reaches
+              the table. I still work that way, now with code: responsive web and mobile applications, from interface
+              design to database integration and testing.
             </p>
 
             <ul className={styles.plates}>

@@ -31,7 +31,7 @@ export default function AboutOpening({ headingLevel, eyebrow, variant }: AboutOp
 
   return (
     <div
-      className={`${styles.container} ${styles.opening}`}
+      className={`${styles.container} ${styles.opening} ${variant === "preview" ? styles.openingCentered : ""}`}
       {...(variant === "full" ? { id: "intro", "data-nav-label": "Intro", "data-nav-intro": "" } : {})}
     >
       <div className={styles.openingCopy}>
@@ -75,6 +75,8 @@ export default function AboutOpening({ headingLevel, eyebrow, variant }: AboutOp
         )}
       </div>
 
+      {/* The homepage hero already shows the portrait, so the preview is text-only. */}
+      {variant === "full" && (
       <div className={styles.openingVisual}>
         <svg className={styles.journeyLine} viewBox="0 0 400 520" fill="none" aria-hidden="true">
           <path
@@ -106,6 +108,7 @@ export default function AboutOpening({ headingLevel, eyebrow, variant }: AboutOp
           </div>
         )}
       </div>
+      )}
     </div>
   );
 }
