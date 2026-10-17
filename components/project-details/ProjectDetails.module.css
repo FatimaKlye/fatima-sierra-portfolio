@@ -488,16 +488,6 @@
   gap: clamp(20px, 3vw, 32px);
 }
 
-/* Two typographic columns, each opened by a hairline; the solution's rule is rose. */
-.storyPart {
-  padding-top: clamp(20px, 2.4vw, 28px);
-  border-top: 2px solid var(--pd-line);
-}
-
-.storySolution {
-  border-top-color: var(--pd-rose);
-}
-
 .storyHead {
   margin-bottom: clamp(16px, 2vw, 24px);
 }
@@ -571,7 +561,6 @@
 .contribRole {
   padding: 22px 24px;
   border: 1px solid rgba(255, 255, 255, 0.16);
-  border-left: 4px solid var(--pd-dusty);
   border-radius: 22px;
   background: rgba(255, 255, 255, 0.06);
 }

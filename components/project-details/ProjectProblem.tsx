@@ -14,7 +14,7 @@ export default function ProjectProblem({ project, problemNumber, solutionNumber 
   return (
     <section className={styles.story} aria-label="Problem and solution">
       <div className={`${styles.container} ${styles.storyGrid}`}>
-        <article className={styles.storyPart} id="problem" aria-labelledby="problem-title" data-nav-label="Problem">
+        <article id="problem" aria-labelledby="problem-title" data-nav-label="Problem">
           <SectionHead
             id="problem-title"
             number={problemNumber}
@@ -31,12 +31,7 @@ export default function ProjectProblem({ project, problemNumber, solutionNumber 
           <ArrowRight size={22} />
         </span>
 
-        <article
-          className={`${styles.storyPart} ${styles.storySolution}`}
-          id="solution"
-          aria-labelledby="solution-title"
-          data-nav-label="Solution"
-        >
+        <article id="solution" aria-labelledby="solution-title" data-nav-label="Solution">
           <SectionHead
             id="solution-title"
             number={solutionNumber}
