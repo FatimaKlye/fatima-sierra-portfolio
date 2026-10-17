@@ -22,6 +22,30 @@ export const ABOUT_PORTRAIT = {
 };
 
 /**
+ * Extra real photos revealed around the About portrait on hover (tap on touch screens).
+ * Save files in /public/assets/about/collage/ and list them here — the first six are
+ * used, in this order. Only genuine photos of Fatima; with an empty list the portrait
+ * simply stays a single image, with no hover effect or hint.
+ *
+ * e.g. { src: "/assets/about/collage/01-kitchen.jpg", alt: "Fatima plating a dish at a Home Economics competition" }
+ */
+const PROFILE_PHOTO = { src: "/assets/profile/profile_picture.jpg", alt: "Fatima Klye M. Sierra in a black blazer" };
+const PROFESSIONAL_PHOTO = {
+  src: "/assets/about/fatima-sierra-professional.jpg",
+  alt: "Professional portrait of Fatima Klye M. Sierra against a grey backdrop",
+};
+
+// The two profile photos for now, alternated across the six spots — swap in new photos as they come.
+export const COLLAGE_PHOTOS: { src: string; alt: string }[] = [
+  PROFESSIONAL_PHOTO,
+  PROFILE_PHOTO,
+  PROFESSIONAL_PHOTO,
+  PROFILE_PHOTO,
+  PROFESSIONAL_PHOTO,
+  PROFILE_PHOTO,
+];
+
+/**
  * Optional real photo for the kitchen chapter. Leave as null until a genuine
  * photo exists; set it to e.g. { src: "/assets/about/story/01-where-it-started.jpg", alt: "…" }
  * and it appears in Chapter 01 as a tilted print — no other code changes needed.

@@ -8,17 +8,18 @@ export default function ProjectOutcomes({ project, number }: { project: ProjectD
   const outcomes = project.outcomes ?? [];
   const stats = outcomes.filter((outcome) => outcome.stat);
   const statements = outcomes.filter((outcome) => !outcome.stat);
+  const limitations = project.limitations ?? [];
   const hasLinks = Boolean(
     project.links.liveUrl || project.links.videoUrl || project.links.repoUrl || project.links.apkUrl
   );
 
   return (
-    <section className={styles.outcomes} id="outcomes" aria-labelledby="outcomes-title" data-nav-label="Results & links">
+    <section className={styles.outcomes} id="outcomes" aria-labelledby="outcomes-title" data-nav-label="Outcome & links">
       <div className={styles.container}>
         <SectionHead
           id="outcomes-title"
           number={number}
-          eyebrow="Results & project links"
+          eyebrow="Outcome & links"
           title="Where it landed"
           tone="onDark"
         />
@@ -46,6 +47,17 @@ export default function ProjectOutcomes({ project, number }: { project: ProjectD
               </li>
             ))}
           </ul>
+        )}
+
+        {limitations.length > 0 && (
+          <div className={styles.scope} data-reveal>
+            <p className={styles.outcomeLinksLabel}>Project scope</p>
+            <ul className={styles.scopeList}>
+              {limitations.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </div>
         )}
 
         {hasLinks && (

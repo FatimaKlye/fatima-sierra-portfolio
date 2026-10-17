@@ -44,7 +44,7 @@ export default function ProjectHero({ project, index, total }: ProjectHeroProps)
   ].filter((item): item is { label: string; value: string } => Boolean(item.value));
 
   return (
-    <header className={styles.hero} id="intro" aria-labelledby="project-title" data-nav-label="Intro" data-nav-intro>
+    <header className={styles.hero} id="intro" aria-labelledby="project-title" data-nav-label="Overview" data-nav-intro>
       {/* Text-only heroes already show the index inside their panel. */}
       {project.hero && (
         <span className={styles.heroNumeral} aria-hidden="true">
@@ -86,7 +86,7 @@ export default function ProjectHero({ project, index, total }: ProjectHeroProps)
           <div className={styles.heroAside} data-intro>
             <dl className={styles.glance}>
               <div className={styles.glanceRow}>
-                <dt>Purpose</dt>
+                <dt>What it does</dt>
                 <dd className={styles.purpose}>{project.purpose}</dd>
               </div>
               {roles.length > 0 && (
@@ -96,18 +96,6 @@ export default function ProjectHero({ project, index, total }: ProjectHeroProps)
                     <ul className={styles.roleTags}>
                       {roles.map((role) => (
                         <li key={role}>{role}</li>
-                      ))}
-                    </ul>
-                  </dd>
-                </div>
-              )}
-              {technologies.length > 0 && (
-                <div className={styles.glanceRow}>
-                  <dt>Tech stack</dt>
-                  <dd>
-                    <ul className={styles.techChips}>
-                      {technologies.map((item) => (
-                        <li key={item}>{item}</li>
                       ))}
                     </ul>
                   </dd>

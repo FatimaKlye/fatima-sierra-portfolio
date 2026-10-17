@@ -59,7 +59,7 @@ export const PROJECTS: Project[] = [
     category: "Web Application · Public Safety",
     title: "IGNIS SAFE Website",
     description:
-      "The companion web platform for IGNIS SAFE, delivering fire-safety resources, program information, and administrative tools.",
+      "The web management platform of our IGNIS SAFE capstone with BFP Dasmariñas: personnel, attendance, reports and fire-safety learning content, plus a public portal.",
     technologies: ["React", "Vite", "Supabase"],
     image: "/assets/projects/ignis-safe-website.svg",
     imageAlt: "IGNIS SAFE website interface preview",
@@ -101,8 +101,8 @@ export const PROJECTS: Project[] = [
     category: "Web Application · Campus System",
     title: "ITSO ID Tracker",
     description:
-      "An ID processing and tracking system built for the ITSO office to streamline issuance, status updates, and record-keeping.",
-    technologies: ["Next.js", "TypeScript", "Supabase"],
+      "A student ID appointment and tracking system for the ITSO office: book by request type, follow the status and know when the ID is ready for pickup.",
+    technologies: ["React", "Express", "MongoDB"],
     image: ITSO_SCREENS.home.src,
     imageAlt: ITSO_SCREENS.home.alt,
     screenshots: [ITSO_SCREENS.home, ITSO_SCREENS.calendar, ITSO_SCREENS.booking, ITSO_SCREENS.admin],
@@ -114,12 +114,11 @@ export const PROJECTS: Project[] = [
     category: "Web Application · Beauty & Commerce",
     title: "Beautiverse",
     description:
-      "A digital storefront and community platform connecting beauty enthusiasts with products, services, and content.",
-    technologies: ["Next.js", "TypeScript", "Supabase"],
+      "A student e-commerce prototype for beauty and makeup products, with customer, employee and admin roles for ordering and order management.",
+    technologies: ["React", "PHP", "MySQL"],
     image: BEAUTIVERSE_SCREENS.admin.src,
     imageAlt: BEAUTIVERSE_SCREENS.admin.alt,
     screenshots: [BEAUTIVERSE_SCREENS.admin, BEAUTIVERSE_SCREENS.profile],
-    repoUrl: "https://github.com/andreii2404/Beautiverse-digi",
   },
   {
     id: "maddy-cassy",

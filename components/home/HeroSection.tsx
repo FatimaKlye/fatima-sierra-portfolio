@@ -11,6 +11,7 @@ import AboutPreview from "./about/AboutPreview";
 import CredentialsTeaser from "./CredentialsTeaser";
 import PreviewHeader from "./PreviewHeader";
 import ProjectList from "./ProjectList";
+import Recommendations from "./Recommendations";
 import { getGithubContributions } from "./githubContributions";
 import styles from "./HeroSection.module.css";
 import editorialStyles from "./HomeEditorial.module.css";
@@ -142,8 +143,8 @@ export default async function HeroSection() {
           <PreviewHeader
             number="01 — Projects"
             headingId="projects-title"
-            title={<>Selected projects, <em>and what I built.</em></>}
-            intro="Web and mobile systems with real screenshots, my role and the stack behind each one. Open a case study for the full breakdown."
+            title={<>Featured project, <em>and what I built.</em></>}
+            intro="A quick look at my strongest work. Open the case study for the problem, my contributions and the stack, or browse every project under All Projects."
             href="/projects"
             linkLabel="All Projects"
           />
@@ -258,10 +259,12 @@ export default async function HeroSection() {
         </div>
       </section>
 
+      <Recommendations number="07 — Recommendations" />
+
       <section className={`${editorialStyles.section} ${editorialStyles.contactSection}`} id="contact" aria-labelledby="contact-title" data-nav-label="Contact">
         <div className={`${editorialStyles.container} ${editorialStyles.contactInner}`}>
           <div className={editorialStyles.contactCopy}>
-            <p className={editorialStyles.sectionNumber}>07 — Contact</p>
+            <p className={editorialStyles.sectionNumber}>08 — Contact</p>
             <h2 id="contact-title" className={editorialStyles.contactTitle}>
               Hiring for web or mobile? <em>Let&apos;s talk.</em>
             </h2>

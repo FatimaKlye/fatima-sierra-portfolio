@@ -14,6 +14,7 @@ import ProjectHero from "@/components/project-details/ProjectHero";
 import ProjectMotion from "@/components/project-details/ProjectMotion";
 import ProjectNext from "@/components/project-details/ProjectNext";
 import ProjectOutcomes from "@/components/project-details/ProjectOutcomes";
+import ProjectProblem from "@/components/project-details/ProjectProblem";
 import ProjectStack from "@/components/project-details/ProjectStack";
 
 type ProjectPageProps = {
@@ -58,7 +59,10 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
   const nextNumber = () => String(++counter).padStart(2, "0");
 
   const { liveUrl, repoUrl, videoUrl, apkUrl } = project.links;
-  const hasResults = (project.outcomes?.length ?? 0) > 0 || Boolean(liveUrl || repoUrl || videoUrl || apkUrl);
+  const hasResults =
+    (project.outcomes?.length ?? 0) > 0 ||
+    (project.limitations?.length ?? 0) > 0 ||
+    Boolean(liveUrl || repoUrl || videoUrl || apkUrl);
 
   return (
     <ProjectMotion key={project.slug}>
@@ -66,18 +70,20 @@ export default async function ProjectDetailPage({ params }: ProjectPageProps) {
         <style>{`[data-motion="pending"] [data-reveal],[data-motion="pending"] [data-intro],[data-motion="pending"] [data-intro-visual],[data-motion="pending"] [data-stagger] > *{opacity:1!important;transform:none!important}[data-motion="pending"] [data-word]{transform:none!important}`}</style>
       </noscript>
 
-      {/* Same structure on every case study: first glance → my contributions → key features →
-          technologies → results & links. Sections without verified content are left out. */}
+      {/* Same structure on every case study: overview → problem → solution → my contributions →
+          tech stack → key features → outcome & links. Sections without verified content are left out. */}
       <main>
         <ProjectHero project={project} index={index} total={total} />
+
+        <ProjectProblem project={project} problemNumber={nextNumber()} solutionNumber={nextNumber()} />
 
         {project.contributions && project.contributions.length > 0 && (
           <ProjectContributions project={project} number={nextNumber()} />
         )}
 
-        {project.features.length > 0 && <ProjectFeatures features={project.features} number={nextNumber()} />}
-
         {project.stack.length > 0 && <ProjectStack project={project} number={nextNumber()} />}
+
+        {project.features.length > 0 && <ProjectFeatures features={project.features} number={nextNumber()} />}
 
         {hasResults && <ProjectOutcomes project={project} number={nextNumber()} />}
 

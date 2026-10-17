@@ -183,6 +183,7 @@
 
 .portraitArch {
   position: absolute;
+  z-index: 1;
   inset: 0;
   overflow: hidden;
   border-radius: 999px 999px 28px 28px;
@@ -207,7 +208,8 @@
 
 .stickerRecipe {
   position: absolute;
-  z-index: 2;
+  z-index: 4;
+  pointer-events: none;
   box-shadow: var(--shadow-card);
   bottom: 9%;
   left: -14%;
@@ -240,6 +242,90 @@
   color: var(--color-text-muted);
   font-size: 0.72rem;
   line-height: 1.45;
+}
+
+/* Photo collage: extra real photos fan out around the portrait on hover / tap.
+   Every print lives inside the 4:5 frame's box (slots overhang it slightly),
+   and .about clips overflow, so nothing reaches neighbouring sections. */
+.collage {
+  margin-bottom: 40px;
+}
+
+.collageSlot {
+  position: absolute;
+  top: var(--y);
+  left: var(--x);
+  width: var(--w);
+  translate: -50% -50%;
+  pointer-events: none;
+}
+
+.collagePrint {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: 18px;
+  background: var(--color-soft-blush);
+  box-shadow: 0 18px 40px -18px rgba(59, 42, 52, 0.38);
+  opacity: 0; /* GSAP reveals; keeps prints hidden before hydration */
+  will-change: transform, opacity;
+}
+
+/* Top-anchored: keeps faces in frame and crops the bottom corner of the headshots. */
+.collagePrint img {
+  object-fit: cover;
+  object-position: 50% 0;
+}
+
+.collageToggle {
+  position: absolute;
+  z-index: 5;
+  inset: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 999px 999px 28px 28px;
+  background: transparent;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.collageToggle:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 6px;
+}
+
+.collageHint {
+  position: absolute;
+  top: calc(100% + 16px);
+  right: 0;
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  transition: opacity 0.4s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .collage[data-expanded] .collageHint { opacity: 0; }
+}
+
+.collageHint::before {
+  content: "";
+  display: inline-block;
+  width: 22px;
+  height: 1px;
+  margin-right: 10px;
+  background: var(--color-secondary);
+  vertical-align: middle;
+}
+
+.collageHintHover { display: none; }
+
+@media (hover: hover) and (pointer: fine) {
+  .collageHintHover { display: inline; }
+  .collageHintTouch { display: none; }
 }
 
 /* Syntax colours for the recipe panel */

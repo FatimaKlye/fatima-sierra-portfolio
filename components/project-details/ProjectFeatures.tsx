@@ -31,7 +31,7 @@ export default function ProjectFeatures({ features, number }: { features: Projec
   return (
     <section className={styles.features} id="features" aria-labelledby="features-title" data-nav-label="Key features">
       <div className={styles.container}>
-        <SectionHead id="features-title" number={number} eyebrow="Key features" title="What it does" />
+        <SectionHead id="features-title" number={number} eyebrow="Key features" title="How it works" />
 
         {rows.length > 0 && (
           <ul className={styles.showcase}>

@@ -9,6 +9,7 @@ export default function ProjectChallenges({ challenges }: { challenges: ProjectC
       <div className={styles.subHead} data-reveal>
         <p className={styles.eyebrow}>Challenges &amp; solutions</p>
         <h3 className={styles.subTitle}>Technical problems solved</h3>
+        <p className={styles.subIntro}>Each fix is marked by who made it, according to the repository&apos;s history.</p>
       </div>
 
       <ol className={styles.challengeList}>
@@ -22,7 +23,9 @@ export default function ProjectChallenges({ challenges }: { challenges: ProjectC
               <ArrowRight size={22} />
             </span>
             <div className={styles.challengeSolution}>
-              <p className={`${styles.tag} ${styles.tagSolution}`}>Solution</p>
+              <p className={`${styles.tag} ${styles.tagSolution}`}>
+                Solution · {item.solvedBy === "me" ? "My fix" : "Team fix"}
+              </p>
               <p className={styles.challengeText}>{item.solution}</p>
             </div>
           </li>

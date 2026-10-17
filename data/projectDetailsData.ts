@@ -5,7 +5,9 @@
  *  - the résumé (public/assets/resume/Fatima-Klye-Sierra-Resume-2026.pdf)
  *  - the project's own repository / package files
  *  - the project's live site or the real screenshots in /public/assets/projects
+ *  - the owner's own description of the project (problem, solution, roles)
  *
+ * Where the résumé and the repository disagree (e.g. a tech stack), the repository wins.
  * Do not add achievements, metrics, images or links that cannot be verified.
  * Optional fields are simply omitted when nothing verified exists — the page
  * hides the matching section instead of filling it with guesses.
@@ -57,6 +59,8 @@ export type ProjectContribution = {
 export type ProjectChallenge = {
   challenge: string;
   solution: string;
+  /** Who made the fix, read from the repository's git history. */
+  solvedBy: "me" | "team";
 };
 
 export type ProjectOutcome = {
@@ -122,12 +126,20 @@ export type ProjectDetail = {
   summary: string;
   /** One sentence: what the application does, who uses it and what problem it solves. */
   purpose: string;
+  /** 2–3 sentences: the need behind the project — what was missing, for whom, and why it mattered. */
+  problem: string;
+  /** How the project answers that need, in terms of purpose and practical value rather than features. */
+  solution: string;
   period?: string;
   /** Résumé job title; also shown on the Experience page and the projects index. */
   role?: string;
   /** Roles shown on the case study when they differ from the résumé title. */
   roles?: string[];
   organization?: string;
+  /** An organizational responsibility on the project team, kept apart from development roles. */
+  teamRole?: string;
+  /** Where my work ends and the team's begins, e.g. a part built mainly by a teammate. */
+  teamNote?: string;
   status?: string;
   /** Real hero visual. When absent the hero is purely typographic. */
   hero?: ProjectMedia;
@@ -141,6 +153,8 @@ export type ProjectDetail = {
   gallery: ProjectMedia[];
   challenges?: ProjectChallenge[];
   outcomes?: ProjectOutcome[];
+  /** What the project is not (prototype scope, sample data, missing integrations), stated plainly. */
+  limitations?: string[];
   /** Grouped by purpose, e.g. Frontend, Backend & database, Development tools. */
   stack: ProjectStackGroup[];
   links: ProjectLinks;
@@ -228,7 +242,7 @@ const IGNIS_ECOSYSTEM: ProjectEcosystem = {
       slug: "ignis-safe-website",
       kind: "Web platform",
       name: "IGNIS SAFE Website",
-      role: "Public portal for the BFP Dasmariñas City Fire Station — services, advisories and the app download.",
+      role: "Management platform for BFP Dasmariñas personnel, plus the public portal and the app download.",
       media: IGNIS_WEB_LANDING,
     },
     {
@@ -332,24 +346,11 @@ const BEAUTIVERSE_SCREENS = {
 const IGNIS_FULL_NAME =
   "IGNIS SAFE: A Mobile Fire Safety Learning and 3D Simulation System with Web Management for BFP Dasmariñas";
 
-/** My roles on IGNIS SAFE as I state them; the résumé title stays in `role`. */
-const IGNIS_ROLES = ["Full-Stack Developer", "Assistant Secretary"];
+/** IGNIS SAFE is a capstone project built with BFP Dasmariñas, not a solo build. */
+const IGNIS_ORGANIZATION = `${NU} · Capstone with BFP Dasmariñas`;
 
-/** Résumé bullets that cover both IGNIS SAFE surfaces, plus my team role. */
-const IGNIS_SHARED_CONTRIBUTIONS: ProjectContribution[] = [
-  {
-    area: "Systems analysis",
-    text: "Analyzed BFP requirements and translated them into system workflows, database structures and functional features.",
-  },
-  {
-    area: "Testing",
-    text: "Tested and debugged system features to improve reliability, usability and overall performance.",
-  },
-  {
-    area: "Team role",
-    text: "Served as the project team's Assistant Secretary alongside the development work.",
-  },
-];
+/** Organizational, not development: shown apart from the roles and contributions. */
+const IGNIS_TEAM_ROLE = "Assistant Secretary of the capstone team";
 
 export const PROJECT_DETAILS: ProjectDetail[] = [
   {
@@ -357,45 +358,71 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
     category: "Web Application · Public Safety",
     title: "IGNIS SAFE Website",
     fullName: IGNIS_FULL_NAME,
-    tagline: "The official online portal for the BFP Dasmariñas City Fire Station.",
+    tagline: "The web management platform for the BFP Dasmariñas City Fire Station.",
     summary:
-      "The web side of IGNIS SAFE: a city fire station portal for fire-safety services, public advisories and FSIC / FSEC application guidance, plus the download page for the IGNIS SAFE Android app.",
+      "The web side of the IGNIS SAFE capstone: a management platform for BFP Dasmariñas covering personnel, attendance, reports, learning content and analytics, plus a public portal and the IGNIS SAFE Android app download.",
     purpose:
-      "Gives the Dasmariñas community one portal for the city fire station's services, advisories and FSIC / FSEC guidance, and gives BFP personnel web-based management of the learning content used by the IGNIS SAFE app.",
+      "A web platform where BFP Dasmariñas manages personnel, attendance, reports and the fire-safety learning content used by the IGNIS SAFE app — with a public portal for the community.",
+    problem:
+      "BFP Dasmariñas needed one central platform to support personnel management, administrative processes, fire-safety educational content and the community's learning progress. Personnel records, attendance, reports and learning content all had to be managed and followed in one system.",
+    solution:
+      "A web-based management platform that brings attendance, personnel and user management, reports, learning materials, assessment questions, analytics and announcements together for BFP personnel. It also runs the public portal where the community finds station services and downloads the IGNIS SAFE app.",
     period: "2025 – Present",
     role: "Systems Analyst, Mobile & Web Developer",
-    roles: IGNIS_ROLES,
-    organization: NU,
+    roles: ["Web Developer", "Systems Analyst"],
+    organization: IGNIS_ORGANIZATION,
+    teamRole: IGNIS_TEAM_ROLE,
+    teamNote: "IGNIS SAFE is our capstone team's project with BFP Dasmariñas. The items listed are my part of it.",
     status: "Live at bfp-dasmacfs.com",
     hero: IGNIS_WEB_LANDING,
     contributions: [
       {
         area: "Development",
-        text: "Developed web and mobile features for IGNIS SAFE — React.js for the website, Flutter for the app — on a shared Supabase backend for fire-safety learning, assessments, tracking and administration.",
+        text: "Contributed to the web application's development with React and Supabase, working with the capstone team on its implementation.",
       },
-      ...IGNIS_SHARED_CONTRIBUTIONS,
+      {
+        area: "Systems analysis",
+        text: "Helped translate BFP Dasmariñas requirements into system workflows, database structures and functional features.",
+      },
+      {
+        area: "Integration",
+        text: "Worked on interface development and on connecting the React front end to the Supabase database.",
+      },
+      {
+        area: "Testing",
+        text: "Tested and debugged features to improve the system's reliability and usability.",
+      },
+      {
+        area: "Version control",
+        text: "Authored 401 of the 626 commits on the repository's main branch (GitHub, October 2026).",
+      },
     ],
     features: [
       {
-        title: "FSIC & FSEC guidance",
+        title: "Verified attendance",
         description:
-          "Requirements and the application process, with a 'Start online application' entry point and a 'View requirements' path.",
+          "Personnel confirm attendance by scanning a rotating QR code, then completing a face check and a location check. Admins search and filter the records and export them as CSV or PDF.",
       },
       {
-        title: "Advisories & emergency contact",
+        title: "Personnel & reports",
         description:
-          "A home-page shortcut to the station's latest announcements, plus hotlines, official channels and an emergency banner telling visitors to call 911.",
+          "Admins manage personnel accounts and leave requests, and review submitted reports from Submitted to Under Review to Approved or Rejected.",
       },
       {
-        title: "Android app download",
+        title: "Learning content for the app",
         description:
-          "A download page with version, size and platform details, a QR code and step-by-step install instructions for the IGNIS SAFE app.",
+          "Learning materials and assessment questions are managed on the website and loaded by the mobile app's modules.",
+      },
+      {
+        title: "Learning analytics",
+        description:
+          "Pre- and post-assessment results become knowledge-gain, completion and module charts, so the station can see what learners understand.",
+      },
+      {
+        title: "Public portal & app download",
+        description:
+          "Announcements, FSIC / FSEC guidance and a download page with version details, a QR code and install steps for the Android app.",
         media: IGNIS_WEB_DOWNLOAD,
-      },
-      {
-        title: "Content for the mobile app",
-        description:
-          "Learning materials and assessment questions are maintained through the website and loaded by the app's modules.",
       },
     ],
     gallery: [IGNIS_WEB_LANDING, IGNIS_WEB_DOWNLOAD],
@@ -414,8 +441,9 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
     stack: [
       { label: "Frontend", items: ["React 19", "Vite", "React Router", "GSAP"] },
       { label: "Backend & database", items: ["Supabase"] },
-      { label: "Charts & documents", items: ["Chart.js", "jsPDF", "QR codes"] },
-      { label: "Development tools", items: ["ESLint", "Lighthouse"] },
+      { label: "Attendance checks", items: ["face-api", "MediaPipe", "React Webcam", "QR codes"] },
+      { label: "Charts & exports", items: ["Chart.js", "jsPDF"] },
+      { label: "Quality tools", items: ["ESLint", "Lighthouse"] },
     ],
     links: {
       liveUrl: IGNIS_LIVE_URL,
@@ -430,26 +458,40 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
     fullName: IGNIS_FULL_NAME,
     tagline: "Learn. Practice. Stay prepared.",
     summary:
-      "A Flutter app that teaches fire safety through five learning modules that pair assessments and learning materials with 3D simulations, backed by Supabase and tracked per learner.",
+      "The mobile side of the IGNIS SAFE capstone: an Android app with five fire-safety learning modules that pair learning materials and assessments with 3D simulations, backed by Supabase.",
     purpose:
-      "Helps learners build fire-safety knowledge through assessments, learning materials and 3D simulations, with each learner's progress and medals saved to their own account.",
+      "An Android app where learners study fire-safety procedures, test what they know and practise in 3D simulations, with progress saved to their account.",
+    problem:
+      "Fire safety education needed to be accessible and interactive — something people could use to learn important procedures, check what they know and practise through simulated scenarios. Reading materials alone don't give learners that kind of repeated, hands-on practice.",
+    solution:
+      "An Android app with five fire-safety learning modules. Each module runs from a pre-assessment through learning materials and a post-assessment to an interactive 3D simulation built in Unity, with progress saved through Supabase.",
     period: "2025 – Present",
     role: "Systems Analyst, Mobile & Web Developer",
-    roles: IGNIS_ROLES,
-    organization: NU,
+    roles: ["Mobile Developer (Flutter)", "Systems Analyst"],
+    organization: IGNIS_ORGANIZATION,
+    teamRole: IGNIS_TEAM_ROLE,
+    teamNote:
+      "My work is the Flutter app. The Unity 3D simulations were built mainly by a teammate (git history of the Unity scripts).",
     status: "v1.0.6 · Android APK available",
     hero: IGNIS_SCREENS.learning,
     heroCompanions: [IGNIS_SCREENS.login, IGNIS_SCREENS.onboarding],
     contributions: [
       {
         area: "Development",
-        text: "Developed mobile and web features for IGNIS SAFE — Flutter for the app, React.js for the website — on a shared Supabase backend for fire-safety learning, assessments, tracking and administration.",
+        text: "Developed mobile app features in Flutter and Dart — learning materials, assessment functionality, user interfaces and app workflows.",
+      },
+      {
+        area: "Integration",
+        text: "Integrated the app with Supabase for accounts, module progress and assessment records.",
+      },
+      {
+        area: "Testing",
+        text: "Tested and debugged the app and improved its usability.",
       },
       {
         area: "Version control",
         text: "Authored 107 of the 138 commits in the app's repository (git history, October 2026).",
       },
-      ...IGNIS_SHARED_CONTRIBUTIONS,
     ],
     features: [
       {
@@ -471,9 +513,9 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
         media: IGNIS_SCREENS.login,
       },
       {
-        title: "3D simulations with Unity",
+        title: "3D simulations",
         description:
-          "Simulations are Unity scenes launched from the Flutter app through a platform channel, then hand control back to the app on completion.",
+          "Team-built Unity scenes launched from the Flutter app through a platform channel, which hand control back to the app when the simulation ends.",
       },
     ],
     gallery: [IGNIS_SCREENS.onboarding, IGNIS_SCREENS.login, IGNIS_SCREENS.learning, IGNIS_SCREENS.profile],
@@ -483,11 +525,13 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
           "Returning from a Unity simulation to Flutter reliably. Leaving the Unity process alive caused a black screen on the next scene launch, and several scripts could trigger a return at the same time, risking a freeze.",
         solution:
           "A ReturnToFlutter helper finishes the Android activity so the Unity process is destroyed and Flutter receives the result, with a guard flag so only one return call ever runs.",
+        solvedBy: "team",
       },
       {
         challenge: "Keeping a Unity-integrated Android build compatible with current Flutter packages.",
         solution:
           "Pinned package_info_plus to 8.0.2, because version 9 needs a newer Kotlin Gradle plugin than the project's Unity-integrated build uses.",
+        solvedBy: "me",
       },
     ],
     outcomes: [
@@ -500,10 +544,11 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
       { stat: "2", label: "Languages", detail: "English and Tagalog." },
     ],
     stack: [
-      { label: "Mobile frontend", items: ["Flutter", "Dart", "Provider"] },
+      { label: "Mobile app", items: ["Flutter", "Dart", "Provider"] },
       { label: "Backend & database", items: ["Supabase"] },
       { label: "Authentication", items: ["Google Sign-In"] },
-      { label: "3D & media", items: ["Unity", "model_viewer_plus", "video_player"] },
+      { label: "3D simulations (team)", items: ["Unity"] },
+      { label: "Media", items: ["model_viewer_plus", "video_player"] },
     ],
     links: {
       apkUrl: IGNIS_APK_URL,
@@ -533,23 +578,27 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
     slug: "itso-id-tracker",
     category: "Web Application · Campus System",
     title: "ITSO ID Tracker",
-    tagline: "Status monitoring and record management for ID issuance.",
+    tagline: "Book, track and claim a school ID in one place.",
     summary:
-      "An ID processing and tracking system that simplifies how ID issuance is monitored and recorded for the ITSO office.",
+      "A student ID appointment and tracking system for the NU Dasmariñas IT Services Office (ITSO): students book ID appointments and follow each request until the ID is ready for pickup.",
     purpose:
-      "Lets NU Dasmariñas students book ID appointments and follow their ID's status online, while the ITSO office monitors and records ID issuance in one system.",
+      "Lets NU Dasmariñas students book an ID appointment and follow its status until the ID is ready for pickup, while ITSO manages appointments, records and announcements.",
+    problem:
+      "Students applying for or replacing a school ID need a convenient way to check their request's status, know whether a new photo is required and find out when the ID is ready to collect. The IT Services Office (ITSO) also needed one place to manage those appointments and records.",
+    solution:
+      "ITSO ID Tracker lets students book an appointment by request type, choose whether to take a new photo and follow the status from approval to printing to ready for pickup. ITSO posts announcements and manages appointments from an admin dashboard in the same system.",
     period: "2024 – 2025",
     role: "Web Developer",
     organization: NU,
     hero: ITSO_SCREENS.home,
     contributions: [
       {
-        area: "Development",
-        text: "Developed an ID processing and tracking system using Next.js, TypeScript and Supabase.",
+        area: "UI/UX design",
+        text: "Reworked the admin dashboard interface the ITSO office uses to manage appointments and ID records.",
       },
       {
         area: "Development",
-        text: "Implemented status monitoring and record management, simplifying ID issuance and tracking workflows.",
+        text: "Worked on status monitoring and record management for ID issuance and tracking.",
       },
       {
         area: "Testing",
@@ -558,10 +607,16 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
     ],
     features: [
       {
-        title: "Book & track from one dashboard",
+        title: "Book by request type",
         description:
-          "Students book an ID appointment on a calendar that marks booked and closed days, manage their schedule and track their ID's status.",
+          "Students choose term renewal, school-year renewal or lost ID, decide whether to take a new photo or keep the current one, and book a slot on a calendar that marks booked and closed days.",
         media: ITSO_SCREENS.booking,
+      },
+      {
+        title: "Status until pickup",
+        description:
+          "Each request moves through clear statuses — and can be put on hold or declined — so students know when their ID is ready to collect.",
+        steps: ["Pending approval", "For printing", "Ready for pickup"],
       },
       {
         title: "Public appointment calendar",
@@ -569,10 +624,14 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
         media: ITSO_SCREENS.calendar,
       },
       {
-        title: "Admin records & reports",
+        title: "Admin dashboard & announcements",
         description:
-          "The ITSO office sees user accounts, pending and completed appointment counts, and an analytics and reports panel in one dashboard.",
+          "ITSO manages accounts and appointments, sees pending and completed counts with analytics and reports, and publishes announcements for students.",
         media: ITSO_SCREENS.admin,
+      },
+      {
+        title: "QR appointment pass",
+        description: "Students get a QR pass for their appointment, which the office scans to verify it.",
       },
     ],
     gallery: [ITSO_SCREENS.home, ITSO_SCREENS.calendar, ITSO_SCREENS.booking, ITSO_SCREENS.admin],
@@ -581,8 +640,10 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
       { label: "Improved usability and data accuracy through testing and refinement." },
     ],
     stack: [
-      { label: "Frontend & framework", items: ["Next.js", "TypeScript"] },
-      { label: "Backend & database", items: ["Supabase"] },
+      { label: "Frontend", items: ["React 19", "Vite", "Tailwind CSS", "React Router"] },
+      { label: "Backend & API", items: ["Node.js", "Express"] },
+      { label: "Database", items: ["MongoDB", "Mongoose"] },
+      { label: "Auth & integrations", items: ["JWT", "Google Calendar API", "Nodemailer", "QR codes"] },
     ],
     links: {
       repoUrl: "https://github.com/seandrodejo/itso-id-tracker1",
@@ -590,70 +651,89 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
   },
   {
     slug: "beautiverse",
-    category: "Web Application · Beauty & Commerce",
+    category: "Web Application · E-Commerce Prototype",
     title: "Beautiverse",
-    tagline: "A beauty storefront and community in one place.",
+    tagline: "A beauty and makeup ordering prototype.",
     summary:
-      "A digital beauty storefront and community platform for products, services and user content.",
+      "A student e-commerce prototype for beauty and makeup products, with customer, employee and admin roles for browsing products, placing orders and managing them.",
     purpose:
-      "Brings beauty products, services and user content into one platform, with an order history for customers and a statistics dashboard for administrators.",
+      "Lets customers browse beauty products and place orders, while employees and administrators manage products and move each order from pending to completed.",
+    problem:
+      "The project explores how customers and administrators can handle a basic online ordering process for beauty products in one application — from browsing and ordering to reviewing and completing orders.",
+    solution:
+      "A simple e-commerce prototype with separate customer, employee and admin roles. Customers browse products, add them to a cart and place orders; staff manage products and move each order from Pending to Processing to Completed or Cancelled.",
     period: "2025 – 2026",
     role: "Web Developer",
     organization: NU,
+    status: "Student prototype",
     hero: BEAUTIVERSE_SCREENS.admin,
     contributions: [
       {
-        area: "Development",
-        text: "Developed a digital beauty storefront and community platform for products, services and user content.",
+        area: "UI/UX design",
+        text: "Designed and refined the login, registration and dashboard interfaces for customers, employees and administrators.",
       },
       {
-        area: "UI/UX design",
-        text: "Designed responsive interfaces and user flows, creating a clearer and more accessible browsing experience.",
+        area: "Development",
+        text: "Expanded the admin and employee dashboards, including their product-management views and styling.",
       },
       {
         area: "Integration",
-        text: "Integrated application features and data management, supporting reliable interaction across the platform.",
+        text: "Updated the PHP add-product endpoint to handle product images, connecting the React dashboards to the MySQL database.",
       },
     ],
     features: [
       {
-        title: "Customer dashboard",
-        description: "Each customer has a dashboard with their profile information and order history.",
+        title: "Shop and order",
+        description:
+          "Customers browse products, add them to a cart, place orders and see their order history in their own dashboard.",
         media: BEAUTIVERSE_SCREENS.profile,
       },
       {
-        title: "Products & services storefront",
-        description: "A storefront for browsing beauty products and services.",
+        title: "Order approval & tracking",
+        description: "Employees and administrators review each order and update its status.",
+        steps: ["Pending", "Processing", "Completed or Cancelled"],
       },
       {
-        title: "Community content",
-        description: "A space for user content alongside the storefront.",
+        title: "Product management",
+        description: "Employees and administrators add, edit and remove products, including product images and stock.",
       },
       {
         title: "Admin dashboard",
-        description: "System statistics across users, employees, products, stock, orders and revenue.",
+        description:
+          "Statistics across users, employees, products, stock, orders and revenue, plus account and employee management.",
       },
     ],
     gallery: [BEAUTIVERSE_SCREENS.admin, BEAUTIVERSE_SCREENS.profile],
     outcomes: [
-      { label: "A clearer, more accessible browsing experience across products, services and content." },
-      { label: "Reliable interaction across the platform through integrated features and data management." },
+      { label: "A working prototype of the full order flow across customer, employee and admin roles." },
+    ],
+    limitations: [
+      "A student demo project, not an operating store.",
+      "Product data is sample data; no real transactions have been made.",
+      "No online payment processing or shipping integration.",
     ],
     stack: [
-      { label: "Frontend & framework", items: ["Next.js", "TypeScript"] },
-      { label: "Backend & database", items: ["Supabase"] },
+      { label: "Frontend", items: ["React 19", "Vite", "Recharts"] },
+      { label: "Backend & database", items: ["PHP", "MySQL"] },
     ],
     links: {},
   },
   {
     slug: "maddy-cassy",
-    category: "Web Application · Equipment Rental & Commerce",
+    category: "Web Application · Gadget Rental",
     title: "Maddy & Cassy Rentals",
     tagline: "Rent the gear. Create the moment.",
     summary:
-      "A rental platform for cameras and iPhones that handles bookings, manual GCash payment verification, and automatically generated invoices and rental agreements.",
+      "A rental website for cameras, iPhones and other gadgets, with online booking, GCash payments verified by the team, and automatically generated invoices and rental agreements.",
     purpose:
-      "Lets customers in Metro Manila rent cameras and iPhones by the day online — reserve dates, pay through GCash and sign the rental agreement — with invoices and agreements generated automatically.",
+      "Lets customers in Metro Manila browse cameras and iPhones, reserve rental dates, pay through GCash and sign the rental agreement online.",
+    problem:
+      "Customers looking to rent cameras, smartphones and other gadgets need an easier way to explore rental options, check rental details and arrange a reservation, instead of relying entirely on separate conversations and manual inquiries.",
+    solution:
+      "A customer-facing rental website that presents the catalog, rental requirements and a step-by-step booking flow — from choosing dates to paying, verifying identity and signing the agreement online. An admin side handles payment review, agreements and equipment handover.",
+    period: "2026",
+    role: "Website Developer",
+    roles: ["Website Developer", "Assistant Website Team Leader"],
     status: "Live on Vercel",
     hero: {
       src: "/assets/projects/maddy-cassy/screenshot-1.webp",
@@ -662,22 +742,43 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
       height: 900,
       frame: "browser",
     },
+    contributions: [
+      {
+        area: "Development",
+        text: "Built the rental calendar and booking flow, the catalog and dashboard pages, and the About Us page.",
+      },
+      {
+        area: "Development",
+        text: "Built admin tools for payment review, agreement signing, equipment release and return condition tracking, notifications and paginated admin lists.",
+      },
+      {
+        area: "Integration",
+        text: "Migrated the inventory from Firebase to a Supabase schema, added booking email notifications and moved sign-in to a 6-digit email code.",
+      },
+      {
+        area: "Team role",
+        text: "As assistant website team leader, helped coordinate development work and resolve implementation issues.",
+      },
+      {
+        area: "Version control",
+        text: "Authored 43 of the 71 commits in the project's git history (September 2026).",
+      },
+    ],
     features: [
       {
         title: "Booking & GCash checkout",
         description:
-          "Pay a 50% deposit or the full amount through GCash, with manual payment verification, then follow the reservation with Track Booking.",
+          "A 50% non-refundable down payment or the full amount secures the booking. Payments are made through GCash and verified manually by the team.",
         steps: [
-          "Select gear",
-          "Set reservation dates",
+          "Choose gear & dates",
+          "Share the rental plan",
           "Pay via GCash",
-          "Submit verification documents",
-          "Sign the rental agreement",
-          "Receive confirmation",
+          "Verify identity & sign",
+          "Pick up or arrange delivery",
         ],
       },
       {
-        title: "Live catalog",
+        title: "Catalog with daily rates",
         description: "Cameras and iPhones organised by category, with a daily rate on every listing.",
       },
       {
@@ -685,9 +786,13 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
         description: "Invoices and rental agreements are generated automatically; agreements are signed electronically.",
       },
       {
-        title: "Customer tools & rewards",
+        title: "Admin operations",
         description:
-          "Favorites, a rental cart and in-app messages for each account, plus a birthday-month discount and loyalty rewards for repeat renters.",
+          "Staff review payments, track agreements, record equipment condition at release and return, and follow notifications.",
+      },
+      {
+        title: "Favorites & discounts",
+        description: "Customers save favorite items and get birthday-month and 11th-rental loyalty discounts at checkout.",
       },
     ],
     gallery: [],
@@ -704,8 +809,11 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
       },
     ],
     stack: [
-      { label: "Frontend & framework", items: ["Next.js", "TypeScript"] },
+      { label: "Framework", items: ["Next.js 16", "React 19", "TypeScript"] },
       { label: "Backend & database", items: ["Supabase"] },
+      { label: "Forms & validation", items: ["React Hook Form", "Zod"] },
+      { label: "Documents & signing", items: ["pdf-lib", "react-signature-canvas"] },
+      { label: "Motion", items: ["GSAP"] },
     ],
     links: {
       liveUrl: "https://maddyandcassyrentals-nine.vercel.app/",

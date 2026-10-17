@@ -40,8 +40,16 @@ export default function ProjectContributions({ project, number }: { project: Pro
           )}
 
           <p className={styles.contribNote} data-reveal>
-            Only my own work is listed here. What the product does is covered under Key features.
+            {project.teamNote ?? "Only my own work is listed here."} What the team built together is described under
+            Solution.
           </p>
+
+          {project.teamRole && (
+            <p className={styles.contribTeamRole} data-reveal>
+              <span className={styles.contribLabel}>Team role · organizational</span>
+              {project.teamRole}
+            </p>
+          )}
         </div>
 
         <ol className={styles.contribList} data-stagger>

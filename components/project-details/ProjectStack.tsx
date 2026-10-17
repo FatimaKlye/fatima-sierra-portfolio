@@ -9,10 +9,10 @@ export default function ProjectStack({ project, number }: { project: ProjectDeta
   const challenges = project.challenges ?? [];
 
   return (
-    <section className={styles.stack} id="stack" aria-labelledby="stack-title" data-nav-label="Technologies">
+    <section className={styles.stack} id="stack" aria-labelledby="stack-title" data-nav-label="Tech stack">
       <div className={styles.container}>
         <div className={styles.stackGrid}>
-          <SectionHead id="stack-title" number={number} eyebrow="Technologies used" title="Built with" />
+          <SectionHead id="stack-title" number={number} eyebrow="Tech stack" title="What we used" />
 
           <ul className={styles.stackList} data-stagger>
             {project.stack.map((group) => (

@@ -1,7 +1,7 @@
-import Image from "next/image";
 import Link from "next/link";
 import { HERO_CONTENT } from "@/components/about/aboutData";
-import { ABOUT_PORTRAIT, COLLEGE, MEDALS, SENIOR_HIGH } from "./aboutStoryData";
+import AboutCollage from "./AboutCollage";
+import { ABOUT_PORTRAIT, COLLAGE_PHOTOS, COLLEGE, MEDALS, SENIOR_HIGH } from "./aboutStoryData";
 import styles from "./AboutStory.module.css";
 
 function TitleWord({ children, className }: { children: string; className?: string }) {
@@ -77,7 +77,7 @@ export default function AboutOpening({ headingLevel, eyebrow, variant }: AboutOp
 
       {/* The homepage hero already shows the portrait, so the preview is text-only. */}
       {variant === "full" && (
-      <div className={styles.openingVisual}>
+      <AboutCollage primary={ABOUT_PORTRAIT} photos={COLLAGE_PHOTOS}>
         <svg className={styles.journeyLine} viewBox="0 0 400 520" fill="none" aria-hidden="true">
           <path
             data-draw
@@ -88,18 +88,6 @@ export default function AboutOpening({ headingLevel, eyebrow, variant }: AboutOp
           />
         </svg>
 
-        <div className={styles.portraitArch}>
-          <div className={styles.portraitInner} data-parallax="5">
-            <Image
-              src={ABOUT_PORTRAIT.src}
-              alt={ABOUT_PORTRAIT.alt}
-              fill
-              sizes="(max-width: 820px) 78vw, 32vw"
-              className={styles.portraitImage}
-            />
-          </div>
-        </div>
-
         {MEDALS.length > 0 && (
           <div className={styles.stickerRecipe}>
             <span className={styles.stickerKicker}>Before the code</span>
@@ -107,7 +95,7 @@ export default function AboutOpening({ headingLevel, eyebrow, variant }: AboutOp
             <span>{MEDALS.map((medal) => medal.label).join(" · ")}</span>
           </div>
         )}
-      </div>
+      </AboutCollage>
       )}
     </div>
   );

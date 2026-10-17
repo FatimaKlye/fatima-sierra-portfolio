@@ -243,7 +243,7 @@
   text-transform: uppercase;
 }
 
-/* First glance: purpose, my role and the stack, readable in a few seconds. */
+/* First glance: what it does and my role, readable in a few seconds. */
 .glance {
   margin: 0 0 22px;
   border-top: 1px solid rgba(166, 61, 104, 0.24);
@@ -275,8 +275,7 @@
   line-height: 1.6;
 }
 
-.roleTags,
-.techChips {
+.roleTags {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
@@ -295,16 +294,6 @@
   line-height: 1.3;
 }
 
-.techChips li {
-  padding: 6px 12px;
-  border: 1px solid rgba(166, 61, 104, 0.28);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.78);
-  color: var(--pd-rose-deep);
-  font-size: 0.8rem;
-  font-weight: 600;
-  line-height: 1.3;
-}
 
 .heroFacts {
   display: flex;
@@ -486,6 +475,71 @@
   font-weight: 600;
 }
 
+/* ---------- Problem → Solution (read before features, contributions or stack) ---------- */
+
+.story {
+  padding-block: clamp(56px, 7vw, 104px);
+  border-top: 1px solid var(--pd-line);
+  background: var(--pd-surface);
+}
+
+.storyGrid {
+  display: grid;
+  gap: clamp(20px, 3vw, 32px);
+}
+
+/* Two typographic columns, each opened by a hairline; the solution's rule is rose. */
+.storyPart {
+  padding-top: clamp(20px, 2.4vw, 28px);
+  border-top: 2px solid var(--pd-line);
+}
+
+.storySolution {
+  border-top-color: var(--pd-rose);
+}
+
+.storyHead {
+  margin-bottom: clamp(16px, 2vw, 24px);
+}
+
+.storyHead .sectionTitle {
+  font-size: clamp(1.6rem, 3vw, 2.5rem);
+}
+
+.storyText {
+  max-width: 54ch;
+  margin: 0;
+  color: var(--pd-ink);
+  font-size: clamp(1.02rem, 1.4vw, 1.14rem);
+  line-height: 1.75;
+}
+
+.storyArrow {
+  display: grid;
+  place-items: center;
+  justify-self: start;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--pd-line);
+  border-radius: 50%;
+  background: #fff;
+  color: var(--pd-rose);
+  transform: rotate(90deg);
+}
+
+@media (min-width: 900px) {
+  .storyGrid {
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    gap: clamp(24px, 3.4vw, 56px);
+    align-items: start;
+  }
+
+  .storyArrow {
+    align-self: center;
+    transform: none;
+  }
+}
+
 /* ---------- My contributions (the page's priority section) ---------- */
 
 .contrib {
@@ -554,6 +608,22 @@
   color: rgba(255, 255, 255, 0.74);
   font-size: 0.88rem;
   line-height: 1.6;
+}
+
+/* Organizational duty (e.g. team secretary), kept visibly apart from development work. */
+.contribTeamRole {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.contribTeamRole .contribLabel {
+  margin-bottom: 4px;
 }
 
 .contribList {
@@ -1229,6 +1299,39 @@
   display: grid;
   gap: 14px;
   margin-top: clamp(32px, 4vw, 56px);
+}
+
+/* What the project is not (prototype scope), stated plainly under the results. */
+.scope {
+  display: grid;
+  gap: 12px;
+  margin-top: clamp(28px, 3.4vw, 44px);
+}
+
+.scopeList {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.scopeList li {
+  position: relative;
+  padding-left: 22px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.98rem;
+  line-height: 1.55;
+}
+
+.scopeList li::before {
+  content: "";
+  position: absolute;
+  top: 0.7em;
+  left: 0;
+  width: 10px;
+  height: 1px;
+  background: currentColor;
 }
 
 .outcomeLinksLabel {
