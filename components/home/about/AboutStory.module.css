@@ -271,7 +271,8 @@
   will-change: transform, opacity;
 }
 
-/* Top-anchored: keeps faces in frame and crops the bottom corner of the headshots. */
+/* Each print takes its photo's own aspect ratio (set inline), so `cover` fills it
+   without cropping; top anchoring only matters for the 4:5 fallback. */
 .collagePrint img {
   object-fit: cover;
   object-position: 50% 0;

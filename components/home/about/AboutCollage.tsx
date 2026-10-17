@@ -5,22 +5,31 @@ import Image from "next/image";
 import gsap from "gsap";
 import styles from "./AboutStory.module.css";
 
-type Photo = { src: string; alt: string };
+type Photo = { src: string; alt: string; width?: number; height?: number };
+
+/** Frame (width / height) — matches .openingVisual's 4:5 aspect ratio. */
+const FRAME_RATIO = 4 / 5;
+const DEFAULT_PRINT_RATIO = 4 / 5;
 
 /**
  * Where each extra photo settles, as a share of the 4:5 frame: centre (x, y),
  * width (w), tilt (r) and whether it lands over or behind the portrait.
  * Overhang is mostly to the left (the gap beside the copy) and stays small on
  * the right so prints never reach the page edge or the section nav.
+ * Slot 4 is narrower so a tall (9:16) photo there stays clear of the sticker;
+ * slot 5 sits left of centre so it never runs under the hint line.
  */
 const SLOTS = [
   { x: 2, y: 18, w: 36, r: -8, over: true },
   { x: 88, y: 32, w: 28, r: 7, over: true },
   { x: 82, y: 86, w: 30, r: -5, over: true },
   { x: 76, y: 2, w: 26, r: 10, over: false },
-  { x: -6, y: 56, w: 28, r: 6, over: false },
-  { x: 46, y: 96, w: 28, r: 3, over: true },
+  { x: -6, y: 54, w: 24, r: 6, over: false },
+  { x: 40, y: 96, w: 28, r: 3, over: true },
 ];
+
+const printRatio = (photo: Photo) =>
+  photo.width && photo.height ? photo.width / photo.height : DEFAULT_PRINT_RATIO;
 
 /** Pointer travel (px) that reveals one more photo while hovering. */
 const REVEAL_DISTANCE = 70;
@@ -53,12 +62,15 @@ export default function AboutCollage({ primary, photos, children }: AboutCollage
     const reducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     // Hidden state: each print tucked behind the portrait's centre.
-    // Percentages of the print's own size, so it holds at any frame width.
+    // Percentages of the print's own size, so it holds at any frame width;
+    // the print's height (as a share of the frame) follows its photo's ratio.
     const tucked = (index: number) => {
       const slot = SLOTS[index];
+      const ratio = Number(slots[index].dataset.ratio) || DEFAULT_PRINT_RATIO;
+      const height = (slot.w * FRAME_RATIO) / ratio;
       return {
         xPercent: ((50 - slot.x) / slot.w) * 100,
-        yPercent: ((50 - slot.y) / slot.w) * 100,
+        yPercent: ((50 - slot.y) / height) * 100,
         rotation: 0,
         scale: 0.55,
         opacity: 0,
@@ -221,14 +233,16 @@ export default function AboutCollage({ primary, photos, children }: AboutCollage
 
       {extras.map((photo, index) => {
         const slot = SLOTS[index];
+        const ratio = printRatio(photo);
         return (
           <div
             className={styles.collageSlot}
             data-collage-slot
-            key={`${index}-${photo.src}`}
+            data-ratio={ratio}
+            key={photo.src}
             style={{ "--x": `${slot.x}%`, "--y": `${slot.y}%`, "--w": `${slot.w}%`, zIndex: slot.over ? 3 : 0 } as CSSProperties}
           >
-            <div className={styles.collagePrint}>
+            <div className={styles.collagePrint} style={{ aspectRatio: ratio }}>
               <Image src={photo.src} alt={photo.alt} fill sizes="(max-width: 820px) 34vw, 180px" />
             </div>
           </div>

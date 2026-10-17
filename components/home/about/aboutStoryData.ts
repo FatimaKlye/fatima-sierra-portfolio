@@ -22,27 +22,19 @@ export const ABOUT_PORTRAIT = {
 };
 
 /**
- * Extra real photos revealed around the About portrait on hover (tap on touch screens).
- * Save files in /public/assets/about/collage/ and list them here — the first six are
- * used, in this order. Only genuine photos of Fatima; with an empty list the portrait
- * simply stays a single image, with no hover effect or hint.
- *
- * e.g. { src: "/assets/about/collage/01-kitchen.jpg", alt: "Fatima plating a dish at a Home Economics competition" }
+ * Moments from Fatima's personal life, revealed around the About portrait on hover
+ * (tap on touch screens). The first six are used, in this order — order maps to the
+ * collage spots in AboutCollage (first two appear on hover). `width` / `height` are the
+ * files' real pixel sizes so each print keeps its own proportions; with an empty list
+ * the portrait simply stays a single image, with no hover effect or hint.
  */
-const PROFILE_PHOTO = { src: "/assets/profile/profile_picture.jpg", alt: "Fatima Klye M. Sierra in a black blazer" };
-const PROFESSIONAL_PHOTO = {
-  src: "/assets/about/fatima-sierra-professional.jpg",
-  alt: "Professional portrait of Fatima Klye M. Sierra against a grey backdrop",
-};
-
-// The two profile photos for now, alternated across the six spots — swap in new photos as they come.
-export const COLLAGE_PHOTOS: { src: string; alt: string }[] = [
-  PROFESSIONAL_PHOTO,
-  PROFILE_PHOTO,
-  PROFESSIONAL_PHOTO,
-  PROFILE_PHOTO,
-  PROFESSIONAL_PHOTO,
-  PROFILE_PHOTO,
+export const COLLAGE_PHOTOS: { src: string; alt: string; width: number; height: number }[] = [
+  { src: "/assets/profile/pic.jpg", alt: "Fatima smiling in a pink dress at an evening garden celebration", width: 1200, height: 1600 },
+  { src: "/assets/profile/bf.jpg", alt: "Fatima and her boyfriend under a heart-shaped flower arch", width: 1200, height: 1600 },
+  { src: "/assets/profile/japan.jpg", alt: "Fatima with friends by a lake in Japan, Mount Fuji behind them", width: 1200, height: 1600 },
+  { src: "/assets/profile/parents.jpg", alt: "Fatima's parents posing together at home", width: 1200, height: 1600 },
+  { src: "/assets/profile/dog.jpg", alt: "Fatima's white Pomeranian in a striped shirt", width: 900, height: 1600 },
+  { src: "/assets/profile/lorie.jpg", alt: "Lorie holding two Pomeranians", width: 1200, height: 1600 },
 ];
 
 /**
