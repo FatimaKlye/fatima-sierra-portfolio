@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
@@ -91,10 +92,18 @@ export default function SiteHeader() {
           <Link
             className={styles.brand}
             href="/"
-            aria-label="Fatima Sierra home"
+            aria-label="Fatima Klye Sierra home"
             onClick={(event) => handleNavClick(event, NAV_ITEMS[0])}
           >
-            Fatima Sierra<span aria-hidden="true">.</span>
+            <Image
+              className={styles.brandLogo}
+              src="/assets/profile/nav-logo.png"
+              alt=""
+              width={1494}
+              height={591}
+              sizes="(max-width: 480px) 106px, (max-width: 900px) 116px, 132px"
+              priority
+            />
           </Link>
 
           <nav className={styles.desktopNav} aria-label="Primary navigation">

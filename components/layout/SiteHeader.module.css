@@ -31,12 +31,23 @@
   min-height: 44px;
   align-items: center;
   justify-self: start;
-  color: var(--color-text-primary);
-  font-size: 1rem;
-  font-weight: 600;
+  border-radius: 6px;
 }
 
-.brand span { color: var(--color-primary); }
+/* Signature mark: height-driven so the 2.53:1 artwork never distorts; 52px sits inside the 72px bar with even breathing room. */
+.brandLogo {
+  display: block;
+  width: auto;
+  height: 52px;
+  transition: opacity 220ms ease;
+}
+
+.brand:hover .brandLogo { opacity: 0.86; }
+
+.brand:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 4px;
+}
 
 .desktopNav {
   display: flex;
@@ -245,9 +256,15 @@
   .desktopNav,
   .resumeCta { display: none; }
   .menuToggle { display: block; }
+  .brandLogo { height: 46px; }
+}
+
+@media (max-width: 480px) {
+  .brandLogo { height: 42px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .brandLogo,
   .desktopNav a,
   .desktopNav a::after,
   .menuToggle span,
