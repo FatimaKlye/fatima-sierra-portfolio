@@ -40,10 +40,11 @@ export default function MediaFrame({ media, sizes, priority, quality = 82, class
     />
   );
 
+  // Spans throughout so a frame can sit inside a button (see ZoomableMedia).
   if (media.frame === "browser") {
     return (
-      <div className={[styles.browser, className].filter(Boolean).join(" ")}>
-        <div className={styles.browserBar} aria-hidden="true">
+      <span className={[styles.browser, className].filter(Boolean).join(" ")}>
+        <span className={styles.browserBar} aria-hidden="true">
           <span />
           <span />
           <span />
@@ -53,18 +54,18 @@ export default function MediaFrame({ media, sizes, priority, quality = 82, class
               {media.url}
             </em>
           )}
-        </div>
+        </span>
         {image}
-      </div>
+      </span>
     );
   }
 
   return (
-    <div className={[styles.plain, className].filter(Boolean).join(" ")}>
+    <span className={[styles.plain, className].filter(Boolean).join(" ")}>
       <span className={styles.plainMedia}>
         {image}
         <Redactions regions={media.redact} />
       </span>
-    </div>
+    </span>
   );
 }

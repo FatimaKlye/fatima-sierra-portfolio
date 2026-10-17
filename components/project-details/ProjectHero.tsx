@@ -35,8 +35,9 @@ function SplitTitle({ text }: { text: string }) {
 }
 
 export default function ProjectHero({ project, index, total }: ProjectHeroProps) {
-  const meta = [
-    { label: "Role", value: project.role },
+  const roles = project.roles ?? (project.role ? [project.role] : []);
+  const technologies = project.stack.flatMap((group) => group.items);
+  const facts = [
     { label: "Period", value: project.period },
     { label: "Organization", value: project.organization },
     { label: "Status", value: project.status },
@@ -69,19 +70,55 @@ export default function ProjectHero({ project, index, total }: ProjectHeroProps)
           <h1 id="project-title" className={styles.title}>
             <SplitTitle text={project.title} />
           </h1>
-          <p className={styles.tagline} data-intro>
-            {project.tagline}
-          </p>
+          {project.fullName ? (
+            <p className={styles.heroFullName} data-intro>
+              <span className={styles.heroFullNameLabel}>Full project name</span>
+              {project.fullName}
+            </p>
+          ) : (
+            <p className={styles.tagline} data-intro>
+              {project.tagline}
+            </p>
+          )}
         </div>
 
         <div className={styles.heroBody}>
           <div className={styles.heroAside} data-intro>
-            <p className={styles.heroSummary}>{project.summary}</p>
+            <dl className={styles.glance}>
+              <div className={styles.glanceRow}>
+                <dt>Purpose</dt>
+                <dd className={styles.purpose}>{project.purpose}</dd>
+              </div>
+              {roles.length > 0 && (
+                <div className={styles.glanceRow}>
+                  <dt>My role</dt>
+                  <dd>
+                    <ul className={styles.roleTags}>
+                      {roles.map((role) => (
+                        <li key={role}>{role}</li>
+                      ))}
+                    </ul>
+                  </dd>
+                </div>
+              )}
+              {technologies.length > 0 && (
+                <div className={styles.glanceRow}>
+                  <dt>Tech stack</dt>
+                  <dd>
+                    <ul className={styles.techChips}>
+                      {technologies.map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
+                  </dd>
+                </div>
+              )}
+            </dl>
 
-            {meta.length > 0 && (
-              <dl className={styles.meta}>
-                {meta.map((item) => (
-                  <div key={item.label} className={styles.metaRow}>
+            {facts.length > 0 && (
+              <dl className={styles.heroFacts}>
+                {facts.map((item) => (
+                  <div key={item.label}>
                     <dt>{item.label}</dt>
                     <dd>{item.value}</dd>
                   </div>
@@ -123,7 +160,7 @@ export default function ProjectHero({ project, index, total }: ProjectHeroProps)
                   {pad(index + 1)}
                 </span>
                 <ul className={styles.typeStack} aria-label="Technologies used">
-                  {project.stack.flatMap((group) => group.items).map((item) => (
+                  {technologies.map((item) => (
                     <li key={item}>{item}</li>
                   ))}
                 </ul>

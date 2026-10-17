@@ -3,13 +3,11 @@ import Link from "next/link";
 import { ArrowRight, Database, Globe, Smartphone } from "lucide-react";
 import type { EcosystemSurface, ProjectEcosystem as ProjectEcosystemData } from "@/data/projectDetailsData";
 import PhoneMockup from "./PhoneMockup";
-import SectionHead from "./SectionHead";
 import styles from "./ProjectDetails.module.css";
 
 type ProjectEcosystemProps = {
   ecosystem: ProjectEcosystemData;
   currentSlug: string;
-  number: string;
 };
 
 function Surface({ surface, current }: { surface: EcosystemSurface; current: boolean }) {
@@ -59,46 +57,44 @@ function Surface({ surface, current }: { surface: EcosystemSurface; current: boo
   );
 }
 
-export default function ProjectEcosystem({ ecosystem, currentSlug, number }: ProjectEcosystemProps) {
+/** How the web and mobile surfaces share one backend; shown inside Technologies. */
+export default function ProjectEcosystem({ ecosystem, currentSlug }: ProjectEcosystemProps) {
   const [first, second] = ecosystem.surfaces;
 
   return (
-    <section className={styles.ecosystem} id="ecosystem" aria-labelledby="ecosystem-title" data-nav-label="Ecosystem">
-      <div className={styles.container}>
-        <div className={styles.ecosystemHead}>
-          <SectionHead id="ecosystem-title" number={number} eyebrow="Connected system" title={ecosystem.title} />
-          <p className={styles.ecosystemIntro} data-reveal>
-            {ecosystem.intro}
-          </p>
-        </div>
-
-        <div className={styles.ecoMap} data-reveal>
-          <Surface surface={first} current={first.slug === currentSlug} />
-
-          <div className={styles.ecoBridge} aria-hidden="true">
-            <span className={styles.ecoTrack}>
-              <span className={styles.ecoFill} data-line />
-              <span className={styles.ecoPulse} />
-            </span>
-            <span className={styles.ecoHub}>
-              <Database size={16} />
-              {ecosystem.hub}
-            </span>
-          </div>
-
-          <Surface surface={second} current={second.slug === currentSlug} />
-        </div>
-
-        <ol className={styles.ecoLinks} data-stagger>
-          {ecosystem.connections.map((connection, connectionIndex) => (
-            <li key={connection.title} className={styles.ecoLink}>
-              <span className={styles.ecoLinkNum}>{String(connectionIndex + 1).padStart(2, "0")}</span>
-              <h3 className={styles.ecoLinkTitle}>{connection.title}</h3>
-              <p className={styles.ecoLinkText}>{connection.description}</p>
-            </li>
-          ))}
-        </ol>
+    <div className={styles.subBlock}>
+      <div className={styles.subHead} data-reveal>
+        <p className={styles.eyebrow}>Connected system</p>
+        <h3 className={styles.subTitle}>{ecosystem.title}</h3>
+        <p className={styles.subIntro}>{ecosystem.intro}</p>
       </div>
-    </section>
+
+      <div className={styles.ecoMap} data-reveal>
+        <Surface surface={first} current={first.slug === currentSlug} />
+
+        <div className={styles.ecoBridge} aria-hidden="true">
+          <span className={styles.ecoTrack}>
+            <span className={styles.ecoFill} data-line />
+            <span className={styles.ecoPulse} />
+          </span>
+          <span className={styles.ecoHub}>
+            <Database size={16} />
+            {ecosystem.hub}
+          </span>
+        </div>
+
+        <Surface surface={second} current={second.slug === currentSlug} />
+      </div>
+
+      <ol className={styles.ecoLinks} data-stagger>
+        {ecosystem.connections.map((connection, connectionIndex) => (
+          <li key={connection.title} className={styles.ecoLink}>
+            <span className={styles.ecoLinkNum}>{String(connectionIndex + 1).padStart(2, "0")}</span>
+            <h4 className={styles.ecoLinkTitle}>{connection.title}</h4>
+            <p className={styles.ecoLinkText}>{connection.description}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
   );
 }

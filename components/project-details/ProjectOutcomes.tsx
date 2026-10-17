@@ -13,9 +13,15 @@ export default function ProjectOutcomes({ project, number }: { project: ProjectD
   );
 
   return (
-    <section className={styles.outcomes} id="outcomes" aria-labelledby="outcomes-title" data-nav-label="Outcomes">
+    <section className={styles.outcomes} id="outcomes" aria-labelledby="outcomes-title" data-nav-label="Results & links">
       <div className={styles.container}>
-        <SectionHead id="outcomes-title" number={number} eyebrow="Outcomes" title="Where it landed" tone="onDark" />
+        <SectionHead
+          id="outcomes-title"
+          number={number}
+          eyebrow="Results & project links"
+          title="Where it landed"
+          tone="onDark"
+        />
 
         {stats.length > 0 && (
           <ul className={styles.stats} data-stagger>
