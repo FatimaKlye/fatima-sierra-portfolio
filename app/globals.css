@@ -51,6 +51,25 @@ body:has([data-home-page]) {
   padding-top: 0;
 }
 
+/* Entrance intro: painted before hydration so the homepage never flashes ahead of it. The intro
+   (z-index 2000) mounts on top and removes the attribute as it reveals the page. If scripts never
+   load, the cover lifts by itself. */
+html[data-entrance-intro] body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 1999;
+  background: var(--color-background);
+  animation: entranceCoverFailsafe 400ms ease 8s forwards;
+}
+
+@keyframes entranceCoverFailsafe {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
 html {
   scroll-padding-top: var(--header-height);
 }

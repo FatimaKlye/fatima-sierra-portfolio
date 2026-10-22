@@ -27,6 +27,7 @@
 }
 
 .heroCopy {
+  container: hero-copy / inline-size;
   min-width: 0;
   animation: pageReveal 800ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
@@ -66,37 +67,53 @@
   animation: pulse 2.4s ease-out infinite;
 }
 
-.hero h1 {
-  max-width: 15ch;
-  margin: 22px 0 0;
+/* Headline breaks are set by hand — one phrase per line — so the rag stays
+   left-aligned and intentional instead of depending on the column width. */
+.heroTitle {
+  margin: 28px 0 0;
   color: var(--color-text-primary);
-  font-size: clamp(2.6rem, 5.2vw, 4.75rem);
+  font-size: clamp(2.75rem, 5.6vw, 5rem);
   font-weight: 600;
-  letter-spacing: -0.05em;
-  line-height: 1.02;
-  text-wrap: balance;
+  letter-spacing: -0.045em;
+  line-height: 1.04;
+  text-align: left;
 }
 
-.hero h1 em {
+.heroTitle em {
   color: var(--color-primary);
   font-style: normal;
 }
 
-.hello {
+.titleLine {
   display: block;
 }
 
+/* Fixed size and an em-based measure (~65 characters), tuned so every line
+   already fills ~90% before justifying — word spacing stays even and
+   "National University – Dasmariñas" never leaves a stretched first line. */
 .heroLead {
-  max-width: 56ch;
-  margin: 22px 0 0;
+  max-width: 33em;
+  margin: 28px 0 0;
   color: var(--color-text-muted);
-  font-size: clamp(0.98rem, 1.2vw, 1.08rem);
-  line-height: 1.7;
+  font-size: 1.0625rem;
+  line-height: 1.75;
+  text-align: left;
+  text-wrap: pretty;
+}
+
+/* Justify only when the column holds the full tuned measure (33em × 17px);
+   narrower columns would stretch the gaps, so they stay left-aligned. */
+@container hero-copy (min-width: 561px) {
+  .heroLead {
+    text-align: justify;
+    text-justify: inter-word;
+  }
 }
 
 .heroLead strong {
   color: var(--color-text-primary);
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .actions {
@@ -254,10 +271,6 @@
     gap: 48px;
   }
 
-  .hero h1 {
-    max-width: 16ch;
-  }
-
   .portraitComposition {
     justify-self: start;
     width: min(100%, 340px);
@@ -269,8 +282,16 @@
     width: min(calc(100% - 40px), var(--page-max-width));
   }
 
-  .hero h1 {
-    font-size: clamp(2.3rem, 10.5vw, 3rem);
+  .heroTitle {
+    margin-top: 24px;
+    font-size: clamp(2.2rem, 10.5vw, 3rem);
+  }
+
+  /* A phone-width column leaves too few words per line to justify cleanly. */
+  .heroLead {
+    margin-top: 22px;
+    font-size: 1rem;
+    text-align: left;
   }
 
   .actions > a {

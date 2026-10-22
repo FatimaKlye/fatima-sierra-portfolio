@@ -1,0 +1,352 @@
+/* Homepage skill index — one border-separated row per area. GSAP drives the
+   custom properties below (fill, rule, divider draw); CSS only paints them. */
+
+.root {
+  position: relative;
+  margin-top: clamp(32px, 4vw, 48px);
+}
+
+.groups {
+  --draw: 1;
+
+  position: relative;
+  margin: 0;
+}
+
+/* Dividers are pseudo-elements so they can draw in on scroll. */
+.groups::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 1px;
+  background: var(--color-border);
+  transform: scaleX(var(--draw));
+  transform-origin: left;
+}
+
+.row {
+  --draw: 1;
+  --fill: 0;
+  --fill-origin: top;
+  --line: 0%;
+  --line-origin: left;
+  --bleed: clamp(10px, 1.4vw, 18px);
+
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(160px, 0.28fr) minmax(0, 1fr);
+  gap: 16px 32px;
+  align-items: center;
+  padding: 18px 0;
+}
+
+/* Soft pink reveal, grown from the edge the pointer entered through. */
+.row::before {
+  content: "";
+  position: absolute;
+  inset: 0 calc(var(--bleed) * -1);
+  z-index: -1;
+  background: var(--color-soft-blush);
+  pointer-events: none;
+  transform: scaleY(var(--fill));
+  transform-origin: 50% var(--fill-origin);
+}
+
+/* Divider + the thin pink rule that sweeps across the active row. */
+.row::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 1px;
+  background:
+    linear-gradient(var(--color-primary), var(--color-primary)) var(--line-origin) center / var(--line) 100% no-repeat,
+    var(--color-border);
+  pointer-events: none;
+  transform: scaleX(var(--draw));
+  transform-origin: left;
+}
+
+.label {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.labelIndex {
+  color: var(--color-secondary);
+  font-size: 0.68rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.12em;
+  transition: color 300ms ease;
+}
+
+.labelText {
+  display: inline-block;
+  transition: transform 550ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.row[data-active] .labelIndex {
+  color: var(--color-primary);
+}
+
+.row[data-active] .labelText {
+  transform: translateX(8px);
+}
+
+.tools {
+  margin: 0;
+}
+
+.list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 26px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Padding + matching negative margin: a comfortable hit area, same layout. */
+.tech {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: -6px -8px;
+  padding: 6px 8px;
+  border-radius: 999px;
+  color: var(--color-text-primary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: opacity 300ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.techStatic {
+  cursor: default;
+}
+
+.tech:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.techIcon {
+  display: inline-grid;
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+  place-items: center;
+}
+
+.techIcon img {
+  display: block;
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+.fallback {
+  color: var(--color-primary);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.techName {
+  transition: color 250ms ease, background-size 450ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Only linked tools get the underline, so nothing informational looks clickable. */
+a.tech .techName {
+  background: linear-gradient(currentColor, currentColor) left bottom / 0% 1px no-repeat;
+}
+
+.tech:hover .techName,
+.tech:focus-visible .techName,
+.tech[data-current] .techName {
+  color: var(--color-primary);
+}
+
+a.tech:hover .techName,
+a.tech:focus-visible .techName,
+a.tech[data-current] .techName {
+  background-size: 100% 1px;
+}
+
+/* While one tool is spotlighted, its neighbours step back. */
+.list:has(.tech[data-current]) .tech:not([data-current]) {
+  opacity: 0.5;
+}
+
+.count {
+  display: inline-grid;
+  min-width: 18px;
+  height: 18px;
+  place-items: center;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--color-soft-blush);
+  color: var(--color-primary-hover);
+  font-size: 0.66rem;
+  font-weight: 700;
+  line-height: 1;
+  transition: background-color 250ms ease, color 250ms ease;
+}
+
+.row[data-active] .count {
+  background: var(--color-white);
+}
+
+.tech:hover .count,
+.tech:focus-visible .count,
+.tech[data-current] .count {
+  background: var(--color-primary);
+  color: var(--color-white);
+}
+
+/* Spotlight ------------------------------------------------------------------ */
+
+.spot {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 5;
+  width: max-content;
+  max-width: min(300px, 100%);
+  padding: 14px 16px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-white);
+  box-shadow: var(--shadow-card);
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* Invisible bridge over the gap, so the pointer can travel into the panel. */
+.spot::before {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 100%;
+  left: 0;
+  height: 12px;
+}
+
+.spotRule {
+  position: absolute;
+  top: -1px;
+  right: 10px;
+  left: 10px;
+  height: 2px;
+  background: var(--color-primary);
+  transform-origin: left;
+}
+
+.spotKicker {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  margin: 0;
+  color: var(--color-primary);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.spotKicker span + span {
+  color: var(--color-secondary);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.12em;
+}
+
+.spotList {
+  display: grid;
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.spotLink {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 5px 0;
+  color: var(--color-text-primary);
+  font-size: 0.88rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.35;
+  text-decoration: none;
+  transition: color 200ms ease;
+}
+
+.spotLink svg {
+  flex: none;
+  color: var(--color-secondary);
+  transition: color 200ms ease, transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.spotLink:hover {
+  color: var(--color-primary);
+}
+
+.spotLink:hover svg {
+  color: var(--color-primary);
+  transform: translate(2px, -2px);
+}
+
+.spotNote {
+  max-width: 30ch;
+  margin: 6px 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+
+.spotHint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 0 0;
+  padding-top: 9px;
+  border-top: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+
+@media (max-width: 820px) {
+  .row {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .labelIndex,
+  .labelText,
+  .tech,
+  .techName,
+  .count,
+  .spotLink,
+  .spotLink svg {
+    transition: none;
+  }
+
+  .spotLink:hover svg {
+    transform: none;
+  }
+}

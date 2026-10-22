@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import SiteFooter from "@/components/layout/SiteFooter";
 import SiteHeader from "@/components/layout/SiteHeader";
+import IntroGate from "@/components/intro/IntroGate";
+import { INTRO_SCRIPT } from "@/components/intro/introScript";
+import FairyDust from "@/components/motion/FairyDust";
 import SectionNav from "@/components/navigation/SectionNav";
 import "./globals.css";
 
@@ -24,12 +27,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    // The inline script may flag <html> for the entrance intro before React hydrates.
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: INTRO_SCRIPT }} />
+      </head>
       <body className={poppins.variable}>
         <SiteHeader />
         <SectionNav />
         {children}
         <SiteFooter />
+        <FairyDust />
+        <IntroGate />
       </body>
     </html>
   );

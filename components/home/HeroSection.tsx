@@ -9,20 +9,14 @@ import TechIcon from "@/components/skills/TechIcon";
 import { PREVIEW_SKILLS, SKILL_GROUPS } from "@/components/skills/skillsData";
 import AboutPreview from "./about/AboutPreview";
 import CredentialsTeaser from "./CredentialsTeaser";
+import GithubActivity from "./GithubActivity";
 import PreviewHeader from "./PreviewHeader";
 import ProjectList from "./ProjectList";
 import Recommendations from "./Recommendations";
+import SkillIndex from "./SkillIndex";
 import { getGithubContributions } from "./githubContributions";
 import styles from "./HeroSection.module.css";
 import editorialStyles from "./HomeEditorial.module.css";
-
-const CONTRIBUTION_LEVEL_COLORS = [
-  "rgba(166, 61, 104, 0.08)",
-  "var(--color-soft-blush)",
-  "var(--color-secondary)",
-  "var(--color-primary-hover)",
-  "var(--color-primary)",
-];
 
 const TEASER_CREDENTIAL_IDS = ["html-and-css", "databases", "modern-web-ai-uiux"];
 const TEASER_CREDENTIALS = TEASER_CREDENTIAL_IDS.flatMap((id) => {
@@ -47,7 +41,6 @@ export default async function HeroSection() {
   const college = EDUCATION[0];
   const githubUsername = GITHUB_LINK?.handle.replace(/^@/, "") ?? "";
   const githubContributions = githubUsername ? await getGithubContributions(githubUsername) : null;
-  const currentYear = new Date().getFullYear();
 
   return (
     <div className={styles.home} data-home-page>
@@ -58,13 +51,17 @@ export default async function HeroSection() {
               <span className={styles.statusDot} aria-hidden="true" />
               Open to internships &amp; junior developer roles
             </p>
-            <h1 id="home-hero-title">
-              <span className={styles.hello}>Hi, I&apos;m Fatima.</span> I build <em>web &amp; mobile apps.</em>
+            <h1 id="home-hero-title" className={styles.heroTitle}>
+              <span className={styles.titleLine}>I create</span>{" "}
+              <em>
+                <span className={styles.titleLine}>web &amp; mobile</span>{" "}
+                <span className={styles.titleLine}>apps.</span>
+              </em>
             </h1>
             <p className={styles.heroLead}>
-              A BS Information Technology student at {college.institution}, building full-stack projects with
-              Next.js, React, Flutter and Supabase — including <strong>IGNIS SAFE</strong>, a fire-safety learning app
-              and website for the BFP Dasmariñas City Fire Station, now live.
+              A BS Information Technology student at {college.institution}, developing web and mobile applications
+              using Next.js, React, Flutter, and Supabase. My work includes <strong>IGNIS SAFE</strong>, a fire safety
+              learning application and web management system developed for the BFP Dasmariñas City Fire Station.
             </p>
 
             <div className={styles.actions}>
@@ -158,37 +155,11 @@ export default async function HeroSection() {
             number="02 — Skills"
             headingId="skills-title"
             title={<>The tools <em>I build with.</em></>}
-            intro="Grouped by where they fit. The count shows how many of my projects on this site use each one."
+            intro="Grouped by where they fit. The count shows how many of my projects on this site use each one — select a tool to see where."
             href="/skills"
             linkLabel="All Skills"
           />
-          <dl className={editorialStyles.skillGroups}>
-            {SKILL_GROUPS.map((group) => (
-              <div className={editorialStyles.skillGroup} key={group.id}>
-                <dt>{group.label}</dt>
-                <dd>
-                  <ul className={editorialStyles.skillList}>
-                    {group.items.map((skill) => (
-                      <li key={skill.name}>
-                        <TechIcon tech={skill} size={20} fallbackClassName={editorialStyles.toolFallback} />
-                        <span>{skill.name}</span>
-                        {skill.projects.length > 0 && (
-                          <span
-                            className={editorialStyles.skillCount}
-                            title={`Used in ${skill.projects.length} project${skill.projects.length === 1 ? "" : "s"}`}
-                          >
-                            <span className="sr-only">, used in </span>
-                            {skill.projects.length}
-                            <span className="sr-only"> project{skill.projects.length === 1 ? "" : "s"}</span>
-                          </span>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                </dd>
-              </div>
-            ))}
-          </dl>
+          <SkillIndex groups={SKILL_GROUPS} />
         </div>
       </section>
 
@@ -225,39 +196,19 @@ export default async function HeroSection() {
         </div>
       </section>
 
-      <section className={`${editorialStyles.section} ${editorialStyles.githubSection}`} id="github" aria-labelledby="github-title" data-nav-label="GitHub">
-        <div className={`${editorialStyles.container} mx-auto w-full`}>
-          <div className={editorialStyles.githubHeader}>
-            <p className={editorialStyles.eyebrow} id="github-title">06 — GitHub activity</p>
-            {GITHUB_LINK && (
-              <a className="ui-btn ui-btn--secondary ui-btn--sm" href={GITHUB_LINK.href} target="_blank" rel="noreferrer" aria-label={`Open ${GITHUB_LINK.handle} on GitHub in a new tab`}>
-                {GITHUB_LINK.handle} <ArrowUpRight size={14} aria-hidden="true" />
-              </a>
-            )}
+      {GITHUB_LINK && (
+        <section className={editorialStyles.section} id="github" aria-labelledby="github-title" data-nav-label="GitHub">
+          <div className={`${editorialStyles.container} mx-auto w-full`}>
+            <GithubActivity
+              number="06 — GitHub activity"
+              headingId="github-title"
+              handle={GITHUB_LINK.handle}
+              profileHref={GITHUB_LINK.href}
+              initialData={githubContributions}
+            />
           </div>
-
-          {githubContributions ? (
-            <div className={editorialStyles.githubBody}>
-              <div className={editorialStyles.githubGridScroll}>
-                <div className={editorialStyles.githubGrid} role="img" aria-label={`GitHub contribution graph: ${githubContributions.totalLastYear} contributions in ${currentYear}`}>
-                  {githubContributions.weeks.map((week, weekIndex) => (
-                    <div className={editorialStyles.githubWeek} key={weekIndex}>
-                      {week.map((day, dayIndex) => day ? (
-                        <span className={editorialStyles.githubDay} key={day.date} style={{ backgroundColor: CONTRIBUTION_LEVEL_COLORS[day.level] ?? CONTRIBUTION_LEVEL_COLORS[0] }} title={`${day.count} contribution${day.count === 1 ? "" : "s"} on ${day.date}`} />
-                      ) : (
-                        <span className={`${editorialStyles.githubDay} ${editorialStyles.githubDayEmpty}`} key={`empty-${weekIndex}-${dayIndex}`} aria-hidden="true" />
-                      ))}
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <p className={editorialStyles.githubCount}><strong>{githubContributions.totalLastYear.toLocaleString()}</strong> contributions in {currentYear}</p>
-            </div>
-          ) : (
-            <p className={editorialStyles.githubFallback}>Activity graph is temporarily unavailable — view the profile directly on GitHub.</p>
-          )}
-        </div>
-      </section>
+        </section>
+      )}
 
       <Recommendations number="07 — Recommendations" />
 

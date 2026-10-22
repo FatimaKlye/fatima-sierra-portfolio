@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import {
   CAPABILITIES,
+  CERTIFICATES,
   CORE_KNOWLEDGE,
   LEARNING_EXPOSURE,
   PROFESSIONAL_SKILLS,
 } from "@/components/about/aboutData";
 import PageHero from "@/components/editorial/PageHero";
 import EditorialMotion from "@/components/motion/EditorialMotion";
+import CertificateCarousel from "@/components/skills/CertificateCarousel";
 import SkillsExplorer from "@/components/skills/SkillsExplorer";
 import { ALL_SKILLS, SKILL_GROUPS } from "@/components/skills/skillsData";
 import styles from "@/components/skills/Skills.module.css";
@@ -19,6 +22,12 @@ export const metadata: Metadata = {
 };
 
 const pad = (value: number) => String(value).padStart(2, "0");
+
+// Featured certifications lead the rail; the rest follow in their existing order.
+const CAROUSEL_CERTIFICATES = [
+  ...CERTIFICATES.filter((certificate) => certificate.featured),
+  ...CERTIFICATES.filter((certificate) => !certificate.featured),
+];
 
 export default function SkillsPage() {
   return (
@@ -92,20 +101,29 @@ export default function SkillsPage() {
         </section>
 
         <section className={`${styles.section} ${styles.surface}`} id="still-learning" aria-labelledby="growing-title" data-nav-label="Still learning">
-          <div className={`${styles.container} ${styles.growing}`}>
-            <div>
-              <p className={styles.kicker} data-reveal>04 — Still learning</p>
-              <h2 id="growing-title" className={styles.title} data-reveal>
-                Always adding <em>to the recipe.</em>
-              </h2>
+          <div className={styles.container}>
+            <header className={styles.growingHead}>
+              <div>
+                <p className={styles.kicker} data-reveal>04 — Still learning</p>
+                <h2 id="growing-title" className={styles.title} data-reveal>
+                  Always adding <em>to the recipe.</em>
+                </h2>
+              </div>
               <p className={styles.growingIntro} data-reveal>
                 Concepts I&apos;ve explored through workshops, webinars and training — each one backed by a
-                certificate.
+                certificate. Drag, swipe or use the arrows to browse; select one to see it up close.
               </p>
-              <Link className={`ui-btn ui-btn--secondary ${styles.textLink}`} href="/certifications" data-reveal>
-                See the Certificates
+            </header>
+
+            <CertificateCarousel certificates={CAROUSEL_CERTIFICATES} />
+
+            <div className={styles.viewAll} data-reveal>
+              <Link className="ui-btn ui-btn--secondary" href="/certifications">
+                View All Certifications
+                <ArrowRight size={16} strokeWidth={1.75} aria-hidden="true" />
               </Link>
             </div>
+
             <div className={styles.growingLists}>
               <div>
                 <h3 className={styles.listLabel}>Technical exposure</h3>

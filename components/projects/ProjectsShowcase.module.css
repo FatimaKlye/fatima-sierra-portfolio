@@ -95,6 +95,97 @@
   color: var(--color-primary);
 }
 
+/* Arrival from the homepage skill index ("?tech="): matching projects get a
+   soft pink sweep, one after another; the rest step back until hovered. */
+.indexFilter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  align-items: baseline;
+  margin: 0 0 16px;
+  color: var(--color-text-muted);
+  font-size: 0.84rem;
+  animation: indexFilterIn 600ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.indexFilter strong {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.indexFilterCount {
+  color: var(--color-secondary);
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+}
+
+.indexFilterClear {
+  margin-left: auto;
+  padding: 4px 0;
+  border: 0;
+  background: none;
+  color: var(--color-primary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: rgba(166, 61, 104, 0.3);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 5px;
+  cursor: pointer;
+  transition: text-decoration-color 200ms ease;
+}
+
+.indexFilterClear:hover,
+.indexFilterClear:focus-visible {
+  text-decoration-color: var(--color-primary);
+}
+
+.indexLinkMatch {
+  position: relative;
+  isolation: isolate;
+  padding-left: 14px;
+}
+
+.indexLinkMatch::before {
+  content: "";
+  position: absolute;
+  inset: 0 -14px 1px; /* stop above the row's own border, which it would otherwise paint over */
+  z-index: -1;
+  background: var(--color-soft-blush);
+  transform-origin: left;
+  animation: indexMatchSweep 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--match-order, 0) * 120ms + 520ms);
+}
+
+.indexLinkMatch .indexTitle {
+  color: var(--color-primary);
+}
+
+.indexLinkMuted {
+  opacity: 0.42;
+  transition: opacity 300ms ease, color 300ms ease, padding 400ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.indexLinkMuted:hover,
+.indexLinkMuted:focus-visible {
+  opacity: 1;
+}
+
+@keyframes indexMatchSweep {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes indexFilterIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
 
 /* Cursor-following preview (fine pointers only; rendered by ProjectsIndex). */
 .indexPreview {
@@ -554,6 +645,11 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .indexFilter,
+  .indexLinkMatch::before {
+    animation: none;
+  }
+
   .indexLink,
   .indexTitle,
   .browser,

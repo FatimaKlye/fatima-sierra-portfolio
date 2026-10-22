@@ -342,29 +342,36 @@
 
 /* Still learning ------------------------------------------------------------- */
 
-.growing {
+.growingHead {
   display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-  gap: clamp(32px, 6vw, 96px);
-  align-items: start;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: 18px clamp(32px, 6vw, 96px);
+  align-items: end;
+  margin-bottom: clamp(32px, 4vw, 56px);
 }
 
 .growingIntro {
   max-width: 44ch;
-  margin: 18px 0 0;
+  margin: 0;
   color: var(--color-text-muted);
   font-size: 0.92rem;
   line-height: 1.75;
 }
 
 /* Layout only — the look comes from the global .ui-btn system. */
-.textLink {
-  margin-top: 24px;
+.viewAll {
+  display: flex;
+  justify-content: center;
+  margin-top: clamp(36px, 4.4vw, 56px);
 }
 
 .growingLists {
   display: grid;
-  gap: 32px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 32px clamp(32px, 5vw, 80px);
+  margin-top: clamp(48px, 6vw, 80px);
+  padding-top: clamp(28px, 3.4vw, 40px);
+  border-top: 1px solid var(--color-border);
 }
 
 .listLabel {
@@ -453,8 +460,13 @@
 
   .verbRow,
   .knowledge,
-  .growing {
+  .growingHead,
+  .growingLists {
     grid-template-columns: 1fr;
+  }
+
+  .growingHead {
+    align-items: start;
   }
 }
 

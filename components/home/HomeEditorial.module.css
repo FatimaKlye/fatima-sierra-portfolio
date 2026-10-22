@@ -156,81 +156,6 @@
   line-height: 1.7;
 }
 
-.githubSection {
-  padding: clamp(40px, 5vw, 64px) 0;
-  text-align: center;
-}
-
-.githubHeader {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-  text-align: center;
-}
-
-.githubBody {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  margin-top: 16px;
-}
-
-.githubGridScroll {
-  display: flex;
-  width: 100%;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-
-.githubGridScroll::-webkit-scrollbar { display: none; }
-
-/* Auto margins center the graph when it fits and fall back to start-aligned scrolling when it overflows. */
-.githubGrid {
-  display: flex;
-  flex: 0 0 auto;
-  gap: 3px;
-  margin-inline: auto;
-  min-width: max-content;
-  padding: 5px 0;
-}
-
-.githubWeek {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.githubDay {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--color-soft-blush);
-}
-
-.githubDayEmpty { background: transparent; }
-
-.githubCount {
-  margin: 0;
-  color: var(--color-text-muted);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  text-align: center;
-  text-transform: uppercase;
-}
-
-.githubCount strong { color: var(--color-primary); }
-
-.githubFallback {
-  margin: 16px 0 0;
-  color: var(--color-text-muted);
-  font-size: 0.85rem;
-  text-align: center;
-}
-
 .contactSection { background: var(--color-surface); }
 
 .contactInner {
@@ -282,75 +207,6 @@
   gap: 24px 48px;
   align-items: flex-end;
   justify-content: space-between;
-}
-
-/* Skills: one row per area — label on the left, the tools I use on the right. */
-.skillGroups {
-  margin: clamp(32px, 4vw, 48px) 0 0;
-  border-top: 1px solid var(--color-border);
-}
-
-.skillGroup {
-  display: grid;
-  grid-template-columns: minmax(160px, 0.28fr) minmax(0, 1fr);
-  gap: 16px 32px;
-  align-items: center;
-  padding: 18px 0;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.skillGroup dt {
-  color: var(--color-text-primary);
-  font-size: 0.92rem;
-  font-weight: 600;
-}
-
-.skillGroup dd {
-  margin: 0;
-}
-
-.skillList {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px 26px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.skillList li {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--color-text-primary);
-  font-size: 0.9rem;
-  font-weight: 500;
-}
-
-.skillList img {
-  width: 20px;
-  height: 20px;
-  object-fit: contain;
-}
-
-.skillCount {
-  display: inline-grid;
-  min-width: 18px;
-  height: 18px;
-  place-items: center;
-  padding: 0 5px;
-  border-radius: 999px;
-  background: var(--color-soft-blush);
-  color: var(--color-primary-hover);
-  font-size: 0.66rem;
-  font-weight: 700;
-  line-height: 1;
-}
-
-.toolFallback {
-  color: var(--color-primary);
-  font-size: 0.7rem;
-  font-weight: 700;
 }
 
 .contactInner { align-items: end; }
@@ -414,13 +270,11 @@ ul.contactLinksRow {
 
   .capabilityRow { grid-template-columns: 52px minmax(160px, 0.8fr) minmax(0, 1fr); gap: 18px; }
   .timelineRow { grid-template-columns: 82px 160px minmax(0, 1fr); gap: 18px; }
-  .skillGroup { grid-template-columns: 1fr; gap: 12px; }
 }
 
 @media (max-width: 640px) {
   .container { width: min(calc(100% - 40px), var(--page-max-width)); }
 
-  .githubSection { padding: 40px 0; }
   .sectionTitle,
   .contactTitle { font-size: clamp(2.1rem, 10vw, 3rem); }
 
@@ -431,11 +285,6 @@ ul.contactLinksRow {
   .capabilityDescription { margin-top: 2px; }
   .timelineRow { padding: 18px 0; }
   .timelineDetail { margin-top: 4px; }
-
-  .githubGridScroll { margin-inline: -20px; padding-inline: 20px; width: calc(100% + 40px); }
-  .githubDay { width: 8px; height: 8px; }
-  .githubGrid,
-  .githubWeek { gap: 2px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

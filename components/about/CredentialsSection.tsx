@@ -125,15 +125,15 @@ function CertificateCard({
           )}
         </dl>
 
-        <a
+        <button
+          type="button"
           className={`ui-btn ui-btn--secondary ui-btn--sm ${styles.certLink}`}
-          href={record.fileUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={`View credential for ${record.title} (opens in a new tab)`}
+          onClick={() => onPreview(record)}
+          aria-haspopup="dialog"
+          aria-label={`View credential: ${record.title}`}
         >
           View Credential
-        </a>
+        </button>
       </div>
     </article>
   );

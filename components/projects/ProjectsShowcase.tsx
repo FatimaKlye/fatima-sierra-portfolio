@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowUpRight, Download } from "lucide-react";
 import PhoneMockup from "@/components/project-details/PhoneMockup";
 import { PROJECTS } from "@/components/projects/projectsData";
+import { ALL_SKILLS } from "@/components/skills/skillsData";
 import { getProjectDetailBySlug, type ProjectMedia } from "@/data/projectDetailsData";
 import ProjectsIndex, { type ProjectIndexItem } from "./ProjectsIndex";
 import styles from "./ProjectsShowcase.module.css";
@@ -57,6 +58,8 @@ export const INDEX_ITEMS: ProjectIndexItem[] = SHOWCASE_PROJECTS.map((project) =
   category: project.category,
   period: project.period,
   image: { src: project.media.src, alt: project.media.alt },
+  // Same matching as the skill counts, so "?tech=React" highlights exactly the projects counted for React.
+  skills: ALL_SKILLS.filter((skill) => skill.projects.some((entry) => entry.slug === project.slug)).map((skill) => skill.name),
 }));
 
 function Frame({ media, companion, sizes }: { media: ShowcaseMedia; companion?: ProjectMedia; sizes: string }) {
