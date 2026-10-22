@@ -1,0 +1,601 @@
+/* A Little Word Break — the navbar "W" tile and its daily word game.
+   Every colour is a token below; dark values switch on with html[data-theme="dark"] or html.dark. */
+
+.trigger,
+.overlay {
+  --wb-surface: var(--color-background);
+  --wb-text: var(--color-text-primary);
+  --wb-muted: var(--color-text-muted);
+  --wb-line: var(--color-border);
+  --wb-accent: var(--color-primary);
+  --wb-trigger-bg: var(--color-white);
+  --wb-tile-border: #ead9e1;
+  --wb-filled-bg: var(--color-white);
+  --wb-filled-border: var(--color-secondary);
+  --wb-key-bg: #f6e6ee;
+  --wb-key-hover: #f0d6e2;
+  --wb-key-text: var(--color-text-primary);
+  --wb-correct: var(--color-primary);
+  --wb-correct-text: #ffffff;
+  --wb-present: #f3d98b;
+  --wb-present-text: #5b4614;
+  --wb-absent: #d9d0d5;
+  --wb-absent-text: #5b4d55;
+  --wb-scrim: rgba(59, 42, 52, 0.42);
+  --wb-shadow: 0 32px 80px -28px rgba(59, 42, 52, 0.42), 0 2px 6px rgba(166, 61, 104, 0.06);
+  --wb-toast-bg: var(--color-text-primary);
+  --wb-toast-text: #ffffff;
+  --wb-sparkle-a: #e8a0bf;
+  --wb-sparkle-b: #f3bcd3;
+}
+
+:global(html[data-theme="dark"]) .trigger,
+:global(html[data-theme="dark"]) .overlay,
+:global(html.dark) .trigger,
+:global(html.dark) .overlay {
+  --wb-surface: #1d1519;
+  --wb-text: #f6e9ef;
+  --wb-muted: #bca8b2;
+  --wb-line: #3a2c33;
+  --wb-accent: #e48bb0;
+  --wb-trigger-bg: #251a20;
+  --wb-tile-border: #3e2f37;
+  --wb-filled-bg: #251a20;
+  --wb-filled-border: #a8728c;
+  --wb-key-bg: #33252c;
+  --wb-key-hover: #3f2e37;
+  --wb-key-text: #f6e9ef;
+  --wb-correct: #b54a7c;
+  --wb-correct-text: #ffffff;
+  --wb-present: #d8b55e;
+  --wb-present-text: #2b2108;
+  --wb-absent: #463a40;
+  --wb-absent-text: #d9cbd2;
+  --wb-scrim: rgba(8, 4, 6, 0.62);
+  --wb-shadow: 0 32px 80px -24px rgba(0, 0, 0, 0.7);
+  --wb-toast-bg: #f6e9ef;
+  --wb-toast-text: #1d1519;
+}
+
+/* ---------- Navbar trigger: a tiny letter tile that flips pink on hover ---------- */
+
+.trigger {
+  display: inline-grid;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  place-items: center;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  cursor: pointer;
+  perspective: 240px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.triggerFace {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border: 1.5px solid var(--wb-line);
+  border-radius: 9px;
+  background: var(--wb-trigger-bg);
+  color: var(--wb-accent);
+  font-family: var(--font-poppins), sans-serif;
+  font-size: 0.86rem;
+  font-weight: 600;
+  line-height: 1;
+  transition:
+    background-color 200ms ease,
+    border-color 200ms ease,
+    color 200ms ease,
+    box-shadow 300ms ease,
+    scale 140ms ease;
+}
+
+@media (hover: hover) {
+  .trigger:hover .triggerFace {
+    border-color: var(--wb-accent);
+    background: var(--wb-accent);
+    color: var(--wb-surface);
+    box-shadow: 0 10px 20px -10px rgba(166, 61, 104, 0.65);
+    animation: triggerFlip 460ms ease-in-out;
+  }
+}
+
+.trigger:focus-visible {
+  outline: 3px solid rgba(166, 61, 104, 0.32);
+  outline-offset: 2px;
+}
+
+.trigger:focus-visible .triggerFace {
+  border-color: var(--wb-accent);
+}
+
+.trigger:active .triggerFace {
+  scale: 0.92;
+}
+
+/* The same half-turn reveal as the game's tiles: colour swaps while the tile is edge-on. */
+@keyframes triggerFlip {
+  0%,
+  49.9% {
+    border-color: var(--wb-line);
+    background: var(--wb-trigger-bg);
+    color: var(--wb-accent);
+  }
+  0% { transform: rotateX(0deg); }
+  50% { transform: rotateX(90deg); }
+  100% { transform: rotateX(0deg); }
+}
+
+/* ---------- Dialog ---------- */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: flex;
+  padding: 16px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--wb-scrim);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.panel {
+  position: relative;
+  width: min(100%, 380px);
+  margin: auto;
+  padding: 20px 20px 16px;
+  border: 1px solid var(--wb-line);
+  border-radius: 24px;
+  background: var(--wb-surface);
+  box-shadow: var(--wb-shadow);
+  color: var(--wb-text);
+  font-family: var(--font-poppins), sans-serif;
+}
+
+.panel:focus {
+  outline: none;
+}
+
+.head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--wb-accent);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.title {
+  margin: 4px 0 0;
+  color: var(--wb-text);
+  font-size: 1.12rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}
+
+.subtitle {
+  margin: 2px 0 0;
+  color: var(--wb-muted);
+  font-size: 0.78rem;
+}
+
+.close {
+  display: grid;
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  place-items: center;
+  border: 1px solid var(--wb-line);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--wb-muted);
+  cursor: pointer;
+  transition: background-color 200ms ease, border-color 200ms ease, color 200ms ease;
+}
+
+.close:hover,
+.close:focus-visible {
+  border-color: var(--wb-accent);
+  background: var(--wb-accent);
+  color: var(--wb-surface);
+}
+
+.close:focus-visible {
+  outline: 3px solid rgba(166, 61, 104, 0.32);
+  outline-offset: 2px;
+}
+
+/* ---------- Board ---------- */
+
+.stage {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  /* Tiles shrink on short or narrow screens so the whole game always fits without scrolling. */
+  --tile: clamp(36px, min(calc((100vh - 390px) / 6), calc((100vw - 96px) / 5)), 54px);
+  --tile: clamp(36px, min(calc((100dvh - 390px) / 6), calc((100vw - 96px) / 5)), 54px);
+}
+
+.board {
+  display: grid;
+  gap: 6px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: repeat(5, var(--tile));
+  gap: 6px;
+}
+
+.tile {
+  --tile-bg: transparent;
+  --tile-fg: var(--wb-text);
+  --tile-border: var(--wb-tile-border);
+
+  display: grid;
+  width: var(--tile);
+  height: var(--tile);
+  place-items: center;
+  border: 1.5px solid var(--tile-border);
+  border-radius: 12px;
+  background: var(--tile-bg);
+  color: var(--tile-fg);
+  font-size: calc(var(--tile) * 0.42);
+  font-weight: 600;
+  line-height: 1;
+  text-transform: uppercase;
+  user-select: none;
+  transition: border-color 160ms ease;
+}
+
+.filled {
+  --tile-bg: var(--wb-filled-bg);
+  --tile-border: var(--wb-filled-border);
+}
+
+/* Shared by tiles and keys (keys read these through var() fallbacks). Declared after .filled so they win. */
+.correct {
+  --tile-bg: var(--wb-correct);
+  --tile-fg: var(--wb-correct-text);
+  --tile-border: var(--wb-correct);
+}
+
+.present {
+  --tile-bg: var(--wb-present);
+  --tile-fg: var(--wb-present-text);
+  --tile-border: var(--wb-present);
+}
+
+.absent {
+  --tile-bg: var(--wb-absent);
+  --tile-fg: var(--wb-absent-text);
+  --tile-border: var(--wb-absent);
+}
+
+.typing {
+  animation: pop 150ms ease-out;
+}
+
+/* Timing must match FLIP_STAGGER_MS / FLIP_MS in WordBreakGame.tsx. */
+.flip {
+  animation: flip 520ms ease-in-out both;
+  animation-delay: calc(var(--i) * 260ms);
+}
+
+.hop {
+  animation: hop 560ms cubic-bezier(0.3, 1.5, 0.5, 1) both;
+  animation-delay: calc(var(--i) * 90ms);
+}
+
+.shake {
+  animation: shake 420ms ease-in-out;
+}
+
+@keyframes pop {
+  0% { transform: scale(0.86); }
+  60% { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+
+@keyframes flip {
+  0%,
+  49.9% {
+    border-color: var(--wb-filled-border);
+    background: var(--wb-filled-bg);
+    color: var(--wb-text);
+  }
+  0% { transform: rotateX(0deg); }
+  50% { transform: rotateX(90deg); }
+  100% { transform: rotateX(0deg); }
+}
+
+@keyframes hop {
+  0%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-12px); }
+  70% { transform: translateY(2px); }
+}
+
+@keyframes shake {
+  10%, 90% { transform: translateX(-1px); }
+  20%, 80% { transform: translateX(3px); }
+  30%, 50%, 70% { transform: translateX(-6px); }
+  40%, 60% { transform: translateX(6px); }
+}
+
+.toastSlot {
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  z-index: 2;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.toast {
+  margin: 0;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: var(--wb-toast-bg);
+  box-shadow: 0 10px 24px -12px rgba(59, 42, 52, 0.5);
+  color: var(--wb-toast-text);
+  font-size: 0.74rem;
+  font-weight: 500;
+  white-space: nowrap;
+  animation: toastIn 220ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(-4px) scale(0.96); }
+  to { opacity: 1; transform: none; }
+}
+
+.burst {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 3;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.burst span {
+  position: absolute;
+  top: -8px;
+  left: -7px;
+  color: var(--wb-accent);
+  font-size: 14px;
+  line-height: 1;
+  opacity: 0;
+}
+
+.burst span:nth-child(3n + 2) { color: var(--wb-sparkle-a); }
+.burst span:nth-child(4n) { color: var(--wb-sparkle-b); font-size: 11px; }
+
+/* ---------- Keyboard ---------- */
+
+.keyboard {
+  display: grid;
+  gap: 6px;
+  margin-top: 16px;
+}
+
+.keyRow {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+}
+
+.keyRow:nth-child(2) {
+  padding-inline: 5%;
+}
+
+.key {
+  display: grid;
+  flex: 1 1 0;
+  min-width: 0;
+  height: 48px;
+  padding: 0;
+  place-items: center;
+  border: 0;
+  border-radius: 10px;
+  background: var(--tile-bg, var(--wb-key-bg));
+  color: var(--tile-fg, var(--wb-key-text));
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 220ms ease, color 220ms ease, scale 120ms ease;
+}
+
+.keyWide {
+  flex-grow: 1.55;
+  font-size: 0.66rem;
+  letter-spacing: 0.04em;
+}
+
+@media (hover: hover) {
+  .key:hover:not(.correct, .present, .absent) {
+    background: var(--wb-key-hover);
+  }
+}
+
+.key:active {
+  scale: 0.94;
+}
+
+.key:focus-visible {
+  outline: 2px solid var(--wb-accent);
+  outline-offset: 2px;
+}
+
+.meta {
+  margin: 12px 0 0;
+  color: var(--wb-muted);
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+
+/* ---------- Result ---------- */
+
+.result {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  margin-top: 18px;
+  text-align: center;
+  animation: resultIn 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes resultIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+.resultTitle {
+  margin: 0;
+  color: var(--wb-accent);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.resultText {
+  margin: 0;
+  color: var(--wb-muted);
+  font-size: 0.82rem;
+}
+
+.resultText strong {
+  color: var(--wb-text);
+  font-weight: 600;
+}
+
+.resultText .answer {
+  color: var(--wb-accent);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.stats {
+  display: flex;
+  margin: 12px 0 4px;
+}
+
+.stats > div {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  padding: 0 18px;
+}
+
+.stats > div + div {
+  border-left: 1px solid var(--wb-line);
+}
+
+.stats dt {
+  color: var(--wb-muted);
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.stats dd {
+  margin: 0;
+  color: var(--wb-text);
+  font-size: 1.2rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.next {
+  margin: 6px 0 0;
+  color: var(--wb-muted);
+  font-size: 0.74rem;
+}
+
+.countdown {
+  display: inline-block;
+  margin-left: 4px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--wb-key-bg);
+  color: var(--wb-text);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.result :global(.ui-btn) {
+  margin-top: 8px;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Touch layouts: a full 44px hit area (matching the menu toggle) around the same small tile. */
+@media (max-width: 900px) {
+  .trigger {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+@media (max-width: 480px) {
+  .panel {
+    padding: 18px 16px 14px;
+    border-radius: 20px;
+  }
+
+  .key {
+    height: 50px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trigger:hover .triggerFace,
+  .typing,
+  .flip,
+  .hop,
+  .shake,
+  .toast,
+  .result {
+    animation: none !important;
+  }
+
+  .triggerFace,
+  .tile,
+  .key,
+  .close {
+    transition-duration: 0.01ms !important;
+  }
+}

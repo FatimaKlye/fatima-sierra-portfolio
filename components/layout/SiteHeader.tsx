@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
 import type { MouseEvent } from "react";
+import WordBreak from "@/components/wordbreak/WordBreak";
 import ResumeModal from "./ResumeModal";
 import styles from "./SiteHeader.module.css";
 
@@ -123,25 +124,29 @@ export default function SiteHeader() {
             })}
           </nav>
 
-          <div className={styles.resumeCta}>
-            <button type="button" className="ui-btn ui-btn--primary ui-btn--sm" onClick={() => setResumeOpen(true)}>
-              Resume
+          <div className={styles.actions}>
+            <WordBreak />
+
+            <div className={styles.resumeCta}>
+              <button type="button" className="ui-btn ui-btn--primary ui-btn--sm" onClick={() => setResumeOpen(true)}>
+                Resume
+              </button>
+            </div>
+
+            <button
+              ref={toggleRef}
+              type="button"
+              className={`${styles.menuToggle}${menuOpen ? ` ${styles.menuToggleOpen}` : ""}`}
+              aria-expanded={menuOpen}
+              aria-controls={menuId}
+              aria-label={menuOpen ? "Close menu" : "Open menu"}
+              onClick={() => setMenuOpen((open) => !open)}
+            >
+              <span aria-hidden="true" />
+              <span aria-hidden="true" />
+              <span aria-hidden="true" />
             </button>
           </div>
-
-          <button
-            ref={toggleRef}
-            type="button"
-            className={`${styles.menuToggle}${menuOpen ? ` ${styles.menuToggleOpen}` : ""}`}
-            aria-expanded={menuOpen}
-            aria-controls={menuId}
-            aria-label={menuOpen ? "Close menu" : "Open menu"}
-            onClick={() => setMenuOpen((open) => !open)}
-          >
-            <span aria-hidden="true" />
-            <span aria-hidden="true" />
-            <span aria-hidden="true" />
-          </button>
         </div>
       </header>
 

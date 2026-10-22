@@ -95,8 +95,13 @@
   transform: scaleX(1);
 }
 
-.resumeCta {
+/* Right-hand cluster: the word-game tile, Resume, and (on mobile) the menu toggle. */
+.actions {
+  display: flex;
+  grid-column: 3;
+  align-items: center;
   justify-self: end;
+  gap: 12px;
 }
 
 .menuToggle {
