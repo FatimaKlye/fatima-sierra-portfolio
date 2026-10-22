@@ -2,7 +2,7 @@
  * Single source of truth for the /projects/[slug] case-study pages.
  *
  * Every statement here is traceable to one of:
- *  - the résumé (public/assets/resume/Fatima-Klye-Sierra-Resume-2026.pdf)
+ *  - the résumé (public/assets/resume/Fatima-Sierra.pdf)
  *  - the project's own repository / package files
  *  - the project's live site or the real screenshots in /public/assets/projects
  *  - the owner's own description of the project (problem, solution, roles)
