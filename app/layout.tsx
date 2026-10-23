@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import SiteFooter from "@/components/layout/SiteFooter";
 import SiteHeader from "@/components/layout/SiteHeader";
 import IntroGate from "@/components/intro/IntroGate";
@@ -45,6 +46,7 @@ export default function RootLayout({
         <SiteFooter />
         <FairyDust />
         <IntroGate />
+        <Analytics />
       </body>
     </html>
   );
