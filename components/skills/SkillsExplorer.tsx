@@ -71,20 +71,21 @@ export default function SkillsExplorer({ groups }: SkillsExplorerProps) {
           </span>
           <p className={styles.detailGroup}>{selected.groupLabel}</p>
           <p className={styles.detailName}>{selected.name}</p>
+          <p className={styles.detailUsage}>{selected.usage}</p>
 
-          <p className={styles.detailLabel}>Used in</p>
-          {selected.projects.length > 0 ? (
-            <ul className={styles.detailProjects}>
-              {selected.projects.map((project) => (
-                <li key={project.slug}>
-                  <Link className="ui-btn ui-btn--ghost-light ui-btn--sm" href={`/projects/${project.slug}`}>
-                    {project.title}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className={styles.detailEmpty}>Part of my development toolkit — not tied to a featured case study.</p>
+          {selected.projects.length > 0 && (
+            <>
+              <p className={styles.detailLabel}>Used in</p>
+              <ul className={styles.detailProjects}>
+                {selected.projects.map((project) => (
+                  <li key={project.slug}>
+                    <Link className="ui-btn ui-btn--ghost-light ui-btn--sm" href={`/projects/${project.slug}`}>
+                      {project.title}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </>
           )}
         </div>
       </aside>

@@ -99,13 +99,21 @@ export default function FairyDustCursor({
   const characterKey = characterSet.join("|");
   const { min: velocityMin, max: velocityMax } = initialVelocity;
 
+  // A colour change (theme switch) only re-tints the sprite cache: sparkles already in the air
+  // finish fading in their own tint instead of the whole trail being torn down.
+  const colorKeyRef = useRef(colorKey);
+  const rebuildSpritesRef = useRef<(() => void) | null>(null);
+  useEffect(() => {
+    colorKeyRef.current = colorKey;
+    rebuildSpritesRef.current?.();
+  }, [colorKey]);
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!enabled || !canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const palette = colorKey.split("|");
     const characters = characterKey.split("|");
     let dpr = 1;
     let sprites: HTMLCanvasElement[] = [];
@@ -114,13 +122,19 @@ export default function FairyDustCursor({
     let lastTime = 0;
     let lastSpawn: { x: number; y: number } | null = null;
 
+    const buildSprites = () => {
+      const palette = colorKeyRef.current.split("|");
+      sprites = characters.flatMap((character) =>
+        palette.map((color) => createSprite(character, color, particleSize, dpr))
+      );
+    };
+    rebuildSpritesRef.current = buildSprites;
+
     const resize = () => {
       dpr = Math.min(window.devicePixelRatio || 1, 2);
       canvas.width = Math.round(window.innerWidth * dpr);
       canvas.height = Math.round(window.innerHeight * dpr);
-      sprites = characters.flatMap((character) =>
-        palette.map((color) => createSprite(character, color, particleSize, dpr))
-      );
+      buildSprites();
       particles.length = 0;
     };
 
@@ -189,13 +203,14 @@ export default function FairyDustCursor({
     document.documentElement.addEventListener("pointerleave", onLeave);
 
     return () => {
+      rebuildSpritesRef.current = null;
       cancelAnimationFrame(frame);
       window.removeEventListener("resize", resize);
       window.removeEventListener("pointermove", onPointerMove);
       document.documentElement.removeEventListener("pointerleave", onLeave);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
     };
-  }, [enabled, colorKey, characterKey, particleSize, particleCount, gravity, fadeSpeed, velocityMin, velocityMax]);
+  }, [enabled, characterKey, particleSize, particleCount, gravity, fadeSpeed, velocityMin, velocityMax]);
 
   if (!enabled) return null;
 

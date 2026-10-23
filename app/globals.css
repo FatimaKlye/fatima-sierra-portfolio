@@ -12,14 +12,98 @@
   --color-white: #ffffff;
   --color-primary-hover: #8b3558;
 
-  --shadow-soft: 0 24px 80px rgba(59, 42, 52, 0.12);
-  --shadow-card: 0 16px 36px rgba(166, 61, 104, 0.1);
+  /* Semantic roles — in light mode each one resolves to the original value it replaced. */
+  --color-card: #ffffff; /* raised cards, tiles, inputs */
+  --color-on-primary: #ffffff; /* text and icons on small pink fills (buttons, pills, active chips) */
+  --color-brand-fill: #a63d68; /* large pink bands that carry white text */
+  --color-plum: #2a1c24; /* deep editorial panels (code blocks, feature cards) */
+  --color-on-fill-soft: #f6dde7; /* blush accents on pink bands and plum panels — same in both themes */
+
+  /* Colour channels for tints and shadows: rgb(var(--rgb-primary) / 0.12). */
+  --rgb-primary: 166 61 104;
+  --rgb-secondary: 201 130 162;
+  --rgb-blush: 246 221 231;
+  --rgb-background: 255 249 251;
+  --rgb-border: 232 212 222;
+  --rgb-card: 255 255 255; /* translucent "glass" over surfaces */
+  --rgb-shadow: 59 42 52; /* neutral shadows and modal scrims */
+  --rgb-shadow-tint: 166 61 104; /* rose-tinted shadows */
+
+  --shadow-soft: 0 24px 80px rgb(var(--rgb-shadow) / 0.12);
+  --shadow-card: 0 16px 36px rgb(var(--rgb-shadow-tint) / 0.1);
+
+  color-scheme: light;
   /* One content width for the header, every page section and the footer, so all edges line up. */
   --page-max-width: 1240px;
   /* Vertical rhythm between page sections — generous enough to breathe, never a blank screen. */
   --section-space: clamp(56px, 7vw, 96px);
   /* Global navbar height — the fixed header, body offset and anchor offset all read this. */
   --header-height: 72px;
+}
+
+/* Dark theme — deep warm charcoal, soft white type, dusty-rose accents. Every component reads
+   these tokens, so this block is the single source of the dark palette. The pink is lifted to a
+   dusty rose so it keeps AA contrast on charcoal; small pink fills switch to dark text. */
+:root[data-theme="dark"] {
+  --color-primary: #db82a8;
+  --color-secondary: #b9809b;
+  --color-soft-blush: #2d2128;
+  --color-background: #141114;
+  --color-surface: #1a1619;
+  --color-text-primary: #f3ecef;
+  --color-text-muted: #a89ba2;
+  --color-border: #352b31;
+  --color-primary-hover: #e89dbd;
+
+  --color-card: #211b1f;
+  --color-on-primary: #1d1218;
+  --color-brand-fill: #8f3c60;
+  --color-plum: #261d22;
+
+  --rgb-primary: 219 130 168;
+  --rgb-secondary: 185 128 155;
+  --rgb-blush: 45 33 40;
+  --rgb-background: 20 17 20;
+  --rgb-border: 53 43 49;
+  --rgb-card: 33 27 31;
+  --rgb-shadow: 0 0 0;
+  --rgb-shadow-tint: 0 0 0;
+
+  --shadow-soft: 0 24px 70px rgb(0 0 0 / 0.45);
+  --shadow-card: 0 16px 36px rgb(0 0 0 / 0.32);
+
+  color-scheme: dark;
+}
+
+/* Theme switch: the new theme opens as a circle from the toggle (see lib/theme.ts). Scoped to the
+   switch so any other view transition keeps the browser default. */
+:root[data-theme-switching]::view-transition-old(root),
+:root[data-theme-switching]::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+:root[data-theme-switching]::view-transition-old(root) { z-index: 1; }
+:root[data-theme-switching]::view-transition-new(root) { z-index: 2; }
+
+/* Fallback for browsers without view transitions: one short cross-fade of colours only. */
+html.theme-fade,
+html.theme-fade *,
+html.theme-fade *::before,
+html.theme-fade *::after {
+  transition:
+    background-color 380ms ease,
+    color 380ms ease,
+    border-color 380ms ease,
+    outline-color 380ms ease,
+    fill 380ms ease,
+    stroke 380ms ease,
+    box-shadow 380ms ease !important;
+}
+
+/* Single-colour (black) brand logos would vanish on charcoal; render them in soft white. */
+:root[data-theme="dark"] img[data-mono-icon] {
+  filter: invert(0.92);
 }
 
 * {
@@ -146,11 +230,11 @@ svg {
 
 ::selection {
   background: var(--color-primary);
-  color: var(--color-white);
+  color: var(--color-on-primary);
 }
 
 :focus-visible {
-  outline: 3px solid rgba(166, 61, 104, 0.32);
+  outline: 3px solid rgb(var(--rgb-primary) / 0.32);
   outline-offset: 4px;
 }
 
@@ -171,7 +255,7 @@ svg {
   --ui-btn-bg-hover: var(--color-soft-blush);
   --ui-btn-fg-hover: var(--color-primary-hover);
   --ui-btn-border-hover: var(--color-primary-hover);
-  --ui-btn-shadow-hover: 0 14px 28px -14px rgba(166, 61, 104, 0.45);
+  --ui-btn-shadow-hover: 0 14px 28px -14px rgb(var(--rgb-shadow-tint) / 0.45);
 
   display: inline-flex;
   flex: 0 0 auto;
@@ -228,7 +312,7 @@ svg {
 }
 
 .ui-btn:focus-visible {
-  outline: 3px solid rgba(166, 61, 104, 0.32);
+  outline: 3px solid rgb(var(--rgb-primary) / 0.32);
   outline-offset: 3px;
 }
 
@@ -240,18 +324,18 @@ svg {
 /* Tones */
 .ui-btn--primary {
   --ui-btn-bg: var(--color-primary);
-  --ui-btn-fg: var(--color-white);
+  --ui-btn-fg: var(--color-on-primary);
   --ui-btn-border: var(--color-primary);
   --ui-btn-bg-hover: var(--color-primary-hover);
-  --ui-btn-fg-hover: var(--color-white);
+  --ui-btn-fg-hover: var(--color-on-primary);
   --ui-btn-border-hover: var(--color-primary-hover);
-  --ui-btn-shadow-hover: 0 16px 32px -14px rgba(166, 61, 104, 0.6);
+  --ui-btn-shadow-hover: 0 16px 32px -14px rgb(var(--rgb-shadow-tint) / 0.6);
 }
 
 .ui-btn--secondary {
   --ui-btn-bg: transparent;
   --ui-btn-fg: var(--color-primary);
-  --ui-btn-border: rgba(166, 61, 104, 0.45);
+  --ui-btn-border: rgb(var(--rgb-primary) / 0.45);
 }
 
 .ui-btn--light {
@@ -277,6 +361,16 @@ svg {
 .ui-btn--light:focus-visible,
 .ui-btn--ghost-light:focus-visible {
   outline-color: rgba(255, 255, 255, 0.75);
+}
+
+/* On the deeper dark-mode pink bands: a soft-white pill with deep rose type. */
+:root[data-theme="dark"] .ui-btn--light {
+  --ui-btn-bg: var(--color-text-primary);
+  --ui-btn-fg: var(--color-brand-fill);
+  --ui-btn-border: var(--color-text-primary);
+  --ui-btn-bg-hover: var(--color-white);
+  --ui-btn-fg-hover: var(--color-brand-fill);
+  --ui-btn-border-hover: var(--color-white);
 }
 
 /* Sizes */

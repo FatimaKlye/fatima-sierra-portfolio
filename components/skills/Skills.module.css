@@ -1,7 +1,7 @@
 /* /skills — toolkit explorer, capability verbs, knowledge index and learning lists. */
 
 .section {
-  --plum: #2a1c24;
+  --plum: var(--color-plum);
 
   padding: var(--section-space) 0;
   border-bottom: 1px solid var(--color-border);
@@ -111,7 +111,7 @@
   padding: 0 18px 0 12px;
   border: 1px solid var(--color-border);
   border-radius: 999px;
-  background: var(--color-white);
+  background: var(--color-card);
   color: var(--color-text-primary);
   font-size: 0.86rem;
   font-weight: 600;
@@ -158,7 +158,7 @@
   place-items: center;
   border-radius: 999px;
   background: var(--color-primary);
-  color: var(--color-white);
+  color: var(--color-on-primary);
   font-size: 0.66rem;
   font-weight: 700;
 }
@@ -191,7 +191,7 @@
   height: 84px;
   place-items: center;
   border-radius: 22px;
-  background: var(--color-white);
+  background: var(--color-card);
 }
 
 .detailIcon img {
@@ -238,11 +238,13 @@
   list-style: none;
 }
 
-.detailEmpty {
-  margin: 10px 0 0;
+.detailUsage {
+  max-width: 34ch;
+  margin: 14px 0 0;
   color: #d9c6cf;
-  font-size: 0.86rem;
+  font-size: 0.9rem;
   line-height: 1.6;
+  text-wrap: pretty;
 }
 
 .detail :focus-visible {
@@ -394,7 +396,7 @@
   padding: 9px 16px;
   border: 1px solid var(--color-border);
   border-radius: 999px;
-  background: var(--color-white);
+  background: var(--color-card);
   color: var(--color-text-primary);
   font-size: 0.8rem;
   font-weight: 500;
@@ -452,10 +454,17 @@
     padding-top: 10px;
   }
 
-  .detailProjects,
-  .detailEmpty {
+  .detailProjects {
     grid-column: 1 / -1;
     margin-top: 4px;
+  }
+
+  .detailUsage {
+    grid-column: 1 / -1;
+    max-width: none;
+    margin-top: 8px;
+    font-size: 0.82rem;
+    line-height: 1.5;
   }
 
   .verbRow,
@@ -483,4 +492,10 @@
   .detailInner {
     animation: none;
   }
+}
+
+/* ---------- Dark theme ---------- */
+
+:global(html[data-theme="dark"]) .detailIcon {
+  background: var(--color-soft-blush);
 }

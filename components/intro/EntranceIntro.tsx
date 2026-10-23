@@ -6,11 +6,13 @@ import gsap from "gsap";
 import { INTRO_ATTR } from "./introScript";
 import { recognizeF, type Point, type Stroke } from "./recognizeF";
 import { createRippleSurface, GLYPH_CENTER_Y } from "./rippleSurface";
+import { getTheme } from "@/lib/theme";
 import styles from "./EntranceIntro.module.css";
 
 type ExitStyle = "ripple" | "dissolve";
 
-const INK_COLOR = "#b5527c"; // between --color-primary and --color-secondary; opaque so joins never bead
+// Between --color-primary and --color-secondary for each theme; opaque so joins never bead.
+const inkColor = () => (getTheme() === "dark" ? "#d07aa0" : "#b5527c");
 const RESET_DELAY = 1800; // quiet time after an unrecognised attempt before the ink drains away
 const MAX_STROKES = 5;
 const REVEAL_FEATHER = 180; // px, soft water edge of the reveal
@@ -96,8 +98,9 @@ export default function EntranceIntro({ onDone }: { onDone: () => void }) {
     /** Draws the newest piece of the stroke as a midpoint-smoothed curve. */
     const inkTo = (stroke: Stroke) => {
       const n = stroke.length;
-      ink.strokeStyle = INK_COLOR;
-      ink.fillStyle = INK_COLOR;
+      const color = inkColor();
+      ink.strokeStyle = color;
+      ink.fillStyle = color;
       ink.lineWidth = inkWidth;
       ink.lineCap = "round";
       ink.lineJoin = "round";

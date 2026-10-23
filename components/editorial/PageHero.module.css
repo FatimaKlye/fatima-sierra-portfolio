@@ -14,8 +14,8 @@
   inset: 0;
   pointer-events: none;
   background:
-    linear-gradient(rgba(166, 61, 104, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(166, 61, 104, 0.035) 1px, transparent 1px);
+    linear-gradient(rgb(var(--rgb-primary) / 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(var(--rgb-primary) / 0.035) 1px, transparent 1px);
   background-size: 40px 40px;
   mask-image: linear-gradient(to bottom, #000 40%, transparent);
 }
@@ -29,7 +29,7 @@
   font-weight: 700;
   letter-spacing: -0.06em;
   line-height: 0.8;
-  -webkit-text-stroke: 1px rgba(166, 61, 104, 0.16);
+  -webkit-text-stroke: 1px rgb(var(--rgb-primary) / 0.16);
   pointer-events: none;
   user-select: none;
 }

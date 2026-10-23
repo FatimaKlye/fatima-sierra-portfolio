@@ -221,7 +221,7 @@
   font-weight: 600;
   overflow-wrap: anywhere;
   text-decoration: underline;
-  text-decoration-color: rgba(166, 61, 104, 0.3);
+  text-decoration-color: rgb(var(--rgb-primary) / 0.3);
   text-decoration-thickness: 2px;
   text-underline-offset: 6px;
   transition: text-decoration-color 200ms ease;

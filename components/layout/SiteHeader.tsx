@@ -7,6 +7,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import type { MouseEvent } from "react";
 import WordBreak from "@/components/wordbreak/WordBreak";
 import ResumeModal from "./ResumeModal";
+import ThemeToggle from "./ThemeToggle";
 import styles from "./SiteHeader.module.css";
 
 type NavItem = {
@@ -96,9 +97,19 @@ export default function SiteHeader() {
             aria-label="Fatima Klye Sierra home"
             onClick={(event) => handleNavClick(event, NAV_ITEMS[0])}
           >
+            {/* Both marks ship in the markup; CSS shows the one for the current theme, so there's no flash. */}
             <Image
-              className={styles.brandLogo}
+              className={`${styles.brandLogo} ${styles.brandLogoLight}`}
               src="/assets/profile/nav-logo.png"
+              alt=""
+              width={1494}
+              height={591}
+              sizes="(max-width: 480px) 106px, (max-width: 900px) 116px, 132px"
+              priority
+            />
+            <Image
+              className={`${styles.brandLogo} ${styles.brandLogoDark}`}
+              src="/assets/profile/nav-logo-dark.png"
               alt=""
               width={1494}
               height={591}
@@ -126,6 +137,7 @@ export default function SiteHeader() {
 
           <div className={styles.actions}>
             <WordBreak />
+            <ThemeToggle />
 
             <div className={styles.resumeCta}>
               <button type="button" className="ui-btn ui-btn--primary ui-btn--sm" onClick={() => setResumeOpen(true)}>

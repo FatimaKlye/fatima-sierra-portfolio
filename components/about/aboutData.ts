@@ -192,6 +192,8 @@ export type TechnologyItem = {
   name: string;
   mark: string;
   icon: string;
+  /** First-person, 1–2 sentences on how the tool is actually used. Projects are named only where the project data confirms it. */
+  usage: string;
 };
 
 export type TechnologyGroup = {
@@ -210,43 +212,138 @@ export const TECHNOLOGY_GROUPS: TechnologyGroup[] = [
     id: "frontend",
     label: "Frontend Development",
     items: [
-      { name: "Next.js", mark: "NX", icon: `${DEVICON_BASE}/nextjs/nextjs-original.svg` },
-      { name: "React", mark: "RE", icon: `${DEVICON_BASE}/react/react-original.svg` },
-      { name: "TypeScript", mark: "TS", icon: `${DEVICON_BASE}/typescript/typescript-original.svg` },
-      { name: "JavaScript", mark: "JS", icon: `${DEVICON_BASE}/javascript/javascript-original.svg` },
-      { name: "HTML", mark: "HT", icon: `${DEVICON_BASE}/html5/html5-original.svg` },
-      { name: "CSS", mark: "CS", icon: `${DEVICON_BASE}/css3/css3-original.svg` },
+      {
+        name: "Next.js",
+        mark: "NX",
+        icon: `${DEVICON_BASE}/nextjs/nextjs-original.svg`,
+        usage: "My framework for full web apps, with routing, pages and server logic in one place. I built Maddy & Cassy Rentals with it.",
+      },
+      {
+        name: "React",
+        mark: "RE",
+        icon: `${DEVICON_BASE}/react/react-original.svg`,
+        usage: "I build interfaces from reusable React components. It powers the front end of most of my web projects.",
+      },
+      {
+        name: "TypeScript",
+        mark: "TS",
+        icon: `${DEVICON_BASE}/typescript/typescript-original.svg`,
+        usage: "I use TypeScript to catch mistakes early and keep larger codebases easier to maintain, as in Maddy & Cassy Rentals.",
+      },
+      {
+        name: "JavaScript",
+        mark: "JS",
+        icon: `${DEVICON_BASE}/javascript/javascript-original.svg`,
+        usage: "The core language behind my web work. I use it for interactivity, app logic and handling data in the browser.",
+      },
+      {
+        name: "HTML",
+        mark: "HT",
+        icon: `${DEVICON_BASE}/html5/html5-original.svg`,
+        usage: "I use HTML to structure pages with semantic, accessible markup that every interface builds on.",
+      },
+      {
+        name: "CSS",
+        mark: "CS",
+        icon: `${DEVICON_BASE}/css3/css3-original.svg`,
+        usage: "I use CSS to style layouts, make designs responsive and add the motion that keeps interfaces polished.",
+      },
     ],
   },
   {
     id: "mobile",
     label: "Mobile Development",
     items: [
-      { name: "Flutter", mark: "FL", icon: `${DEVICON_BASE}/flutter/flutter-original.svg` },
-      { name: "Dart", mark: "DA", icon: `${DEVICON_BASE}/dart/dart-original.svg` },
-      { name: "Java", mark: "JV", icon: `${DEVICON_BASE}/java/java-original.svg` },
+      {
+        name: "Flutter",
+        mark: "FL",
+        icon: `${DEVICON_BASE}/flutter/flutter-original.svg`,
+        usage: "My framework for cross-platform mobile apps. I used it to build the IGNIS SAFE Android app.",
+      },
+      {
+        name: "Dart",
+        mark: "DA",
+        icon: `${DEVICON_BASE}/dart/dart-original.svg`,
+        usage: "The language I write Flutter apps in. I use it for app logic, state and connecting IGNIS SAFE Mobile to Supabase.",
+      },
+      {
+        name: "Java",
+        mark: "JV",
+        icon: `${DEVICON_BASE}/java/java-original.svg`,
+        usage: "I use Java for object-oriented programming, structuring application logic with classes and reusable code.",
+      },
     ],
   },
   {
     id: "backend-database",
     label: "Backend & Database",
     items: [
-      { name: "Supabase", mark: "SU", icon: `${DEVICON_BASE}/supabase/supabase-original.svg` },
-      { name: "PostgreSQL", mark: "PG", icon: `${DEVICON_BASE}/postgresql/postgresql-original.svg` },
+      {
+        name: "Supabase",
+        mark: "SU",
+        icon: `${DEVICON_BASE}/supabase/supabase-original.svg`,
+        usage: "My go-to backend for authentication and databases. It connects IGNIS SAFE and Maddy & Cassy Rentals to live data.",
+      },
+      {
+        name: "PostgreSQL",
+        mark: "PG",
+        icon: `${DEVICON_BASE}/postgresql/postgresql-original.svg`,
+        usage: "The database behind my Supabase work. I use it to design tables and relationships and manage structured app data.",
+      },
     ],
   },
   {
     id: "tools",
     label: "Development Tools",
     items: [
-      { name: "Git", mark: "GT", icon: `${DEVICON_BASE}/git/git-original.svg` },
-      { name: "GitHub", mark: "GH", icon: `${DEVICON_BASE}/github/github-original.svg` },
-      { name: "Visual Studio Code", mark: "VS", icon: `${DEVICON_BASE}/vscode/vscode-original.svg` },
-      { name: "Cursor", mark: "CU", icon: `${SIMPLE_ICONS_BASE}/cursor.svg` },
-      { name: "Figma", mark: "FI", icon: `${DEVICON_BASE}/figma/figma-original.svg` },
-      { name: "Canva", mark: "CV", icon: `${SIMPLE_ICONS_BASE}/canva.svg` },
-      { name: "ChatGPT", mark: "AI", icon: `${SIMPLE_ICONS_BASE}/openai.svg` },
-      { name: "Claude", mark: "AI", icon: `${SIMPLE_ICONS_BASE}/claude.svg` },
+      {
+        name: "Git",
+        mark: "GT",
+        icon: `${DEVICON_BASE}/git/git-original.svg`,
+        usage: "I use Git to track code changes and manage different versions of my work.",
+      },
+      {
+        name: "GitHub",
+        mark: "GH",
+        icon: `${DEVICON_BASE}/github/github-original.svg`,
+        usage: "Where I store my repositories, manage code, and collaborate on projects.",
+      },
+      {
+        name: "Visual Studio Code",
+        mark: "VS",
+        icon: `${DEVICON_BASE}/vscode/vscode-original.svg`,
+        usage: "My main code editor for writing, organizing, and debugging projects.",
+      },
+      {
+        name: "Cursor",
+        mark: "CU",
+        icon: `${SIMPLE_ICONS_BASE}/cursor.svg`,
+        usage: "An AI-assisted code editor I use to speed up development and troubleshoot issues.",
+      },
+      {
+        name: "Figma",
+        mark: "FI",
+        icon: `${DEVICON_BASE}/figma/figma-original.svg`,
+        usage: "I use Figma to plan layouts, design interfaces, and prototype website concepts.",
+      },
+      {
+        name: "Canva",
+        mark: "CV",
+        icon: `${SIMPLE_ICONS_BASE}/canva.svg`,
+        usage: "My tool for creating presentations, graphics, and other visual materials.",
+      },
+      {
+        name: "ChatGPT",
+        mark: "AI",
+        icon: `${SIMPLE_ICONS_BASE}/openai.svg`,
+        usage: "I use it to explore solutions, understand concepts, and troubleshoot development problems.",
+      },
+      {
+        name: "Claude",
+        mark: "AI",
+        icon: `${SIMPLE_ICONS_BASE}/claude.svg`,
+        usage: "I use it to review code, refine implementations, and explore development approaches.",
+      },
     ],
   },
 ];

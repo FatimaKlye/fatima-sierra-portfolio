@@ -62,8 +62,8 @@
   padding: clamp(10px, 1.4vw, 18px);
   border: 0;
   border-radius: 16px;
-  background: var(--color-white);
-  box-shadow: 0 1px 0 rgba(59, 42, 52, 0.04), var(--shadow-card);
+  background: var(--color-card);
+  box-shadow: 0 1px 0 rgb(var(--rgb-shadow) / 0.04), var(--shadow-card);
   cursor: zoom-in;
   overflow: hidden;
   transition: box-shadow 400ms ease;
@@ -95,7 +95,7 @@
   gap: 6px;
   padding: 7px 12px;
   border-radius: 999px;
-  background: rgba(59, 42, 52, 0.78);
+  background: rgb(var(--rgb-shadow) / 0.78);
   color: var(--color-white);
   font-size: 0.7rem;
   font-weight: 600;
@@ -108,7 +108,7 @@
 
 @media (hover: hover) {
   .frame:hover {
-    box-shadow: 0 1px 0 rgba(59, 42, 52, 0.04), 0 28px 60px -24px rgba(166, 61, 104, 0.35);
+    box-shadow: 0 1px 0 rgb(var(--rgb-shadow) / 0.04), 0 28px 60px -24px rgb(var(--rgb-shadow-tint) / 0.35);
   }
 
   .frame:hover .image {
@@ -246,7 +246,7 @@
 .arrow:not(:disabled):hover {
   border-color: var(--color-primary);
   background: var(--color-primary);
-  color: var(--color-white);
+  color: var(--color-on-primary);
 }
 
 .arrow:focus-visible {

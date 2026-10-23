@@ -1,6 +1,15 @@
 "use client";
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, type MouseEvent, type PointerEvent } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type FocusEvent,
+  type MouseEvent,
+  type PointerEvent,
+} from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import gsap from "gsap";
@@ -23,8 +32,12 @@ const pad = (value: number) => String(value).padStart(2, "0");
 const plural = (count: number) => `${count} project${count === 1 ? "" : "s"}`;
 /** The projects index reads this and highlights the projects built with the tool. */
 const techHref = (name: string) => `/projects?tech=${encodeURIComponent(name)}`;
+/** Id of the hidden usage note each tool is described by. */
+const noteId = (name: string) => `skill-note-${name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
 
 const HIDE_DELAY = 240; // ms — long enough to travel from a tool into the spotlight
+const GAP = 10; // px between a tool and its spotlight
+const EDGE = 8; // px kept clear of the viewport edge and the fixed header
 const HINTS: Record<Mode, string> = {
   pointer: "Click to see them in Projects",
   touch: "Tap again to see them in Projects",
@@ -169,8 +182,9 @@ export default function SkillIndex({ groups }: SkillIndexProps) {
     [hide]
   );
 
-  // Place the spotlight under its tool: reveal from the top the first time,
-  // glide between tools afterwards, and cross-fade the content when it changes.
+  // Place the spotlight under its tool — or above it when the viewport runs out
+  // below and there is room under the fixed header. Reveal from the tool's side
+  // the first time, glide between tools afterwards, cross-fade changed content.
   useLayoutEffect(() => {
     const root = rootRef.current;
     const panel = panelRef.current;
@@ -181,7 +195,13 @@ export default function SkillIndex({ groups }: SkillIndexProps) {
     const anchorBox = anchor.getBoundingClientRect();
     const maxX = Math.max(rootBox.width - panel.offsetWidth, 0);
     const x = Math.min(Math.max(anchorBox.left - rootBox.left, 0), maxX);
-    const y = anchorBox.bottom - rootBox.top + 10;
+    const height = panel.offsetHeight;
+    const header = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--header-height")) || 0;
+    const fitsBelow = anchorBox.bottom + GAP + height <= window.innerHeight - EDGE;
+    const fitsAbove = anchorBox.top - GAP - height >= header + EDGE;
+    const above = !fitsBelow && fitsAbove;
+    panel.dataset.placement = above ? "top" : "bottom";
+    const y = above ? anchorBox.top - rootBox.top - GAP - height : anchorBox.bottom - rootBox.top + GAP;
     const reduced = reducedRef.current;
     const changed = lastNameRef.current !== spot.name;
     lastNameRef.current = spot.name;
@@ -194,7 +214,7 @@ export default function SkillIndex({ groups }: SkillIndexProps) {
       if (reduced) return;
       gsap.fromTo(
         panel,
-        { y: y + 8, clipPath: "inset(0% 0% 100% 0%)" },
+        { y: above ? y - 8 : y + 8, clipPath: above ? "inset(100% 0% 0% 0%)" : "inset(0% 0% 100% 0%)" },
         { y, clipPath: "inset(0% 0% 0% 0%)", duration: 0.6, ease: "power4.out", clearProps: "clipPath" }
       );
       if (ruleRef.current) {
@@ -378,6 +398,19 @@ export default function SkillIndex({ groups }: SkillIndexProps) {
     },
   });
 
+  /** Keyboard focus opens the spotlight; leaving the tool closes it. */
+  const focusHandlers = (item: SkillEntry) => ({
+    onKeyDown: () => {
+      lastPointerRef.current = "";
+    },
+    onFocus: (event: FocusEvent<HTMLElement>) => {
+      if (isFocusVisible(event.currentTarget)) show(item, event.currentTarget, "keyboard");
+    },
+    onBlur: (event: FocusEvent<HTMLElement>) => {
+      if (modeRef.current === "keyboard" && anchorRef.current === event.currentTarget) scheduleHide(120);
+    },
+  });
+
   const onLinkClick = (item: SkillEntry) => (event: MouseEvent<HTMLAnchorElement>) => {
     const pointer = lastPointerRef.current;
     lastPointerRef.current = "";
@@ -394,13 +427,14 @@ export default function SkillIndex({ groups }: SkillIndexProps) {
     navigate(item, tech);
   };
 
-  const onStaticClick = (item: SkillEntry) => (event: MouseEvent<HTMLSpanElement>) => {
+  /** Tools without projects: tap or Enter toggles the spotlight; a mouse already opened it on hover. */
+  const onStaticClick = (item: SkillEntry) => (event: MouseEvent<HTMLButtonElement>) => {
     const pointer = lastPointerRef.current;
     lastPointerRef.current = "";
-    if (pointer !== "touch") return;
+    if (pointer && pointer !== "touch") return;
     const tech = event.currentTarget;
     if (shownRef.current && anchorRef.current === tech) hide();
-    else show(item, tech, "touch");
+    else show(item, tech, pointer === "touch" ? "touch" : "keyboard");
   };
 
   return (
@@ -446,17 +480,10 @@ export default function SkillIndex({ groups }: SkillIndexProps) {
                           className={styles.tech}
                           href={techHref(item.name)}
                           data-tech
+                          aria-describedby={noteId(item.name)}
                           {...techHandlers(item)}
+                          {...focusHandlers(item)}
                           onClick={onLinkClick(item)}
-                          onKeyDown={() => {
-                            lastPointerRef.current = "";
-                          }}
-                          onFocus={(event) => {
-                            if (isFocusVisible(event.currentTarget)) show(item, event.currentTarget, "keyboard");
-                          }}
-                          onBlur={(event) => {
-                            if (modeRef.current === "keyboard" && anchorRef.current === event.currentTarget) scheduleHide(120);
-                          }}
                         >
                           {inner}
                           <span className="sr-only">
@@ -464,15 +491,21 @@ export default function SkillIndex({ groups }: SkillIndexProps) {
                           </span>
                         </Link>
                       ) : (
-                        <span
+                        <button
+                          type="button"
                           className={`${styles.tech} ${styles.techStatic}`}
                           data-tech
+                          aria-describedby={noteId(item.name)}
                           {...techHandlers(item)}
+                          {...focusHandlers(item)}
                           onClick={onStaticClick(item)}
                         >
                           {inner}
-                        </span>
+                        </button>
                       )}
+                      <span id={noteId(item.name)} hidden>
+                        {item.usage}
+                      </span>
                     </li>
                   );
                 })}
@@ -497,34 +530,34 @@ export default function SkillIndex({ groups }: SkillIndexProps) {
         <span ref={ruleRef} className={styles.spotRule} />
         {current && spot && (
           <div ref={innerRef} className={styles.spotInner}>
-            <p className={styles.spotKicker}>
-              <span>{current.projects.length > 0 ? "Used in" : current.groupLabel}</span>
-              {current.projects.length > 0 && <span>{pad(current.projects.length)}</span>}
-            </p>
-            {current.projects.length > 0 ? (
-              <ul className={styles.spotList}>
-                {current.projects.map((project) => (
-                  <li key={project.slug}>
-                    <Link
-                      className={styles.spotLink}
-                      href={`/projects/${project.slug}`}
-                      tabIndex={-1}
-                      onMouseDown={(event) => event.preventDefault()}
-                    >
-                      {project.title}
-                      <ArrowUpRight size={14} strokeWidth={1.75} aria-hidden="true" />
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className={styles.spotNote}>Part of my development toolkit — not tied to a featured case study.</p>
-            )}
+            <p className={styles.spotKicker}>{current.groupLabel}</p>
+            <p className={styles.spotNote}>{current.usage}</p>
             {current.projects.length > 0 && (
-              <p className={styles.spotHint}>
-                {navigating ? "Opening Projects…" : HINTS[spot.mode]}
-                <ArrowRight size={12} strokeWidth={2} aria-hidden="true" />
-              </p>
+              <>
+                <p className={styles.spotLabel}>
+                  <span>Used in</span>
+                  <span>{pad(current.projects.length)}</span>
+                </p>
+                <ul className={styles.spotList}>
+                  {current.projects.map((project) => (
+                    <li key={project.slug}>
+                      <Link
+                        className={styles.spotLink}
+                        href={`/projects/${project.slug}`}
+                        tabIndex={-1}
+                        onMouseDown={(event) => event.preventDefault()}
+                      >
+                        {project.title}
+                        <ArrowUpRight size={14} strokeWidth={1.75} aria-hidden="true" />
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+                <p className={styles.spotHint}>
+                  {navigating ? "Opening Projects…" : HINTS[spot.mode]}
+                  <ArrowRight size={12} strokeWidth={2} aria-hidden="true" />
+                </p>
+              </>
             )}
           </div>
         )}

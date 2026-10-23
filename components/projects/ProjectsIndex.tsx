@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useSyncExternalStore, type CSSProperties }
 import Image from "next/image";
 import Link from "next/link";
 import gsap from "gsap";
+import { getLastNavigation } from "@/components/navigation/ScrollManager";
 import styles from "./ProjectsShowcase.module.css";
 
 export type ProjectIndexItem = {
@@ -39,7 +40,8 @@ export default function ProjectsIndex({ items }: { items: ProjectIndexItem[] }) 
   const matchCount = tech ? items.filter((item) => item.skills.includes(tech)).length : 0;
 
   useEffect(() => {
-    if (!tech) return;
+    // Back/Forward returns to where the visitor was; only a fresh arrival glides to the index.
+    if (!tech || getLastNavigation() === "traverse") return;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     // Let the route's scroll-to-top settle, then glide down to the index.
     const timer = window.setTimeout(() => {

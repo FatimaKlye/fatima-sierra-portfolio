@@ -132,7 +132,15 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Tools without projects are buttons (focusable, tappable) styled like the links. */
 .techStatic {
+  appearance: none;
+  border: 0;
+  background: none;
+  font-family: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+  text-align: inherit;
   cursor: default;
 }
 
@@ -204,14 +212,14 @@ a.tech[data-current] .techName {
 }
 
 .row[data-active] .count {
-  background: var(--color-white);
+  background: var(--color-card);
 }
 
 .tech:hover .count,
 .tech:focus-visible .count,
 .tech[data-current] .count {
   background: var(--color-primary);
-  color: var(--color-white);
+  color: var(--color-on-primary);
 }
 
 /* Spotlight ------------------------------------------------------------------ */
@@ -221,12 +229,11 @@ a.tech[data-current] .techName {
   top: 0;
   left: 0;
   z-index: 5;
-  width: max-content;
-  max-width: min(300px, 100%);
+  width: min(300px, 100%);
   padding: 14px 16px 12px;
   border: 1px solid var(--color-border);
   border-radius: 10px;
-  background: var(--color-white);
+  background: var(--color-card);
   box-shadow: var(--shadow-card);
   opacity: 0;
   visibility: hidden;
@@ -242,6 +249,12 @@ a.tech[data-current] .techName {
   height: 12px;
 }
 
+/* Flipped above its tool: the bridge moves under the panel. */
+.spot[data-placement="top"]::before {
+  top: 100%;
+  bottom: auto;
+}
+
 .spotRule {
   position: absolute;
   top: -1px;
@@ -253,9 +266,6 @@ a.tech[data-current] .techName {
 }
 
 .spotKicker {
-  display: flex;
-  justify-content: space-between;
-  gap: 24px;
   margin: 0;
   color: var(--color-primary);
   font-size: 10px;
@@ -265,7 +275,23 @@ a.tech[data-current] .techName {
   text-transform: uppercase;
 }
 
-.spotKicker span + span {
+/* "Used in" sub-label, separated from the usage note by a hairline. */
+.spotLabel {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  margin: 10px 0 0;
+  padding-top: 9px;
+  border-top: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.spotLabel span + span {
   color: var(--color-secondary);
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.12em;
@@ -309,11 +335,11 @@ a.tech[data-current] .techName {
 }
 
 .spotNote {
-  max-width: 30ch;
   margin: 6px 0 0;
-  color: var(--color-text-muted);
-  font-size: 0.82rem;
-  line-height: 1.6;
+  color: var(--color-text-primary);
+  font-size: 0.84rem;
+  line-height: 1.55;
+  text-wrap: pretty;
 }
 
 .spotHint {

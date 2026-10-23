@@ -5,6 +5,8 @@ import SiteHeader from "@/components/layout/SiteHeader";
 import IntroGate from "@/components/intro/IntroGate";
 import { INTRO_SCRIPT } from "@/components/intro/introScript";
 import FairyDust from "@/components/motion/FairyDust";
+import ScrollManager from "@/components/navigation/ScrollManager";
+import { THEME_SCRIPT } from "@/lib/themeScript";
 import SectionNav from "@/components/navigation/SectionNav";
 import "./globals.css";
 
@@ -27,12 +29,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    // The inline script may flag <html> for the entrance intro before React hydrates.
-    <html lang="en" suppressHydrationWarning>
+    // The inline scripts set the theme and may flag <html> for the entrance intro before React hydrates.
+    // data-scroll-behavior: Next turns the global smooth scrolling off during route changes, so
+    // a new page opens at the top instantly instead of gliding there (and being interrupted).
+    <html lang="en" data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
         <script dangerouslySetInnerHTML={{ __html: INTRO_SCRIPT }} />
       </head>
       <body className={poppins.variable}>
+        <ScrollManager />
         <SiteHeader />
         <SectionNav />
         {children}

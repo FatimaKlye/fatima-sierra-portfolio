@@ -8,6 +8,7 @@ import {
   normalizePhone,
   PHONE_INPUT_FILTER,
 } from "@/lib/contactValidation";
+import { getTheme } from "@/lib/theme";
 import styles from "./ContactPanel.module.css";
 
 type FormValues = {
@@ -140,7 +141,8 @@ function TurnstileBox({ siteKey, resetKey, onToken, onLoadError }: TurnstileBoxP
 
         widgetIdRef.current = api.render(hostRef.current, {
           sitekey: siteKey,
-          theme: "light",
+          // Matched once at render; re-rendering on a theme switch would discard a solved challenge.
+          theme: getTheme(),
           appearance: "interaction-only",
           callback: (token) => onToken(token),
           "expired-callback": () => onToken(""),

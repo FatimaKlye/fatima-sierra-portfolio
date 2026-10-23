@@ -1,5 +1,7 @@
+import { getTheme, subscribeTheme } from "@/lib/theme";
+
 /**
- * A still, blush-white pool with a faint "F" resting beneath it.
+ * A still, blush-white (or, in dark mode, deep charcoal) pool with a faint "F" resting beneath it.
  *
  * Classic two-buffer height-field ripples run on a coarse grid (~90k cells at most), and each
  * cell refracts and shades the background texture by the local slope. The canvas is sized to the
@@ -22,9 +24,34 @@ const REFRACTION = 0.07; // texture cells displaced per unit of slope
 const SHADING = 0.42; // brightness per unit of slope
 const MAX_SHADE = 46;
 
-const BASE_TOP = "#fff9fb"; // --color-background
-const BASE_BOTTOM = "#fcf0f5";
-const GLYPH_COLOR = "rgba(166, 61, 104, 0.1)"; // --color-primary, barely there
+interface Palette {
+  top: string;
+  bottom: string;
+  glyph: string;
+  /** Per-channel (r, g, b) response to slope: crests lift by `crest`, troughs deepen by `trough`. */
+  crest: [number, number, number];
+  trough: [number, number, number];
+}
+
+const PALETTES: Record<"light" | "dark", Palette> = {
+  // Crests lift toward white; troughs deepen toward rose rather than grey.
+  light: {
+    top: "#fff9fb", // --color-background
+    bottom: "#fcf0f5",
+    glyph: "rgba(166, 61, 104, 0.1)", // --color-primary, barely there
+    crest: [0.4, 1, 0.75],
+    trough: [0.3, 0.95, 0.62],
+  },
+  // Crests catch a dusty-rose sheen; troughs settle gently toward the charcoal floor.
+  dark: {
+    top: "#161215", // a breath above --color-background
+    bottom: "#121012",
+    glyph: "rgba(219, 130, 168, 0.12)", // dark --color-primary, barely there
+    crest: [1, 0.62, 0.8],
+    trough: [0.25, 0.3, 0.28],
+  },
+};
+
 export const GLYPH_CENTER_Y = 0.45; // fraction of the viewport height
 
 export function createRippleSurface(canvas: HTMLCanvasElement, { animate }: { animate: boolean }): RippleSurface {
@@ -52,15 +79,17 @@ export function createRippleSurface(canvas: HTMLCanvasElement, { animate }: { an
   let nextAmbient = 0;
   let destroyed = false;
   let dirty = true;
+  let palette = PALETTES[getTheme()];
 
   const fontFamily = getComputedStyle(document.body).fontFamily || "sans-serif";
 
   const paintTexture = () => {
+    palette = PALETTES[getTheme()];
     texture.width = W;
     texture.height = H;
     const gradient = tctx.createLinearGradient(0, 0, 0, H);
-    gradient.addColorStop(0, BASE_TOP);
-    gradient.addColorStop(1, BASE_BOTTOM);
+    gradient.addColorStop(0, palette.top);
+    gradient.addColorStop(1, palette.bottom);
     tctx.fillStyle = gradient;
     tctx.fillRect(0, 0, W, H);
 
@@ -72,7 +101,7 @@ export function createRippleSurface(canvas: HTMLCanvasElement, { animate }: { an
     const glyphWidth = m.actualBoundingBoxLeft + m.actualBoundingBoxRight;
     const x = W / 2 - glyphWidth / 2 + m.actualBoundingBoxLeft;
     const y = H * GLYPH_CENTER_Y + (m.actualBoundingBoxAscent - m.actualBoundingBoxDescent) / 2;
-    tctx.fillStyle = GLYPH_COLOR;
+    tctx.fillStyle = palette.glyph;
     tctx.fillText("F", x, y);
 
     const pixels = tctx.getImageData(0, 0, W, H).data;
@@ -89,6 +118,8 @@ export function createRippleSurface(canvas: HTMLCanvasElement, { animate }: { an
   };
 
   const render = () => {
+    const [crestR, crestG, crestB] = palette.crest;
+    const [troughR, troughG, troughB] = palette.trough;
     for (let y = 1; y < H - 1; y++) {
       let i = y * W + 1;
       for (let x = 1; x < W - 1; x++, i++) {
@@ -115,18 +146,17 @@ export function createRippleSurface(canvas: HTMLCanvasElement, { animate }: { an
         if (shade > MAX_SHADE) shade = MAX_SHADE;
         else if (shade < -MAX_SHADE) shade = -MAX_SHADE;
 
-        // Crests lift toward white; troughs deepen toward rose rather than grey.
         let r = texR[j] * w00 + texR[j + 1] * w10 + texR[j + W] * w01 + texR[j + W + 1] * w11;
         let g = texG[j] * w00 + texG[j + 1] * w10 + texG[j + W] * w01 + texG[j + W + 1] * w11;
         let b = texB[j] * w00 + texB[j + 1] * w10 + texB[j + W] * w01 + texB[j + W + 1] * w11;
         if (shade > 0) {
-          r += shade * 0.4;
-          g += shade;
-          b += shade * 0.75;
+          r += shade * crestR;
+          g += shade * crestG;
+          b += shade * crestB;
         } else {
-          r += shade * 0.3;
-          g += shade * 0.95;
-          b += shade * 0.62;
+          r += shade * troughR;
+          g += shade * troughG;
+          b += shade * troughB;
         }
         r = r < 0 ? 0 : r > 255 ? 255 : r | 0;
         g = g < 0 ? 0 : g > 255 ? 255 : g | 0;
@@ -232,6 +262,12 @@ export function createRippleSurface(canvas: HTMLCanvasElement, { animate }: { an
     render();
   });
   window.addEventListener("resize", onResize);
+  // A theme change from elsewhere (system, another tab) repaints the pool in place.
+  const unsubscribeTheme = subscribeTheme(() => {
+    if (destroyed) return;
+    paintTexture();
+    render();
+  });
   if (animate) frame = requestAnimationFrame(tick);
 
   return {
@@ -242,6 +278,7 @@ export function createRippleSurface(canvas: HTMLCanvasElement, { animate }: { an
       cancelAnimationFrame(frame);
       cancelAnimationFrame(resizeFrame);
       window.removeEventListener("resize", onResize);
+      unsubscribeTheme();
     },
   };
 }

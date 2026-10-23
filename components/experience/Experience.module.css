@@ -218,7 +218,7 @@
   font-weight: 700;
   letter-spacing: -0.07em;
   line-height: 1;
-  -webkit-text-stroke: 1px rgba(166, 61, 104, 0.18);
+  -webkit-text-stroke: 1px rgb(var(--rgb-primary) / 0.18);
   pointer-events: none;
 }
 
@@ -309,7 +309,7 @@
 
 .credentials {
   padding: var(--section-space) 0;
-  background: #2a1c24;
+  background: var(--color-plum);
   color: #efe3e9;
 }
 

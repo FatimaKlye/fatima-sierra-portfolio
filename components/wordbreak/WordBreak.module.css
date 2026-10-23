@@ -21,8 +21,8 @@
   --wb-present-text: #5b4614;
   --wb-absent: #d9d0d5;
   --wb-absent-text: #5b4d55;
-  --wb-scrim: rgba(59, 42, 52, 0.42);
-  --wb-shadow: 0 32px 80px -28px rgba(59, 42, 52, 0.42), 0 2px 6px rgba(166, 61, 104, 0.06);
+  --wb-scrim: rgb(var(--rgb-shadow) / 0.42);
+  --wb-shadow: 0 32px 80px -28px rgb(var(--rgb-shadow) / 0.42), 0 2px 6px rgb(var(--rgb-shadow-tint) / 0.06);
   --wb-toast-bg: var(--color-text-primary);
   --wb-toast-text: #ffffff;
   --wb-sparkle-a: #e8a0bf;
@@ -33,12 +33,12 @@
 :global(html[data-theme="dark"]) .overlay,
 :global(html.dark) .trigger,
 :global(html.dark) .overlay {
-  --wb-surface: #1d1519;
-  --wb-text: #f6e9ef;
-  --wb-muted: #bca8b2;
-  --wb-line: #3a2c33;
-  --wb-accent: #e48bb0;
-  --wb-trigger-bg: #251a20;
+  --wb-surface: var(--color-card);
+  --wb-text: var(--color-text-primary);
+  --wb-muted: var(--color-text-muted);
+  --wb-line: var(--color-border);
+  --wb-accent: var(--color-primary);
+  --wb-trigger-bg: var(--color-card);
   --wb-tile-border: #3e2f37;
   --wb-filled-bg: #251a20;
   --wb-filled-border: #a8728c;
@@ -100,13 +100,13 @@
     border-color: var(--wb-accent);
     background: var(--wb-accent);
     color: var(--wb-surface);
-    box-shadow: 0 10px 20px -10px rgba(166, 61, 104, 0.65);
+    box-shadow: 0 10px 20px -10px rgb(var(--rgb-shadow-tint) / 0.65);
     animation: triggerFlip 460ms ease-in-out;
   }
 }
 
 .trigger:focus-visible {
-  outline: 3px solid rgba(166, 61, 104, 0.32);
+  outline: 3px solid rgb(var(--rgb-primary) / 0.32);
   outline-offset: 2px;
 }
 
@@ -218,7 +218,7 @@
 }
 
 .close:focus-visible {
-  outline: 3px solid rgba(166, 61, 104, 0.32);
+  outline: 3px solid rgb(var(--rgb-primary) / 0.32);
   outline-offset: 2px;
 }
 
@@ -353,7 +353,7 @@
   padding: 7px 14px;
   border-radius: 999px;
   background: var(--wb-toast-bg);
-  box-shadow: 0 10px 24px -12px rgba(59, 42, 52, 0.5);
+  box-shadow: 0 10px 24px -12px rgb(var(--rgb-shadow) / 0.5);
   color: var(--wb-toast-text);
   font-size: 0.74rem;
   font-weight: 500;
