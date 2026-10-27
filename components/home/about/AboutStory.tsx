@@ -4,6 +4,7 @@ import { HERO_CONTENT } from "@/components/about/aboutData";
 import EditorialMotion from "@/components/motion/EditorialMotion";
 import AboutOpening from "./AboutOpening";
 import RecipeToCode from "./RecipeToCode";
+import TableAndRecord from "./TableAndRecord";
 import {
   COLLEGE,
   DEANS_LIST,
@@ -12,16 +13,11 @@ import {
   KITCHEN_PHOTO,
   MARQUEE_WORDS,
   MEDALS,
-  PHOTOGRAPHER_ROLE,
   PROJECT_PLATES,
   SENIOR_HIGH,
   SENIOR_HIGH_HONORS,
-  SERVICE_ROLES,
-  TEAM_SKILLS,
 } from "./aboutStoryData";
 import styles from "./AboutStory.module.css";
-
-const KITCHEN_VALUES = ["Patience", "Precision", "Creativity", "Problem-solving"];
 
 const MEDAL_ICONS = [
   // Cooking pot
@@ -266,61 +262,8 @@ export default function AboutStory() {
           </div>
         </article>
 
-        {/* Beyond the code ------------------------------------------------- */}
-        <div className={`${styles.container} ${styles.table}`} id="what-i-bring" data-nav-label="What I bring">
-          <h2 className={styles.blockTitle} data-reveal>
-            What I bring <em>to the table.</em>
-          </h2>
-          <div className={styles.tableCols} data-stagger>
-            <div>
-              <p className={styles.tableLabel}>Carried over from the kitchen</p>
-              <ul className={styles.tableList}>
-                {KITCHEN_VALUES.map((value) => (
-                  <li key={value}>{value}</li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <p className={styles.tableLabel}>Sharpened in teams</p>
-              <ul className={styles.tableList}>
-                {TEAM_SKILLS.map((skill) => (
-                  <li key={skill}>{skill}</li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <p className={styles.tableLabel}>Away from the keyboard</p>
-              <ul className={`${styles.tableList} ${styles.tableListDetail}`}>
-                <li>
-                  Cooking &amp; baking
-                  <span>Cookery and Bread &amp; Pastry Production NC II</span>
-                </li>
-                {PHOTOGRAPHER_ROLE && (
-                  <li>
-                    Behind the camera
-                    <span>
-                      {PHOTOGRAPHER_ROLE.role}, {PHOTOGRAPHER_ROLE.organization}
-                    </span>
-                  </li>
-                )}
-                {SERVICE_ROLES.length > 0 && (
-                  <li>
-                    Student service
-                    {SERVICE_ROLES.map((role) => (
-                      <span key={role.role}>
-                        {role.role}, {role.organization}
-                      </span>
-                    ))}
-                  </li>
-                )}
-              </ul>
-            </div>
-          </div>
-          {/* Honours, leadership and education live in one place: the Experience page. */}
-          <Link className={`ui-btn ui-btn--secondary ${styles.inlineCta}`} href="/experience" data-reveal>
-            Honours, Leadership &amp; Education
-          </Link>
-        </div>
+        {/* What I bring to the table + Honours, Leadership & Education ---- */}
+        <TableAndRecord />
 
         {/* Finale: approach + what's next ----------------------------------- */}
         <div className={styles.finale} id="whats-next" data-nav-label="What’s next">

@@ -1049,54 +1049,6 @@
   margin-top: clamp(32px, 4vw, 48px);
 }
 
-/* What I bring to the table ------------------------------------------------- */
-
-.table {
-  padding: var(--section-space) 0;
-  border-top: 1px solid var(--color-border);
-}
-
-.tableCols {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.35fr);
-  gap: clamp(28px, 4vw, 64px);
-  margin-top: clamp(32px, 4vw, 52px);
-}
-
-.tableLabel {
-  margin: 0 0 6px;
-  color: var(--color-primary);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-}
-
-.tableList {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.tableList li {
-  padding: 12px 0;
-  border-bottom: 1px solid var(--color-border);
-  color: var(--color-text-primary);
-  font-size: clamp(0.98rem, 1.3vw, 1.12rem);
-  font-weight: 500;
-  letter-spacing: -0.01em;
-}
-
-.tableListDetail li span {
-  display: block;
-  margin-top: 3px;
-  color: var(--color-text-muted);
-  font-size: 0.76rem;
-  font-weight: 400;
-  letter-spacing: 0;
-  line-height: 1.5;
-}
-
 /* Finale -------------------------------------------------------------------- */
 
 .finale {
@@ -1280,7 +1232,6 @@
     justify-self: center;
   }
 
-  .tableCols { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 640px) {
@@ -1301,8 +1252,7 @@
   }
 
   .method,
-  .chapter,
-  .table { padding: 56px 0; }
+  .chapter { padding: 56px 0; }
 
   .recipeCell,
   .codeCell {

@@ -1,18 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import {
-  CAPABILITIES,
-  CERTIFICATES,
-  CORE_KNOWLEDGE,
-  LEARNING_EXPOSURE,
-  PROFESSIONAL_SKILLS,
-} from "@/components/about/aboutData";
-import PageHero from "@/components/editorial/PageHero";
+import { CERTIFICATES, LEARNING_EXPOSURE, PROFESSIONAL_SKILLS } from "@/components/about/aboutData";
 import EditorialMotion from "@/components/motion/EditorialMotion";
 import CertificateCarousel from "@/components/skills/CertificateCarousel";
-import SkillsExplorer from "@/components/skills/SkillsExplorer";
-import { ALL_SKILLS, SKILL_GROUPS } from "@/components/skills/skillsData";
+import PracticeIndex from "@/components/skills/PracticeIndex";
+import SkillsHero from "@/components/skills/SkillsHero";
+import SkillsPointer from "@/components/skills/SkillsPointer";
+import StackConstellation from "@/components/skills/StackConstellation";
+import { PRACTICE_AREAS, SKILL_PROJECTS, STACK_SIDES } from "@/components/skills/skillsData";
 import styles from "@/components/skills/Skills.module.css";
 
 export const metadata: Metadata = {
@@ -21,95 +17,66 @@ export const metadata: Metadata = {
     "The languages, frameworks, tools and practices Fatima Klye M. Sierra uses to build responsive web and mobile applications — Next.js, React, TypeScript, Flutter, Supabase and more.",
 };
 
-const pad = (value: number) => String(value).padStart(2, "0");
-
 // Featured certifications lead the rail; the rest follow in their existing order.
 const CAROUSEL_CERTIFICATES = [
   ...CERTIFICATES.filter((certificate) => certificate.featured),
   ...CERTIFICATES.filter((certificate) => !certificate.featured),
 ];
 
+const PROJECT_IMAGES = Object.fromEntries(SKILL_PROJECTS.map((project) => [project.slug, project.image]));
+
 export default function SkillsPage() {
   return (
     <EditorialMotion>
-      <main>
-        <PageHero
-          label="Skills"
-          eyebrow="Technical expertise"
-          index={pad(ALL_SKILLS.length)}
-          title={<>A toolkit for <em>working products.</em></>}
-          intro="The languages, frameworks and tools I reach for — and the practices around them. Select any technology to see the projects where I actually used it."
-          meta={[
-            { label: "Technologies", value: pad(ALL_SKILLS.length) },
-            { label: "Categories", value: pad(SKILL_GROUPS.length) },
-            { label: "Core areas", value: pad(CORE_KNOWLEDGE.length) },
-          ]}
-        />
+      <main className={styles.page}>
+        <SkillsHero />
 
-        <section className={styles.section} id="toolkit" aria-labelledby="toolkit-title" data-nav-label="Toolkit">
+        <section className={`${styles.section} ${styles.stage}`} id="stack" aria-labelledby="stack-title" data-nav-label="Core stack">
           <div className={styles.container}>
-            <header className={styles.head}>
-              <p className={styles.kicker} data-reveal>01 — Toolkit</p>
-              <h2 id="toolkit-title" className={styles.title} data-reveal>
-                Languages, frameworks <em>&amp; tools.</em>
-              </h2>
+            <header className={styles.splitHead}>
+              <div>
+                <p className={styles.kicker} data-reveal>01 — Core stack</p>
+                <h2 id="stack-title" className={styles.title} data-reveal>
+                  Every tool, <em>wired to the work.</em>
+                </h2>
+              </div>
+              <p className={styles.headNote} data-reveal>
+                Each line joins a technology to a project whose stack lists it. Hover, tap or tab through a
+                technology to see how I use it — or point at a project to trace what it was built with.
+              </p>
             </header>
-            <SkillsExplorer groups={SKILL_GROUPS} />
+            <StackConstellation sides={STACK_SIDES} projects={SKILL_PROJECTS} initial="React" />
           </div>
         </section>
 
-        <section className={`${styles.section} ${styles.surface}`} id="capabilities" aria-labelledby="capabilities-title" data-nav-label="Capabilities">
+        <section className={styles.section} id="practice" aria-labelledby="practice-title" data-nav-label="In practice">
           <div className={styles.container}>
-            <header className={styles.head}>
-              <p className={styles.kicker} data-reveal>02 — Capabilities</p>
-              <h2 id="capabilities-title" className={styles.title} data-reveal>
-                What I can <em>take on.</em>
-              </h2>
+            <header className={styles.splitHead}>
+              <div>
+                <p className={styles.kicker} data-reveal>02 — In practice</p>
+                <h2 id="practice-title" className={styles.title} data-reveal>
+                  What the stack <em>turns into.</em>
+                </h2>
+              </div>
+              <p className={styles.headNote} data-reveal>
+                Three areas I build in, and five practices that keep the work usable, tested and easy to hand
+                over.
+              </p>
             </header>
-            <ol className={styles.verbs}>
-              {CAPABILITIES.map((capability) => (
-                <li className={styles.verbRow} key={capability.id} data-reveal>
-                  <span className={styles.verb}>{capability.verb}</span>
-                  <div>
-                    <h3 className={styles.verbTitle}>{capability.title}</h3>
-                    <p className={styles.verbText}>{capability.description}</p>
-                  </div>
-                </li>
-              ))}
-            </ol>
-          </div>
-        </section>
-
-        <section className={styles.section} id="knowledge" aria-labelledby="knowledge-title" data-nav-label="Knowledge areas">
-          <div className={styles.container}>
-            <header className={styles.head}>
-              <p className={styles.kicker} data-reveal>03 — Knowledge areas</p>
-              <h2 id="knowledge-title" className={styles.title} data-reveal>
-                The practice <em>around the code.</em>
-              </h2>
-            </header>
-            <ol className={styles.knowledge} data-stagger>
-              {CORE_KNOWLEDGE.map((item, index) => (
-                <li className={styles.knowledgeItem} key={item.title}>
-                  <span className={styles.knowledgeIndex} aria-hidden="true">{pad(index + 1)}</span>
-                  <h3 className={styles.knowledgeTitle}>{item.title}</h3>
-                  <p className={styles.knowledgeText}>{item.description}</p>
-                </li>
-              ))}
-            </ol>
+            <PracticeIndex areas={PRACTICE_AREAS} images={PROJECT_IMAGES} />
           </div>
         </section>
 
         <section className={`${styles.section} ${styles.surface}`} id="still-learning" aria-labelledby="growing-title" data-nav-label="Still learning">
           <div className={styles.container}>
-            <header className={styles.growingHead}>
+            <header className={styles.splitHead}>
               <div>
-                <p className={styles.kicker} data-reveal>04 — Still learning</p>
+                <p className={styles.kicker} data-reveal>03 — Still learning</p>
                 <h2 id="growing-title" className={styles.title} data-reveal>
                   Always adding <em>to the recipe.</em>
                 </h2>
               </div>
-              <p className={styles.growingIntro} data-reveal>
+              <p className={styles.headNote} data-reveal>
                 Concepts I&apos;ve explored through workshops, webinars and training — each one backed by a
                 certificate. Drag, swipe or use the arrows to browse; select one to see it up close.
               </p>
@@ -118,7 +85,7 @@ export default function SkillsPage() {
             <CertificateCarousel certificates={CAROUSEL_CERTIFICATES} />
 
             <div className={styles.viewAll} data-reveal>
-              <Link className="ui-btn ui-btn--secondary" href="/certifications">
+              <Link className="ui-btn ui-btn--secondary" href="/certifications" data-magnetic>
                 View All Certifications
                 <ArrowRight size={16} strokeWidth={1.75} aria-hidden="true" />
               </Link>
@@ -144,6 +111,8 @@ export default function SkillsPage() {
             </div>
           </div>
         </section>
+
+        <SkillsPointer />
       </main>
     </EditorialMotion>
   );

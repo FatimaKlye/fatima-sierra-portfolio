@@ -7,21 +7,50 @@
 /* Hero ------------------------------------------------------------------- */
 
 .hero {
+  /* Eyebrow pill + its gap to the headline: the portrait starts level with the headline. */
+  --hero-eyebrow-offset: 60px;
+
   position: relative;
-  padding: calc(var(--header-height) + clamp(36px, 5vw, 64px)) 0 clamp(56px, 6vw, 80px);
+  isolation: isolate;
+  padding: calc(var(--header-height) + clamp(28px, 4vw, 56px)) 0 clamp(64px, 7vw, 104px);
   border-bottom: 1px solid var(--color-border);
+  background: var(--color-background);
+}
+
+/* Blueprint grid, faded out toward the edges so it reads as texture, not a table. */
+.hero::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
   background:
-    linear-gradient(rgb(var(--rgb-primary) / 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(var(--rgb-primary) / 0.03) 1px, transparent 1px),
-    var(--color-background);
-  background-size: 40px 40px;
+    linear-gradient(rgb(var(--rgb-primary) / 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(var(--rgb-primary) / 0.05) 1px, transparent 1px);
+  background-size: 48px 48px;
+  content: "";
+  -webkit-mask-image: radial-gradient(ellipse 75% 70% at 62% 42%, #000 25%, transparent 80%);
+  mask-image: radial-gradient(ellipse 75% 70% at 62% 42%, #000 25%, transparent 80%);
+  pointer-events: none;
+}
+
+/* A soft blush wash behind the portrait gives the right side depth. */
+.hero::after {
+  position: absolute;
+  top: 2%;
+  right: -12%;
+  z-index: -1;
+  width: min(64vw, 860px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(var(--rgb-secondary) / 0.24), transparent);
+  content: "";
+  pointer-events: none;
 }
 
 .heroInner {
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(300px, 0.8fr);
-  align-items: center;
-  gap: clamp(40px, 6vw, 96px);
+  grid-template-columns: minmax(0, 1.1fr) minmax(300px, 0.9fr);
+  align-items: start;
+  gap: clamp(40px, 6vw, 88px);
   width: min(calc(100% - 64px), var(--page-max-width));
   margin: 0 auto;
 }
@@ -29,7 +58,6 @@
 .heroCopy {
   container: hero-copy / inline-size;
   min-width: 0;
-  animation: pageReveal 800ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .eyebrow {
@@ -72,10 +100,10 @@
 .heroTitle {
   margin: 28px 0 0;
   color: var(--color-text-primary);
-  font-size: clamp(2.75rem, 5.6vw, 5rem);
+  font-size: clamp(2.75rem, 6vw, 5.5rem);
   font-weight: 600;
   letter-spacing: -0.045em;
-  line-height: 1.04;
+  line-height: 1.02;
   text-align: left;
 }
 
@@ -88,12 +116,56 @@
   display: block;
 }
 
+/* Each word slides up inside its own mask. The padding/negative-margin pair gives
+   descenders ("p") and the tight tracking room without shifting the layout. */
+.wordMask {
+  display: inline-block;
+  overflow: hidden;
+  padding: 0 0.05em 0.14em;
+  margin: 0 -0.05em -0.14em;
+  vertical-align: top;
+}
+
+.word {
+  display: inline-block;
+}
+
+/* An outlined ampersand: a quiet typographic accent inside the pink line. */
+.amp {
+  color: transparent;
+  font-weight: 500;
+  -webkit-text-stroke: 0.03em var(--color-primary);
+}
+
+.underlined {
+  position: relative;
+  display: inline-block;
+}
+
+/* Hand-drawn underline under "apps"; it draws itself in after the words land. */
+.squiggle {
+  position: absolute;
+  left: 0.02em;
+  bottom: -0.16em;
+  width: calc(100% - 0.32em);
+  height: auto;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.squiggle path {
+  fill: none;
+  stroke: var(--color-secondary);
+  stroke-linecap: round;
+  stroke-width: 4;
+}
+
 /* Fixed size and an em-based measure (~65 characters), tuned so every line
    already fills ~90% before justifying — word spacing stays even and
    "National University – Dasmariñas" never leaves a stretched first line. */
 .heroLead {
   max-width: 33em;
-  margin: 28px 0 0;
+  margin: 32px 0 0;
   color: var(--color-text-muted);
   font-size: 1.0625rem;
   line-height: 1.75;
@@ -120,37 +192,60 @@
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  margin-top: 30px;
+  margin-top: 32px;
+}
+
+.iconForward,
+.iconDown,
+.iconUpRight {
+  transition: transform 360ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.actions a:hover .iconForward,
+.actions a:focus-visible .iconForward {
+  transform: translateX(4px);
+}
+
+.actions a:hover .iconDown,
+.actions a:focus-visible .iconDown {
+  transform: translateY(2px);
 }
 
 .quickLinks {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px 22px;
-  margin: 20px 0 0;
+  gap: 6px 24px;
+  margin: 22px 0 0;
   padding: 0;
   list-style: none;
 }
 
+/* Underline sweeps in from the left over a hairline track on hover. */
 .quickLinks a {
   display: inline-flex;
   min-height: 32px;
   align-items: center;
   gap: 6px;
+  background:
+    linear-gradient(var(--color-primary), var(--color-primary)) 0 calc(100% - 2px) / 0 2px no-repeat,
+    linear-gradient(var(--color-border), var(--color-border)) 0 calc(100% - 2px) / 100% 2px no-repeat;
   color: var(--color-text-primary);
   font-size: 0.86rem;
   font-weight: 600;
-  text-decoration: underline;
-  text-decoration-color: var(--color-border);
-  text-decoration-thickness: 2px;
-  text-underline-offset: 5px;
-  transition: color 200ms ease, text-decoration-color 200ms ease;
+  transition:
+    color 200ms ease,
+    background-size 420ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .quickLinks a:hover,
 .quickLinks a:focus-visible {
+  background-size: 100% 2px, 100% 2px;
   color: var(--color-primary);
-  text-decoration-color: var(--color-primary);
+}
+
+.quickLinks a:hover .iconUpRight,
+.quickLinks a:focus-visible .iconUpRight {
+  transform: translate(2px, -2px);
 }
 
 .stack {
@@ -158,7 +253,7 @@
   flex-wrap: wrap;
   align-items: baseline;
   gap: 10px 18px;
-  margin-top: 30px;
+  margin-top: 32px;
   padding-top: 20px;
   border-top: 1px solid var(--color-border);
 }
@@ -195,6 +290,11 @@
   width: 18px;
   height: 18px;
   object-fit: contain;
+  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.stackList li:hover img {
+  transform: translateY(-2px) rotate(-8deg);
 }
 
 .stackFallback {
@@ -203,34 +303,189 @@
   font-weight: 700;
 }
 
-/* Portrait --------------------------------------------------------------- */
+/* Portrait showcase ------------------------------------------------------ */
 
-.portraitComposition {
+/* Every layer is sized in cqi (1% of the showcase width), so the whole
+   composition scales as one piece from phone to desktop. */
+.showcase {
+  container-type: inline-size;
+  position: relative;
   justify-self: end;
-  width: min(100%, 420px);
-  animation: pageReveal 900ms 120ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  width: min(100%, 460px);
+  margin-top: var(--hero-eyebrow-offset);
 }
 
-.portraitFrame {
+.stage {
   position: relative;
   aspect-ratio: 4 / 5;
+}
+
+.glow {
+  position: absolute;
+  inset: -14% -18%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(var(--rgb-primary) / 0.14), transparent);
+  pointer-events: none;
+}
+
+/* A dotted orbit tilted behind the arch; only its ends show past the frame. */
+.orbit {
+  position: absolute;
+  top: 9cqi;
+  left: -17cqi;
+  width: 134cqi;
+  height: auto;
+  overflow: visible;
+  color: var(--color-primary);
+  rotate: -12deg;
+  pointer-events: none;
+}
+
+.orbit ellipse {
+  fill: none;
+  stroke: currentColor;
+  stroke-dasharray: 1 7;
+  stroke-linecap: round;
+  stroke-opacity: 0.5;
+  stroke-width: 1.4;
+}
+
+.orbit circle {
+  fill: currentColor;
+}
+
+/* The arch: a semicircular top over softly rounded feet. */
+.archEcho,
+.arch {
+  position: absolute;
+  inset: 0;
+  border-radius: 50cqi 50cqi 3.5cqi 3.5cqi;
+}
+
+/* Offset outline of the arch — editorial linework that adds depth. */
+.archEcho {
+  border: 1.5px solid rgb(var(--rgb-primary) / 0.5);
+  translate: 5cqi 4cqi;
+}
+
+/* The photo's white backdrop multiplies into this blush gradient, so the portrait
+   sits on brand colour with headroom instead of a hard white crop. The light centre
+   sits behind the face to keep skin tones natural; the deeper rim keeps the arch's
+   silhouette readable against the cream page. Same in both themes. */
+.arch {
   overflow: hidden;
-  border: 1px solid rgb(var(--rgb-primary) / 0.2);
-  border-radius: 4px;
-  background: var(--color-surface);
-  box-shadow: 20px 22px 0 rgb(var(--rgb-blush) / 0.85);
+  isolation: isolate;
+  background: radial-gradient(circle at 50% 34%, #fbeef3 0%, #efc9da 56%, #dea7bf 100%);
+  box-shadow: 0 50px 90px -50px rgb(var(--rgb-shadow-tint) / 0.6);
+}
+
+:root[data-theme="dark"] .arch {
+  box-shadow: 0 50px 90px -40px rgb(0 0 0 / 0.7);
+}
+
+.archMedia {
+  position: absolute;
+  top: 6cqi;
+  left: 0;
+  width: 100%;
+  aspect-ratio: 1166 / 1600;
+  mix-blend-mode: multiply;
 }
 
 .portraitImage {
   object-fit: cover;
-  object-position: center 12%;
+  object-position: center top;
+}
+
+/* Outlined surname overlapping the foot of the arch. */
+.outlineName {
+  position: absolute;
+  bottom: 7cqi;
+  left: -11cqi;
+  margin: 0;
+  color: transparent;
+  font-size: 29cqi;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 0.8;
+  -webkit-text-stroke: 1.5px var(--color-secondary);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Rotating circular badge, tucked into the corner the arch's curve leaves open. */
+.badge {
+  position: absolute;
+  top: 3cqi;
+  left: -11cqi;
+  width: 28cqi;
+  aspect-ratio: 1;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  background: var(--color-card);
+  box-shadow: 0 18px 40px -24px rgb(var(--rgb-shadow-tint) / 0.6);
+}
+
+.badgeRing {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  animation: badgeSpin 24s linear infinite;
+}
+
+.badgeRing text {
+  fill: var(--color-text-primary);
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.badgeCore {
+  position: absolute;
+  inset: 31%;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.badgeCore svg {
+  width: 48%;
+}
+
+.sparkleA,
+.sparkleB {
+  position: absolute;
+  pointer-events: none;
+}
+
+.sparkleA svg,
+.sparkleB svg {
+  width: 100%;
+  height: auto;
+}
+
+.sparkleA {
+  top: 11cqi;
+  right: -4cqi;
+  width: 8cqi;
+  color: var(--color-primary);
+}
+
+.sparkleB {
+  top: 60cqi;
+  left: -9cqi;
+  width: 4.5cqi;
+  color: var(--color-secondary);
 }
 
 .portraitCaption {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
-  margin: 40px 0 0;
+  margin: clamp(28px, 9cqi, 44px) 0 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border);
 }
 
 .portraitCaption dt {
@@ -248,9 +503,20 @@
   font-weight: 500;
 }
 
-@keyframes pageReveal {
-  from { opacity: 0; transform: translateY(16px); }
-  to { opacity: 1; transform: translateY(0); }
+/* Entrance hold ---------------------------------------------------------- */
+
+/* Until HeroMotion hydrates and sets its start states, the animated pieces stay
+   hidden so the first paint never flashes the finished layout. If scripts never
+   arrive, the failsafe reveals them after 3s. */
+@media (prefers-reduced-motion: no-preference) {
+  .heroInner:not([data-hero-ready]) :is([data-hero-reveal], [data-hero-word]) {
+    animation: heroFailsafe 1ms 3s both;
+  }
+}
+
+@keyframes heroFailsafe {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 @keyframes pulse {
@@ -258,9 +524,25 @@
   to { opacity: 0; transform: scale(1.6); }
 }
 
+@keyframes badgeSpin {
+  to { transform: rotate(360deg); }
+}
+
+/* Responsive ------------------------------------------------------------- */
+
+@media (max-width: 1024px) {
+  .badge {
+    left: -6cqi;
+  }
+
+  .outlineName {
+    left: -6cqi;
+  }
+}
+
 @media (max-width: 900px) {
   .heroInner {
-    grid-template-columns: minmax(0, 1fr) minmax(240px, 0.7fr);
+    grid-template-columns: minmax(0, 1fr) minmax(240px, 0.75fr);
     gap: 36px;
   }
 }
@@ -268,12 +550,29 @@
 @media (max-width: 760px) {
   .heroInner {
     grid-template-columns: 1fr;
-    gap: 48px;
+    gap: 56px;
   }
 
-  .portraitComposition {
-    justify-self: start;
-    width: min(100%, 340px);
+  .showcase {
+    justify-self: center;
+    width: min(100%, 400px);
+    margin-top: 0;
+  }
+
+  .badge {
+    left: -3cqi;
+  }
+
+  .outlineName {
+    left: -3cqi;
+  }
+
+  .sparkleA {
+    right: -1cqi;
+  }
+
+  .sparkleB {
+    left: -4cqi;
   }
 }
 
@@ -284,7 +583,7 @@
 
   .heroTitle {
     margin-top: 24px;
-    font-size: clamp(2.2rem, 10.5vw, 3rem);
+    font-size: clamp(2.3rem, 11vw, 3.1rem);
   }
 
   /* A phone-width column leaves too few words per line to justify cleanly. */
@@ -297,16 +596,18 @@
   .actions > a {
     flex: 1 1 auto;
   }
-
-  .portraitFrame {
-    box-shadow: 14px 16px 0 rgb(var(--rgb-blush) / 0.85);
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .heroCopy,
-  .portraitComposition,
-  .statusDot::after {
+  .statusDot::after,
+  .badgeRing {
     animation: none !important;
+  }
+
+  .iconForward,
+  .iconDown,
+  .iconUpRight,
+  .stackList img {
+    transition: none;
   }
 }

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import type { ReactNode, SVGProps } from "react";
 import { ArrowRight, ArrowUpRight, Download, Mail } from "lucide-react";
 import { CERTIFICATES, EDUCATION } from "@/components/about/aboutData";
 import { CONTACT_EMAIL, RESUME_URL, SOCIAL_LINKS } from "@/components/contact/contactData";
@@ -10,6 +11,7 @@ import { PREVIEW_SKILLS, SKILL_GROUPS } from "@/components/skills/skillsData";
 import AboutPreview from "./about/AboutPreview";
 import CredentialsTeaser from "./CredentialsTeaser";
 import GithubActivity from "./GithubActivity";
+import HeroMotion from "./HeroMotion";
 import PreviewHeader from "./PreviewHeader";
 import ProjectList from "./ProjectList";
 import Recommendations from "./Recommendations";
@@ -32,6 +34,29 @@ const GITHUB_LINK = SOCIAL_LINKS.find((link) => link.id === "github");
 const LINKEDIN_LINK = SOCIAL_LINKS.find((link) => link.id === "linkedin");
 const EMAIL_LINK = SOCIAL_LINKS.find((link) => link.id === "email");
 
+/** One headline word inside a clipping mask, so HeroMotion can slide it up into place. */
+function TitleWord({ children, className }: { children: ReactNode; className?: string }) {
+  return (
+    <span className={styles.wordMask}>
+      <span className={className ? `${styles.word} ${className}` : styles.word} data-hero-word>
+        {children}
+      </span>
+    </span>
+  );
+}
+
+/** Four-point sparkle, the same motif as the site's fairy-dust cursor. */
+function Sparkle({ className, ...rest }: SVGProps<SVGSVGElement>) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" aria-hidden="true" focusable="false" {...rest}>
+      <path
+        d="M12 0C12.8 7.2 16.8 11.2 24 12C16.8 12.8 12.8 16.8 12 24C11.2 16.8 7.2 12.8 0 12C7.2 11.2 11.2 7.2 12 0Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
 /**
  * The homepage answers a recruiter's first questions in order: who, what stack,
  * what was built (with my part in it), then the supporting record. Each section
@@ -45,59 +70,71 @@ export default async function HeroSection() {
   return (
     <div className={styles.home} data-home-page>
       <section className={styles.hero} id="home" aria-labelledby="home-hero-title" data-nav-label="Intro" data-nav-intro>
-        <div className={styles.heroInner}>
+        <HeroMotion className={styles.heroInner}>
           <div className={styles.heroCopy}>
-            <p className={styles.eyebrow}>
+            <p className={styles.eyebrow} data-hero-reveal="eyebrow">
               <span className={styles.statusDot} aria-hidden="true" />
               Open to internships &amp; junior developer roles
             </p>
             <h1 id="home-hero-title" className={styles.heroTitle}>
-              <span className={styles.titleLine}>I create</span>{" "}
+              <span className={styles.titleLine}>
+                <TitleWord>I</TitleWord> <TitleWord>create</TitleWord>
+              </span>{" "}
               <em>
-                <span className={styles.titleLine}>web &amp; mobile</span>{" "}
-                <span className={styles.titleLine}>apps.</span>
+                <span className={styles.titleLine}>
+                  <TitleWord>web</TitleWord> <TitleWord className={styles.amp}>&amp;</TitleWord>{" "}
+                  <TitleWord>mobile</TitleWord>
+                </span>{" "}
+                <span className={styles.titleLine}>
+                  <span className={styles.underlined}>
+                    <TitleWord>apps.</TitleWord>
+                    <svg className={styles.squiggle} viewBox="0 0 200 20" aria-hidden="true" focusable="false" data-hero-reveal="draw">
+                      <path d="M4 13C30 5 52 17 82 11S140 4 166 10 190 13 196 9" pathLength={1} />
+                    </svg>
+                  </span>
+                </span>
               </em>
             </h1>
-            <p className={styles.heroLead}>
+            <p className={styles.heroLead} data-hero-reveal="lead">
               A BS Information Technology student at {college.institution}, developing web and mobile applications
               using Next.js, React, Flutter, and Supabase. My work includes <strong>IGNIS SAFE</strong>, a fire safety
               learning application and web management system developed for the BFP Dasmariñas City Fire Station.
             </p>
 
             <div className={styles.actions}>
-              <Link className="ui-btn ui-btn--primary" href="#projects">
-                View Projects <ArrowRight size={16} aria-hidden="true" />
+              <Link className="ui-btn ui-btn--primary" href="#projects" data-hero-reveal="action" data-magnetic="0.25">
+                View Projects <ArrowRight size={16} aria-hidden="true" className={styles.iconForward} />
               </Link>
-              <a className="ui-btn ui-btn--secondary" href={RESUME_URL} download>
-                Download Resume <Download size={16} aria-hidden="true" />
+              <a className="ui-btn ui-btn--secondary" href={RESUME_URL} download data-hero-reveal="action" data-magnetic="0.25">
+                Download Resume <Download size={16} aria-hidden="true" className={styles.iconDown} />
               </a>
             </div>
 
             <ul className={styles.quickLinks} aria-label="Profiles and contact">
               {GITHUB_LINK && (
-                <li>
-                  <a href={GITHUB_LINK.href} target="_blank" rel="noreferrer" aria-label="GitHub profile (opens in a new tab)">
-                    GitHub <ArrowUpRight size={14} aria-hidden="true" />
+                <li data-hero-reveal="link">
+                  <a href={GITHUB_LINK.href} target="_blank" rel="noreferrer" aria-label="GitHub profile (opens in a new tab)" data-magnetic>
+                    GitHub <ArrowUpRight size={14} aria-hidden="true" className={styles.iconUpRight} />
                   </a>
                 </li>
               )}
               {LINKEDIN_LINK && (
-                <li>
-                  <a href={LINKEDIN_LINK.href} target="_blank" rel="noreferrer" aria-label="LinkedIn profile (opens in a new tab)">
-                    LinkedIn <ArrowUpRight size={14} aria-hidden="true" />
+                <li data-hero-reveal="link">
+                  <a href={LINKEDIN_LINK.href} target="_blank" rel="noreferrer" aria-label="LinkedIn profile (opens in a new tab)" data-magnetic>
+                    LinkedIn <ArrowUpRight size={14} aria-hidden="true" className={styles.iconUpRight} />
                   </a>
                 </li>
               )}
               {EMAIL_LINK && (
-                <li>
-                  <a href={EMAIL_LINK.href} target="_blank" rel="noreferrer" aria-label={`Email ${CONTACT_EMAIL} (opens Gmail in a new tab)`}>
+                <li data-hero-reveal="link">
+                  <a href={EMAIL_LINK.href} target="_blank" rel="noreferrer" aria-label={`Email ${CONTACT_EMAIL} (opens Gmail in a new tab)`} data-magnetic>
                     <Mail size={14} aria-hidden="true" /> Email
                   </a>
                 </li>
               )}
             </ul>
 
-            <div className={styles.stack}>
+            <div className={styles.stack} data-hero-reveal="stack">
               <p className={styles.stackLabel}>Core stack</p>
               <ul className={styles.stackList}>
                 {PREVIEW_SKILLS.map((skill) => (
@@ -110,18 +147,63 @@ export default async function HeroSection() {
             </div>
           </div>
 
-          <div className={styles.portraitComposition}>
-            <div className={styles.portraitFrame}>
-              <Image
-                src="/assets/profile/profile_picture.jpg"
-                alt="Professional portrait of Fatima Klye M. Sierra"
-                fill
-                priority
-                sizes="(max-width: 820px) 80vw, 420px"
-                className={styles.portraitImage}
-              />
+          {/* The portrait showcase: an arched frame layered with linework, an orbit, a spinning
+              badge and an outlined name. Everything except the photo and caption is decorative. */}
+          <div className={styles.showcase}>
+            <div className={styles.stage}>
+              <div className={styles.glow} aria-hidden="true" />
+              <svg
+                className={styles.orbit}
+                viewBox="0 0 600 240"
+                aria-hidden="true"
+                focusable="false"
+                data-hero-reveal="deco"
+                data-depth="0.6"
+                data-drift="-14"
+                data-turn="-8"
+              >
+                <ellipse cx="300" cy="120" rx="292" ry="104" />
+                <circle cx="540" cy="61" r="5" />
+              </svg>
+              <div className={styles.archEcho} aria-hidden="true" data-hero-reveal="deco" data-depth="1.3" data-drift="6" />
+              <div className={styles.arch} data-hero-reveal="portrait" data-depth="0.35">
+                <div className={styles.archMedia} data-hero-media>
+                  <Image
+                    src="/assets/profile/profile_picture.jpg"
+                    alt="Professional portrait of Fatima Klye M. Sierra"
+                    fill
+                    priority
+                    sizes="(max-width: 760px) 90vw, 460px"
+                    className={styles.portraitImage}
+                  />
+                </div>
+              </div>
+              <p className={styles.outlineName} aria-hidden="true" data-hero-reveal="deco" data-depth="-0.9" data-drift="-12">
+                Sierra
+              </p>
+              <div className={styles.badge} aria-hidden="true" data-hero-reveal="badge" data-depth="1.8">
+                <svg className={styles.badgeRing} viewBox="0 0 120 120" focusable="false">
+                  <defs>
+                    <path id="hero-badge-path" d="M60 60m-45 0a45 45 0 1 1 90 0a45 45 0 1 1 -90 0" />
+                  </defs>
+                  <text>
+                    <textPath href="#hero-badge-path" textLength="282" lengthAdjust="spacing">
+                      WEB &amp; MOBILE DEVELOPER · OPEN TO WORK ·
+                    </textPath>
+                  </text>
+                </svg>
+                <span className={styles.badgeCore}>
+                  <Sparkle />
+                </span>
+              </div>
+              <span className={styles.sparkleA} data-hero-reveal="deco">
+                <Sparkle data-float />
+              </span>
+              <span className={styles.sparkleB} data-hero-reveal="deco">
+                <Sparkle data-float />
+              </span>
             </div>
-            <dl className={styles.portraitCaption}>
+            <dl className={styles.portraitCaption} data-hero-reveal="caption">
               <div>
                 <dt>Name</dt>
                 <dd>Fatima Klye M. Sierra</dd>
@@ -132,7 +214,7 @@ export default async function HeroSection() {
               </div>
             </dl>
           </div>
-        </div>
+        </HeroMotion>
       </section>
 
       <section className={editorialStyles.section} id="projects" aria-labelledby="projects-title" data-nav-label="Projects">

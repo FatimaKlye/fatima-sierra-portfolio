@@ -75,6 +75,91 @@ export const SERVICE_ROLES = [...visibleRole("Former Registration Committee"), .
 
 export const TEAM_SKILLS = PROFESSIONAL_SKILLS;
 
+export const KITCHEN_VALUES = ["Patience", "Precision", "Creativity", "Problem-solving"];
+
+/* "Honours, Leadership & Education" record ----------------------------------
+   One chronological timeline assembled from the verified lists above. Titles,
+   organisations and dates are passed through untouched; only the grouping
+   (type + starting year) is derived. */
+
+export type RecordType = "award" | "certification" | "leadership" | "education";
+
+export type RecordEntry = {
+  id: string;
+  type: RecordType;
+  title: string;
+  organization: string;
+  /** The date exactly as recorded (a range, an academic year, or a calendar date). */
+  date: string;
+  /** Starting year, used only to place the entry on the timeline. */
+  year: number;
+  location?: string;
+};
+
+export const RECORD_TYPES: { id: RecordType; label: string; singular: string }[] = [
+  { id: "award", label: "Awards & honours", singular: "Award" },
+  { id: "certification", label: "Certifications", singular: "Certification" },
+  { id: "leadership", label: "Leadership roles", singular: "Leadership" },
+  { id: "education", label: "Education", singular: "Education" },
+];
+
+const firstYear = (text: string) => Number(text.match(/\d{4}/)?.[0] ?? 0);
+
+// Leadership records that name an award or recognition (e.g. "Leadership Awardee",
+// "Outstanding Club Member") are honours; "Former …" records are roles held.
+const isRoleHeld = (role: string) => role.startsWith("Former");
+const VISIBLE_LEADERSHIP = LEADERSHIP.filter((entry) => !entry.hidden);
+const TYPE_ORDER: RecordType[] = ["education", "award", "leadership", "certification"];
+
+export const RECORD_ENTRIES: RecordEntry[] = [
+  ...EDUCATION.map((entry) => ({
+    id: `edu-${entry.institution}`,
+    type: "education" as const,
+    title: entry.detail,
+    organization: entry.institution,
+    location: entry.location,
+    date: entry.years,
+    year: firstYear(entry.years),
+  })),
+  ...ACHIEVEMENTS.map((entry) => ({
+    id: `award-${entry.title}`,
+    type: "award" as const,
+    title: entry.title,
+    organization: entry.institution,
+    date: entry.years,
+    year: firstYear(entry.years),
+  })),
+  ...VISIBLE_LEADERSHIP.map((entry) => ({
+    id: `lead-${entry.organization}-${entry.role}`,
+    type: isRoleHeld(entry.role) ? ("leadership" as const) : ("award" as const),
+    title: entry.role,
+    organization: entry.organization,
+    date: entry.years,
+    year: firstYear(entry.years),
+  })),
+  ...CERTIFICATES.filter((entry) => entry.category === "professional").map((entry) => ({
+    id: `cert-${entry.id}`,
+    type: "certification" as const,
+    title: `${entry.type} — ${entry.title}`,
+    organization: entry.issuer,
+    date: entry.date ?? "",
+    year: firstYear(entry.date?.slice(-4) ?? ""),
+  })),
+]
+  .filter((entry) => entry.year > 0)
+  .sort((a, b) => a.year - b.year || TYPE_ORDER.indexOf(a.type) - TYPE_ORDER.indexOf(b.type));
+
+/** Timeline rows: one per starting year, in order. */
+export const RECORD_YEARS = Array.from(new Set(RECORD_ENTRIES.map((entry) => entry.year))).map((year) => ({
+  year,
+  entries: RECORD_ENTRIES.filter((entry) => entry.year === year),
+}));
+
+/** Certificates beyond the professional ones (completions, workshops, webinars), counted not listed. */
+export const OTHER_CERTIFICATE_COUNT = CERTIFICATES.filter((entry) => entry.category !== "professional").length;
+
+export const LEADERSHIP_ROLE_COUNT = VISIBLE_LEADERSHIP.filter((entry) => isRoleHeld(entry.role)).length;
+
 export type CodeToken = {
   kind: "keyword" | "fn" | "string" | "tag" | "plain";
   text: string;

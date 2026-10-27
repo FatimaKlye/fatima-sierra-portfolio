@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import PageHero from "@/components/editorial/PageHero";
-import EditorialMotion from "@/components/motion/EditorialMotion";
-import ProjectsShowcase, { SHOWCASE_PROJECTS } from "@/components/projects/ProjectsShowcase";
-import styles from "@/components/projects/ProjectsShowcase.module.css";
+import ProjectChapters from "@/components/projects/ProjectChapters";
+import ProjectsHero from "@/components/projects/ProjectsHero";
+import ProjectsMotion from "@/components/projects/ProjectsMotion";
+import styles from "@/components/projects/ProjectsPage.module.css";
 
 export const metadata: Metadata = {
   title: "Projects | Fatima Sierra",
@@ -11,43 +11,42 @@ export const metadata: Metadata = {
     "Web and mobile projects by Fatima Klye M. Sierra — public-safety platforms, campus systems and commerce apps built with Next.js, React, Flutter and Supabase.",
 };
 
-const count = (predicate: (project: (typeof SHOWCASE_PROJECTS)[number]) => boolean) =>
-  String(SHOWCASE_PROJECTS.filter(predicate).length).padStart(2, "0");
-
 export default function ProjectsPage() {
   return (
-    <EditorialMotion>
+    <ProjectsMotion>
       <main>
-        <PageHero
-          label="Projects"
-          eyebrow="Selected work"
-          index={String(SHOWCASE_PROJECTS.length).padStart(2, "0")}
-          title={<>Systems built for <em>real people.</em></>}
-          intro="Every project here started with a practical need — a fire station, a campus office, a small business — and ended with a clearer way to get something done. Open any of them for the full case study."
-          meta={[
-            { label: "Projects", value: String(SHOWCASE_PROJECTS.length).padStart(2, "0") },
-            { label: "Web", value: count((project) => project.category.startsWith("Web")) },
-            { label: "Mobile", value: count((project) => project.category.startsWith("Mobile")) },
-            { label: "Live", value: count((project) => Boolean(project.liveUrl)) },
-          ]}
-        />
+        <ProjectsHero />
 
-        <ProjectsShowcase />
+        <ProjectChapters />
 
         <section className={styles.closing} id="work-together" aria-labelledby="projects-closing-title" data-nav-label="Work together">
-          <h2 id="projects-closing-title" className={styles.closingTitle} data-reveal>
-            Have a problem worth <em>building for?</em>
-          </h2>
-          <div className={styles.closingActions} data-reveal>
-            <Link className="ui-btn ui-btn--light" href="/contact">
-              Let&apos;s Work Together
-            </Link>
-            <Link className="ui-btn ui-btn--ghost-light" href="/skills">
-              See the Toolkit
-            </Link>
+          <div className={styles.closingInner}>
+            <p className={styles.closingKicker} data-reveal>
+              Next project
+            </p>
+            <h2 id="projects-closing-title" className={styles.closingTitle}>
+              <span className={styles.mask}>
+                <span data-word>Have a problem</span>
+              </span>{" "}
+              <em>
+                <span className={styles.mask}>
+                  <span data-word>worth building for?</span>
+                </span>
+              </em>
+            </h2>
+            <div className={styles.closingActions} data-reveal>
+              <span className={styles.magnet} data-magnetic>
+                <Link className="ui-btn ui-btn--light ui-btn--lg" href="/contact">
+                  Let&apos;s Work Together
+                </Link>
+              </span>
+              <Link className="ui-btn ui-btn--ghost-light ui-btn--lg" href="/skills">
+                See the Toolkit
+              </Link>
+            </div>
           </div>
         </section>
       </main>
-    </EditorialMotion>
+    </ProjectsMotion>
   );
 }
