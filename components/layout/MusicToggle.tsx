@@ -27,6 +27,7 @@ export default function MusicToggle() {
   const ringRef = useRef<HTMLSpanElement>(null);
   const timers = useRef<{ show?: number; hide?: number }>({});
   const inputType = useRef("mouse");
+  const refocusing = useRef(false);
   const labelId = useId();
 
   const playing = status === "playing";
@@ -71,32 +72,40 @@ export default function MusicToggle() {
     const bars = barsRef.current ? Array.from(barsRef.current.children) : [];
     if (!bars.length) return;
     const still = reducedMotion();
+    let tweens: gsap.core.Tween[];
 
-    if (playing) {
-      if (still) {
-        gsap.to(bars, { scaleY: (i: number) => STILL_LEVELS[i], duration: 0.2 });
-      } else {
-        bars.forEach((bar, i) =>
-          gsap.to(bar, {
-            scaleY: "random(0.32, 1)",
-            duration: "random(0.32, 0.6)",
-            ease: "sine.inOut",
-            repeat: -1,
-            repeatRefresh: true,
-            delay: i * 0.07,
-          })
-        );
-      }
+    if (playing && !still) {
+      tweens = bars.map((bar, i) =>
+        gsap.to(bar, {
+          scaleY: "random(0.32, 1)",
+          duration: "random(0.32, 0.6)",
+          ease: "sine.inOut",
+          repeat: -1,
+          repeatRefresh: true,
+          delay: i * 0.07,
+          overwrite: true,
+        })
+      );
+    } else if (playing) {
+      tweens = [gsap.to(bars, { scaleY: (i: number) => STILL_LEVELS[i], duration: 0.2, overwrite: true })];
     } else if (status === "loading" && !still) {
-      gsap.to(bars, { scaleY: 0.62, duration: 0.44, ease: "sine.inOut", repeat: -1, yoyo: true, stagger: 0.11 });
+      tweens = [
+        gsap.to(bars, {
+          scaleY: 0.62,
+          duration: 0.44,
+          ease: "sine.inOut",
+          repeat: -1,
+          yoyo: true,
+          stagger: 0.11,
+          overwrite: true,
+        }),
+      ];
     } else {
-      gsap.to(bars, { scaleY: REST_SCALE, duration: still ? 0 : 0.5, ease: "power3.out" });
+      tweens = [gsap.to(bars, { scaleY: REST_SCALE, duration: still ? 0 : 0.5, ease: "power3.out", overwrite: true })];
     }
 
     // Kill rather than revert, so the next state animates on from wherever the bars are.
-    return () => {
-      gsap.killTweensOf(bars);
-    };
+    return () => tweens.forEach((tween) => tween.kill());
   }, [playing, status]);
 
   // Close on taps outside the control.
@@ -151,6 +160,7 @@ export default function MusicToggle() {
   };
 
   const handleFocus = (event: FocusEvent<HTMLDivElement>) => {
+    if (refocusing.current) return; // focus handed back by Escape shouldn't reopen the card
     if (event.target.matches(":focus-visible")) show();
   };
 
@@ -162,7 +172,9 @@ export default function MusicToggle() {
     if (event.key !== "Escape" || !open) return;
     event.stopPropagation();
     hide();
+    refocusing.current = true;
     buttonRef.current?.focus({ preventScroll: true });
+    refocusing.current = false;
   };
 
   const handleVolume = (event: ChangeEvent<HTMLInputElement>) => {

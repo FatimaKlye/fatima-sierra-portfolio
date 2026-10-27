@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
 import type { MouseEvent } from "react";
 import WordBreak from "@/components/wordbreak/WordBreak";
+import MusicToggle from "./MusicToggle";
 import ResumeModal from "./ResumeModal";
 import ThemeToggle from "./ThemeToggle";
 import styles from "./SiteHeader.module.css";
@@ -137,6 +138,7 @@ export default function SiteHeader() {
 
           <div className={styles.actions}>
             <WordBreak />
+            <MusicToggle />
             <ThemeToggle />
 
             <div className={styles.resumeCta}>
