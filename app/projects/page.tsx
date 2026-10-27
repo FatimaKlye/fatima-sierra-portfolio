@@ -4,12 +4,14 @@ import ProjectChapters from "@/components/projects/ProjectChapters";
 import ProjectsHero from "@/components/projects/ProjectsHero";
 import ProjectsMotion from "@/components/projects/ProjectsMotion";
 import styles from "@/components/projects/ProjectsPage.module.css";
+import { pageMetadata } from "@/lib/site";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
+  path: "/projects",
   title: "Projects | Fatima Sierra",
   description:
     "Web and mobile projects by Fatima Klye M. Sierra — public-safety platforms, campus systems and commerce apps built with Next.js, React, Flutter and Supabase.",
-};
+});
 
 export default function ProjectsPage() {
   return (

@@ -16,6 +16,7 @@ import ProjectNext from "@/components/project-details/ProjectNext";
 import ProjectOutcomes from "@/components/project-details/ProjectOutcomes";
 import ProjectProblem from "@/components/project-details/ProjectProblem";
 import ProjectStack from "@/components/project-details/ProjectStack";
+import { SITE_NAME } from "@/lib/site";
 
 type ProjectPageProps = {
   params: Promise<{ slug: string }>;
@@ -33,10 +34,16 @@ export async function generateMetadata({ params }: ProjectPageProps): Promise<Me
     return { title: "Project not found | Fatima Sierra" };
   }
 
+  const path = `/projects/${project.slug}`;
+
   return {
     title: `${project.title} — Case Study | Fatima Sierra`,
     description: project.summary,
+    alternates: { canonical: path },
     openGraph: {
+      type: "website",
+      siteName: SITE_NAME,
+      url: path,
       title: `${project.title} — Case Study`,
       description: project.summary,
     },

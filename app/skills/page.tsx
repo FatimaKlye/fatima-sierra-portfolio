@@ -10,12 +10,14 @@ import SkillsPointer from "@/components/skills/SkillsPointer";
 import StackConstellation from "@/components/skills/StackConstellation";
 import { PRACTICE_AREAS, SKILL_PROJECTS, STACK_SIDES } from "@/components/skills/skillsData";
 import styles from "@/components/skills/Skills.module.css";
+import { pageMetadata } from "@/lib/site";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
+  path: "/skills",
   title: "Skills | Fatima Sierra",
   description:
     "The languages, frameworks, tools and practices Fatima Klye M. Sierra uses to build responsive web and mobile applications — Next.js, React, TypeScript, Flutter, Supabase and more.",
-};
+});
 
 // Featured certifications lead the rail; the rest follow in their existing order.
 const CAROUSEL_CERTIFICATES = [

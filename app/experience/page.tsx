@@ -11,12 +11,14 @@ import PageHero from "@/components/editorial/PageHero";
 import { DEVELOPMENT_EXPERIENCE } from "@/components/experience/experienceData";
 import EditorialMotion from "@/components/motion/EditorialMotion";
 import styles from "@/components/experience/Experience.module.css";
+import { pageMetadata } from "@/lib/site";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
+  path: "/experience",
   title: "Experience | Fatima Sierra",
   description:
     "The development roles, education, leadership and recognition of Fatima Klye M. Sierra, BS Information Technology student and web & mobile developer.",
-};
+});
 
 const pad = (value: number) => String(value).padStart(2, "0");
 

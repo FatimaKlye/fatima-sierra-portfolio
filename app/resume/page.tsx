@@ -2,12 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { RESUME_URL } from "@/components/contact/contactData";
 import styles from "./Resume.module.css";
+import { pageMetadata } from "@/lib/site";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
+  path: "/resume",
   title: "Resume | Fatima Sierra",
   description:
     "Resume of Fatima Klye M. Sierra — web and mobile developer working with Next.js, React, TypeScript, Flutter and Supabase.",
-};
+});
 
 export default function ResumePage() {
   return (

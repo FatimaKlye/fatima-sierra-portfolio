@@ -3,12 +3,14 @@ import { CERTIFICATES, CERTIFICATE_FILTERS } from "@/components/about/aboutData"
 import CredentialsSection from "@/components/about/CredentialsSection";
 import PageHero from "@/components/editorial/PageHero";
 import EditorialMotion from "@/components/motion/EditorialMotion";
+import { pageMetadata } from "@/lib/site";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
+  path: "/certifications",
   title: "Certifications | Fatima Sierra",
   description:
     "Certificates, certifications, workshops, training, and webinar credentials earned by Fatima Klye M. Sierra.",
-};
+});
 
 const pad = (value: number) => String(value).padStart(2, "0");
 

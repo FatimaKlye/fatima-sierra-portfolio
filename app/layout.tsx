@@ -7,6 +7,7 @@ import IntroGate from "@/components/intro/IntroGate";
 import { INTRO_SCRIPT } from "@/components/intro/introScript";
 import FairyDust from "@/components/motion/FairyDust";
 import ScrollManager from "@/components/navigation/ScrollManager";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 import { THEME_SCRIPT } from "@/lib/themeScript";
 import SectionNav from "@/components/navigation/SectionNav";
 import "./globals.css";
@@ -18,10 +19,12 @@ const poppins = Poppins({
   display: "swap",
 });
 
+// metadataBase turns each page's relative canonical and Open Graph URL into an absolute one on the primary domain.
 export const metadata: Metadata = {
-  title: "Fatima Sierra — Portfolio",
-  description:
-    "Portfolio of Fatima Sierra, a web and mobile developer creating purposeful, reliable, and user-centered digital solutions for public safety, education, sustainability, and connected communities.",
+  metadataBase: new URL(SITE_URL),
+  title: SITE_NAME,
+  description: SITE_DESCRIPTION,
+  openGraph: { type: "website", siteName: SITE_NAME, title: SITE_NAME, description: SITE_DESCRIPTION },
 };
 
 export default function RootLayout({
