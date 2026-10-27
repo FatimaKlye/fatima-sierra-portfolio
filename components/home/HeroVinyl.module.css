@@ -1,0 +1,405 @@
+/* The hero's circular badge as a miniature record, tucked into the corner the arch's curve leaves
+   open. Layers, back to front: halo (glow while playing), plate (the static card, border and
+   shadow), disc (grooves, lettering and label, the only part that turns), sheen (light that stays
+   put), control (upright icons), ripple (click feedback). */
+
+.badge {
+  position: absolute;
+  top: 3cqi;
+  left: -11cqi;
+  width: 28cqi;
+  aspect-ratio: 1;
+  --caption-x: -50%;
+}
+
+.vinyl {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition: scale 480ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.vinyl:focus-visible {
+  outline-offset: 5px;
+}
+
+.halo,
+.plate,
+.disc,
+.grooves,
+.label,
+.sheen,
+.control,
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.halo {
+  inset: 0;
+  box-shadow:
+    0 0 0 1px rgb(var(--rgb-primary) / 0.32),
+    0 0 36px 6px rgb(var(--rgb-primary) / 0.42);
+  opacity: 0;
+  transition: opacity 700ms ease;
+}
+
+.badge[data-active] .halo {
+  opacity: 1;
+  animation: haloBreathe 3.6s ease-in-out infinite;
+}
+
+.plate {
+  inset: 0;
+  border: 1px solid var(--color-border);
+  background: var(--color-card);
+  box-shadow: 0 18px 40px -24px rgb(var(--rgb-shadow-tint) / 0.6);
+}
+
+.disc {
+  inset: 0;
+  will-change: transform;
+}
+
+/* Fine concentric grooves between the label and the lettering, with two track gaps. */
+.grooves {
+  inset: 15%;
+  background:
+    radial-gradient(
+      circle closest-side,
+      transparent 71%,
+      rgb(var(--rgb-primary) / 0.22) 71.5% 73%,
+      transparent 73.5% 87%,
+      rgb(var(--rgb-primary) / 0.16) 87.5% 89%,
+      transparent 89.5%
+    ),
+    repeating-radial-gradient(
+      circle,
+      transparent 0 1.6px,
+      color-mix(in srgb, var(--color-text-primary) 9%, transparent) 1.6px 2.1px
+    );
+}
+
+.ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.ring text {
+  fill: var(--color-text-primary);
+  font-size: 9px;
+  font-weight: 600;
+}
+
+/* The pink centre label, lit from the top left, with a burgundy rim. */
+.label {
+  inset: 31%;
+  background: radial-gradient(
+    circle at 34% 28%,
+    color-mix(in srgb, var(--color-primary) 78%, white),
+    var(--color-primary) 58%,
+    color-mix(in srgb, var(--color-primary) 74%, black)
+  );
+  box-shadow:
+    inset 0 0 0 1.5px color-mix(in srgb, var(--color-primary) 62%, black),
+    inset 0 0 0 4px rgb(255 255 255 / 0.14);
+}
+
+/* An off-centre printed mark, so the label visibly turns with the record. */
+.label::after {
+  content: "";
+  position: absolute;
+  top: 11%;
+  left: 50%;
+  width: 7%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.6);
+  translate: -50% 0;
+}
+
+.badge[data-status="loading"] .label {
+  animation: labelPulse 1s ease-in-out infinite alternate;
+}
+
+/* Studio light glancing off the vinyl. It stays still while the disc turns beneath it. */
+.sheen {
+  inset: 1px;
+  background: conic-gradient(
+    from 300deg,
+    transparent 0deg,
+    rgb(var(--rgb-primary) / 0.16) 24deg,
+    transparent 54deg 180deg,
+    rgb(var(--rgb-primary) / 0.11) 204deg,
+    transparent 234deg
+  );
+  -webkit-mask: radial-gradient(circle closest-side, transparent 39%, #000 41% 96%, transparent 98%);
+  mask: radial-gradient(circle closest-side, transparent 39%, #000 41% 96%, transparent 98%);
+}
+
+.control {
+  inset: 31%;
+  display: grid;
+  place-items: center;
+  color: var(--color-on-primary);
+}
+
+.control svg {
+  grid-area: 1 / 1;
+  width: 46%;
+  height: auto;
+  transition:
+    opacity 260ms ease,
+    scale 460ms cubic-bezier(0.22, 1, 0.36, 1),
+    rotate 460ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.play,
+.pause {
+  opacity: 0;
+  scale: 0.45;
+}
+
+.play {
+  rotate: -45deg;
+  translate: 6% 0; /* optical centring: a triangle's mass sits left of its box */
+}
+
+.pause {
+  rotate: 45deg;
+}
+
+.badge[data-active] .sparkle {
+  opacity: 0;
+  scale: 0.45;
+  rotate: 90deg;
+}
+
+.badge[data-active] .pause {
+  opacity: 1;
+  scale: 1;
+  rotate: 0deg;
+}
+
+.badge:not([data-active]) .vinyl:focus-visible .sparkle {
+  opacity: 0;
+  scale: 0.45;
+  rotate: 90deg;
+}
+
+.badge:not([data-active]) .vinyl:focus-visible .play {
+  opacity: 1;
+  scale: 1;
+  rotate: 0deg;
+}
+
+.ripple {
+  inset: 0;
+  border: 1.5px solid var(--color-primary);
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* Small pill under the record: "Now playing" while music is on, the action on hover or focus. */
+.caption {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 50%;
+  display: grid;
+  width: max-content;
+  padding: 6px 11px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-card);
+  box-shadow: 0 10px 24px -16px rgb(var(--rgb-shadow-tint) / 0.6);
+  color: var(--color-text-primary);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0;
+  translate: var(--caption-x) -4px;
+  pointer-events: none;
+  transition:
+    opacity 240ms ease,
+    translate 380ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.hint,
+.now {
+  display: inline-flex;
+  grid-area: 1 / 1;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  transition: opacity 200ms ease;
+}
+
+.hint {
+  opacity: 0;
+}
+
+.badge:is([data-active], [data-status="error"]) .caption,
+.vinyl:focus-visible ~ .caption {
+  opacity: 1;
+  translate: var(--caption-x) 0;
+}
+
+.vinyl:focus-visible ~ .caption .hint {
+  opacity: 1;
+}
+
+.vinyl:focus-visible ~ .caption .now {
+  opacity: 0;
+}
+
+.bars {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 9px;
+}
+
+.bars span {
+  width: 2px;
+  height: 100%;
+  border-radius: 1px;
+  background: var(--color-primary);
+  transform-origin: bottom;
+  scale: 1 0.3;
+  animation: eq 820ms ease-in-out infinite alternate;
+  animation-play-state: paused;
+}
+
+.bars span:nth-child(2) {
+  animation-duration: 560ms;
+  animation-delay: -240ms;
+}
+
+.bars span:nth-child(3) {
+  animation-duration: 940ms;
+  animation-delay: -520ms;
+}
+
+.bars span:nth-child(4) {
+  animation-duration: 680ms;
+  animation-delay: -110ms;
+}
+
+.badge[data-status="playing"] .bars span {
+  animation-play-state: running;
+}
+
+.badge[data-status="error"] .bars {
+  display: none;
+}
+
+/* Hover only where it's real, so a tap on a phone doesn't leave the record stuck "hovered". */
+@media (hover: hover) and (pointer: fine) {
+  .vinyl:hover {
+    scale: 1.05;
+  }
+
+  .badge:not([data-active]) .vinyl:hover .sparkle {
+    opacity: 0;
+    scale: 0.45;
+    rotate: 90deg;
+  }
+
+  .badge:not([data-active]) .vinyl:hover .play {
+    opacity: 1;
+    scale: 1;
+    rotate: 0deg;
+  }
+
+  .vinyl:hover ~ .caption {
+    opacity: 1;
+    translate: var(--caption-x) 0;
+  }
+
+  .vinyl:hover ~ .caption .hint {
+    opacity: 1;
+  }
+
+  .vinyl:hover ~ .caption .now {
+    opacity: 0;
+  }
+}
+
+@keyframes haloBreathe {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+@keyframes labelPulse {
+  to {
+    scale: 0.94;
+  }
+}
+
+@keyframes eq {
+  to {
+    scale: 1 1;
+  }
+}
+
+/* Responsive ------------------------------------------------------------- */
+
+@media (max-width: 1024px) {
+  .badge {
+    left: -6cqi;
+  }
+}
+
+@media (max-width: 760px) {
+  .badge {
+    left: -3cqi;
+  }
+
+  /* Centred under the record, the pill would hang past the screen edge on a phone. */
+  .caption {
+    left: 2%;
+    --caption-x: 0%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vinyl,
+  .vinyl:hover {
+    scale: none;
+    transition: none;
+  }
+
+  .control svg,
+  .caption {
+    transition: opacity 200ms ease;
+  }
+
+  .badge[data-active] .halo,
+  .badge[data-status="loading"] .label,
+  .bars span {
+    animation: none;
+  }
+
+  /* A still equaliser still says "on". */
+  .badge[data-status="playing"] .bars span:nth-child(1) { scale: 1 0.55; }
+  .badge[data-status="playing"] .bars span:nth-child(2) { scale: 1 0.95; }
+  .badge[data-status="playing"] .bars span:nth-child(3) { scale: 1 0.7; }
+  .badge[data-status="playing"] .bars span:nth-child(4) { scale: 1 0.45; }
+}

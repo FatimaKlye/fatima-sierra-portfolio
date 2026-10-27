@@ -12,6 +12,7 @@ import AboutPreview from "./about/AboutPreview";
 import CredentialsTeaser from "./CredentialsTeaser";
 import GithubActivity from "./GithubActivity";
 import HeroMotion from "./HeroMotion";
+import HeroVinyl from "./HeroVinyl";
 import PreviewHeader from "./PreviewHeader";
 import ProjectList from "./ProjectList";
 import Recommendations from "./Recommendations";
@@ -143,8 +144,9 @@ export default async function HeroSection() {
             </div>
           </div>
 
-          {/* The portrait showcase: an arched frame layered with linework, an orbit, a spinning
-              badge and an outlined name. Everything except the photo and caption is decorative. */}
+          {/* The portrait showcase: an arched frame layered with linework, an orbit, the record
+              badge and an outlined name. Everything except the photo, the record (the music
+              control) and the caption is decorative. */}
           <div className={styles.showcase}>
             <div className={styles.stage}>
               <div className={styles.glow} aria-hidden="true" />
@@ -177,21 +179,7 @@ export default async function HeroSection() {
               <p className={styles.outlineName} aria-hidden="true" data-hero-reveal="deco" data-depth="-0.9" data-drift="-12">
                 Sierra
               </p>
-              <div className={styles.badge} aria-hidden="true" data-hero-reveal="badge" data-depth="1.8">
-                <svg className={styles.badgeRing} viewBox="0 0 120 120" focusable="false">
-                  <defs>
-                    <path id="hero-badge-path" d="M60 60m-45 0a45 45 0 1 1 90 0a45 45 0 1 1 -90 0" />
-                  </defs>
-                  <text>
-                    <textPath href="#hero-badge-path" textLength="282" lengthAdjust="spacing">
-                      WEB &amp; MOBILE DEVELOPER · OPEN TO WORK ·
-                    </textPath>
-                  </text>
-                </svg>
-                <span className={styles.badgeCore}>
-                  <Sparkle />
-                </span>
-              </div>
+              <HeroVinyl />
               <span className={styles.sparkleA} data-hero-reveal="deco">
                 <Sparkle data-float />
               </span>

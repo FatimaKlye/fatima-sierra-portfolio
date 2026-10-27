@@ -50,6 +50,7 @@ function readVolume(): number {
 // Volume is remembered between visits; playback deliberately is not.
 let state: MusicState = typeof window === "undefined" ? SERVER_STATE : { status: "idle", volume: readVolume() };
 let engine: Engine | null = null;
+let trackBytes: Promise<ArrayBuffer> | undefined;
 // Bumped by every play/pause so a slow load or a pending suspend can't override a newer choice.
 let generation = 0;
 const listeners = new Set<() => void>();
@@ -88,18 +89,39 @@ function getEngine(): Engine {
   return engine;
 }
 
-function loadBuffer(current: Engine): Promise<AudioBuffer> {
-  current.buffer ??= fetch(SRC)
+function fetchTrack(): Promise<ArrayBuffer> {
+  trackBytes ??= fetch(SRC)
     .then((response) => {
       if (!response.ok) throw new Error(`Music request failed (${response.status})`);
       return response.arrayBuffer();
     })
+    .catch((error: unknown) => {
+      trackBytes = undefined;
+      throw error;
+    });
+  return trackBytes;
+}
+
+function loadBuffer(current: Engine): Promise<AudioBuffer> {
+  current.buffer ??= fetchTrack()
     .then((bytes) => current.ctx.decodeAudioData(bytes))
+    .finally(() => {
+      trackBytes = undefined; // decoding detaches the bytes; from here the decoded buffer is kept
+    })
     .catch((error: unknown) => {
       current.buffer = undefined; // let the next click retry
       throw error;
     });
   return current.buffer;
+}
+
+/**
+ * Downloads the track ahead of a likely click (hover, keyboard focus) so playback starts sooner.
+ * It only fetches bytes: no audio context, no sound.
+ */
+export function preloadMusic() {
+  if (engine?.buffer) return;
+  fetchTrack().catch(() => {}); // a failure resurfaces, and retries, on the actual click
 }
 
 function startSource(current: Engine, buffer: AudioBuffer) {
