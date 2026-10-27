@@ -7,9 +7,6 @@
 /* Hero ------------------------------------------------------------------- */
 
 .hero {
-  /* Eyebrow pill + its gap to the headline: the portrait starts level with the headline. */
-  --hero-eyebrow-offset: 60px;
-
   position: relative;
   isolation: isolate;
   padding: calc(var(--header-height) + clamp(28px, 4vw, 56px)) 0 clamp(64px, 7vw, 104px);
@@ -60,45 +57,10 @@
   min-width: 0;
 }
 
-.eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  margin: 0;
-  padding: 6px 14px 6px 10px;
-  border: 1px solid var(--color-border);
-  border-radius: 999px;
-  background: var(--color-card);
-  color: var(--color-text-primary);
-  font-size: 0.78rem;
-  font-weight: 500;
-  line-height: 1.4;
-}
-
-/* Availability dot — the one place a soft pulse helps: it reads as "currently open". */
-.statusDot {
-  position: relative;
-  width: 8px;
-  height: 8px;
-  flex-shrink: 0;
-  border-radius: 50%;
-  background: var(--color-primary);
-}
-
-.statusDot::after {
-  position: absolute;
-  inset: -4px;
-  border-radius: 50%;
-  background: var(--color-primary);
-  content: "";
-  opacity: 0.25;
-  animation: pulse 2.4s ease-out infinite;
-}
-
 /* Headline breaks are set by hand — one phrase per line — so the rag stays
    left-aligned and intentional instead of depending on the column width. */
 .heroTitle {
-  margin: 28px 0 0;
+  margin: 0;
   color: var(--color-text-primary);
   font-size: clamp(2.75rem, 6vw, 5.5rem);
   font-weight: 600;
@@ -312,7 +274,6 @@
   position: relative;
   justify-self: end;
   width: min(100%, 460px);
-  margin-top: var(--hero-eyebrow-offset);
 }
 
 .stage {
@@ -519,11 +480,6 @@
   to { opacity: 1; }
 }
 
-@keyframes pulse {
-  from { opacity: 0.35; transform: scale(0.6); }
-  to { opacity: 0; transform: scale(1.6); }
-}
-
 @keyframes badgeSpin {
   to { transform: rotate(360deg); }
 }
@@ -556,7 +512,6 @@
   .showcase {
     justify-self: center;
     width: min(100%, 400px);
-    margin-top: 0;
   }
 
   .badge {
@@ -582,7 +537,6 @@
   }
 
   .heroTitle {
-    margin-top: 24px;
     font-size: clamp(2.3rem, 11vw, 3.1rem);
   }
 
@@ -599,7 +553,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .statusDot::after,
   .badgeRing {
     animation: none !important;
   }

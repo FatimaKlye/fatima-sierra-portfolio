@@ -11,7 +11,7 @@ const READY_ATTR = "data-hero-ready";
  * Choreographs the homepage hero from data attributes, so the markup stays server-rendered:
  *
  *  data-hero-word         headline words, masked slide-up
- *  data-hero-reveal="g"   entrance group: eyebrow, lead, action, link, stack, portrait, deco, badge, draw, caption
+ *  data-hero-reveal="g"   entrance group: lead, action, link, stack, portrait, deco, badge, draw, caption
  *  data-hero-media        photo inside the arch: settles from a zoom, drifts while scrolling
  *  data-depth="n"         follows the pointer by n steps (decorative layers, wide screens)
  *  data-drift="n"         drifts n% vertically as the hero scrolls away (data-turn="deg" also rotates)
@@ -53,7 +53,6 @@ export default function HeroMotion({ children, className }: { children: ReactNod
       const media = all("[data-hero-media]");
       const drawPaths = group("draw").flatMap((svg) => Array.from(svg.querySelectorAll("path")));
       const risers: [string, number][] = [
-        ["eyebrow", 14],
         ["lead", 22],
         ["action", 18],
         ["link", 14],
@@ -85,7 +84,6 @@ export default function HeroMotion({ children, className }: { children: ReactNod
         }
       };
 
-      rise("eyebrow", 0);
       tl.to(words, { yPercent: 0, duration: 1.15, ease: "power4.out", stagger: 0.07, clearProps: "transform" }, 0.08);
       tl.to(arch, { clipPath: "inset(0% 0% 0% 0%)", duration: 1.4, ease: "expo.out", clearProps: "clipPath" }, 0.15);
       tl.to(media, { scale: 1, duration: 1.8, ease: "expo.out" }, 0.15);

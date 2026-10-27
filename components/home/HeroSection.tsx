@@ -72,10 +72,6 @@ export default async function HeroSection() {
       <section className={styles.hero} id="home" aria-labelledby="home-hero-title" data-nav-label="Intro" data-nav-intro>
         <HeroMotion className={styles.heroInner}>
           <div className={styles.heroCopy}>
-            <p className={styles.eyebrow} data-hero-reveal="eyebrow">
-              <span className={styles.statusDot} aria-hidden="true" />
-              Open to internships &amp; junior developer roles
-            </p>
             <h1 id="home-hero-title" className={styles.heroTitle}>
               <span className={styles.titleLine}>
                 <TitleWord>I</TitleWord> <TitleWord>create</TitleWord>
