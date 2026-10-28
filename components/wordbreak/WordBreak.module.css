@@ -1,9 +1,14 @@
 /* A Little Word Break — the daily word game, opened from the navbar utility menu.
    Every colour is a token below; dark values switch on with html[data-theme="dark"] or html.dark.
-   Wide screens get two columns (a blush card with the title, rules and stats beside the board);
-   below 820px it stacks — keep that breakpoint in step with STACKED in WordBreakGame.tsx. */
+   Wide screens get two columns (a blush info card with the title, rules and stats beside the board);
+   below 820px it stacks — keep that breakpoint in step with STACKED in wordbreakLogic.ts.
+   The info card folds away (panel[data-info="closed"]), and the dialog narrows around the game. */
 
 .overlay {
+  /* One timing for every property of the fold, so the game column keeps its width while it slides. */
+  --wb-fold-ms: 280ms;
+  --wb-fold-ease: cubic-bezier(0.32, 0.72, 0, 1);
+
   --wb-surface: var(--color-background);
   --wb-text: var(--color-text-primary);
   --wb-muted: var(--color-text-muted);
@@ -21,9 +26,10 @@
   --wb-key-text: var(--color-text-primary);
   --wb-key-lip: rgb(var(--rgb-shadow) / 0.1);
   --wb-key-shine: 0.55;
-  --wb-correct: var(--color-primary);
-  --wb-correct-text: #ffffff;
-  --wb-correct-lip: #82304f;
+  /* Green / yellow / gray feedback, softened to sit with the blush palette (dark text keeps AA contrast). */
+  --wb-correct: #93cba2;
+  --wb-correct-text: #173f26;
+  --wb-correct-lip: #6ea67e;
   --wb-present: #f3d98b;
   --wb-present-text: #5b4614;
   --wb-present-lip: #dcbc62;
@@ -60,9 +66,9 @@
   --wb-key-text: #f6e9ef;
   --wb-key-lip: rgb(0 0 0 / 0.38);
   --wb-key-shine: 0.04;
-  --wb-correct: #b54a7c;
-  --wb-correct-text: #ffffff;
-  --wb-correct-lip: #7d2f53;
+  --wb-correct: #74ad84;
+  --wb-correct-text: #0f2717;
+  --wb-correct-lip: #4f8460;
   --wb-present: #d8b55e;
   --wb-present-text: #2b2108;
   --wb-present-lip: #a7873a;
@@ -96,11 +102,10 @@
   position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  grid-template-areas: "head" "help" "play" "foot";
-  row-gap: 14px;
+  grid-template-areas: "bar" "info" "play";
   width: min(100%, 540px);
   margin: auto;
-  padding: 22px 22px 18px;
+  padding: 16px 20px 18px;
   border: 1px solid var(--wb-line);
   border-radius: 28px;
   background:
@@ -116,17 +121,145 @@
   outline: none;
 }
 
-/* The blush card only appears in the two-column layout (see the wide-screen block below). */
-.introCard {
+/* ---------- Top bar ---------- */
+
+/* Three columns so the compact title sits dead centre over the board, whatever the buttons' widths. */
+.bar {
+  display: grid;
+  grid-area: bar;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.infoToggle {
+  display: inline-flex;
+  justify-self: start;
+  align-items: center;
+  gap: 5px;
+  height: 36px;
+  padding: 0 14px 0 10px;
+  border: 1px solid rgb(var(--rgb-primary) / 0.22);
+  border-radius: 999px;
+  background: var(--wb-card-bg);
+  color: var(--wb-text);
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background-color 200ms ease,
+    border-color 200ms ease,
+    box-shadow 200ms ease,
+    scale 140ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* The chevron points the way the panel will move: up / down when stacked, left / right beside the board. */
+.infoChevron {
+  color: var(--wb-accent);
+  rotate: 90deg;
+  transition:
+    rotate var(--wb-fold-ms) var(--wb-fold-ease),
+    translate 200ms ease;
+}
+
+.panel[data-info="closed"] .infoChevron {
+  rotate: 270deg;
+}
+
+@media (hover: hover) {
+  .infoToggle:hover {
+    border-color: rgb(var(--rgb-primary) / 0.5);
+    background: var(--color-soft-blush);
+    box-shadow: 0 6px 14px -10px rgb(var(--rgb-shadow-tint) / 0.5);
+  }
+
+  .infoToggle:hover .infoChevron { translate: 0 -2px; }
+  .panel[data-info="closed"] .infoToggle:hover .infoChevron { translate: 0 2px; }
+}
+
+.infoToggle:active {
+  scale: 0.96;
+}
+
+.infoToggle:focus-visible {
+  outline: 3px solid rgb(var(--rgb-primary) / 0.32);
+  outline-offset: 2px;
+}
+
+/* Stands in for the info card's title while it's folded away. */
+.barTitle {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  color: var(--wb-muted);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0;
+  translate: 0 4px;
+  transition:
+    opacity 160ms ease,
+    translate var(--wb-fold-ms) var(--wb-fold-ease);
+}
+
+.barTitle span {
+  color: var(--wb-accent);
+}
+
+.panel[data-info="closed"] .barTitle {
+  opacity: 1;
+  translate: none;
+  transition-delay: 100ms;
+}
+
+/* ---------- Info panel (title, rules, stats) ---------- */
+
+/* Stacked: folds vertically by animating a grid row from 1fr to 0fr — no measuring. Hidden once folded:
+   visibility flips only after the fold has played. */
+.info {
+  display: grid;
+  grid-area: info;
+  grid-template-rows: 1fr;
+  min-width: 0;
+  transition:
+    grid-template-rows var(--wb-fold-ms) var(--wb-fold-ease),
+    opacity 220ms ease,
+    visibility 0s;
+}
+
+.panel[data-info="closed"] .info {
+  grid-template-rows: 0fr;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    grid-template-rows var(--wb-fold-ms) var(--wb-fold-ease),
+    opacity 160ms ease,
+    visibility 0s linear var(--wb-fold-ms);
+}
+
+.infoClip {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.infoInner {
+  display: grid;
+  gap: 14px;
+  padding-bottom: 16px;
+}
+
+/* The sparkles only decorate the wide-screen card. */
+.sparks {
   display: none;
 }
 
 /* ---------- Header ---------- */
-
-.head {
-  grid-area: head;
-  padding-right: 48px; /* clear of the close button */
-}
 
 .eyebrow {
   display: flex;
@@ -177,11 +310,8 @@
 }
 
 .close {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  z-index: 2;
   display: grid;
+  justify-self: end;
   width: 36px;
   height: 36px;
   padding: 0;
@@ -229,7 +359,6 @@
 
 .help {
   display: grid;
-  grid-area: help;
   align-content: start;
 }
 
@@ -366,12 +495,51 @@
   font-weight: 600;
 }
 
-.examples {
+/* The colour guide: name-spelled sample tiles on a soft blush slip, labelled as examples, not guesses. */
+.guide {
   display: grid;
-  gap: 9px;
-  margin: 0;
-  padding: 12px 0 0;
+  gap: 8px;
+  padding-top: 12px;
   border-top: 1px dashed var(--wb-line);
+}
+
+.guideHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 0;
+}
+
+.guideTitle {
+  color: var(--wb-accent);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.guideTag {
+  padding: 2px 8px;
+  border: 1px dashed rgb(var(--rgb-primary) / 0.3);
+  border-radius: 999px;
+  color: var(--wb-muted);
+  font-size: 0.58rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.examples {
+  --mini: 24px;
+  --mini-gap: 4px;
+
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 10px;
+  border-radius: 14px;
+  background: var(--color-soft-blush);
   list-style: none;
 }
 
@@ -384,7 +552,7 @@
 
 .sample {
   display: flex;
-  gap: 4px;
+  gap: var(--mini-gap);
 }
 
 .caption {
@@ -393,19 +561,27 @@
   line-height: 1.4;
 }
 
-/* Each opening replays a short cascade, and the key letter of every sample flips to its colour. */
-.helpBody[data-open] .rules li,
-.helpBody[data-open] .example {
+/* Each time the panel or the rules open, a short cascade replays and the key letter of every sample
+   flips to its colour (the selectors re-match on opening, which restarts the animations). */
+.panel[data-info="open"] .helpBody[data-open] .rules li,
+.panel[data-info="open"] .helpBody[data-open] .example {
   animation: rise 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-.helpBody[data-open] .rules li:nth-child(2) { animation-delay: 50ms; }
-.helpBody[data-open] .rules li:nth-child(3) { animation-delay: 100ms; }
-.helpBody[data-open] .example { animation-delay: calc(160ms + var(--n) * 50ms); }
+.panel[data-info="open"] .helpBody[data-open] .rules li:nth-child(2) { animation-delay: 50ms; }
+.panel[data-info="open"] .helpBody[data-open] .rules li:nth-child(3) { animation-delay: 100ms; }
+.panel[data-info="open"] .helpBody[data-open] .example { animation-delay: calc(160ms + var(--n) * 50ms); }
 
-.helpBody[data-open] .miniFlip {
+.panel[data-info="open"] .helpBody[data-open] .miniFlip {
   animation: flip 520ms ease-in-out both;
   animation-delay: calc(380ms + var(--n) * 200ms);
+}
+
+/* Hovering a sample gives its tiles a little ripple. */
+@media (hover: hover) {
+  .example:hover .mini {
+    translate: 0 -2px;
+  }
 }
 
 @keyframes rise {
@@ -428,8 +604,9 @@
   display: flex;
   justify-content: center;
   /* Tiles shrink on short or narrow screens so the whole game fits without scrolling. */
-  --tile: clamp(34px, min(calc((100vh - 470px) / 6), calc((100vw - 100px) / 5)), 56px);
-  --tile: clamp(34px, min(calc((100dvh - 470px) / 6), calc((100vw - 100px) / 5)), 56px);
+  /* Budgeted for the folded info panel; opening it on a phone lets the dialog scroll rather than resize the tiles. */
+  --tile: clamp(34px, min(calc((100vh - 330px) / 6), calc((100vw - 100px) / 5)), 56px);
+  --tile: clamp(34px, min(calc((100dvh - 330px) / 6), calc((100vw - 100px) / 5)), 56px);
 }
 
 .board {
@@ -486,18 +663,19 @@
   --tile-border: var(--wb-tile-border);
 
   display: grid;
-  width: 24px;
-  height: 24px;
+  width: var(--mini);
+  height: var(--mini);
   place-items: center;
   border: 1.5px solid var(--tile-border);
-  border-radius: 7px;
+  border-radius: calc(var(--mini) * 0.3);
   background: var(--tile-bg);
   box-shadow: 0 1.5px 0 var(--tile-lip, transparent);
   color: var(--tile-fg);
-  font-size: 0.7rem;
+  font-size: calc(var(--mini) * 0.46);
   font-weight: 700;
   line-height: 1;
   text-transform: uppercase;
+  transition: translate 220ms cubic-bezier(0.3, 1.5, 0.5, 1) calc(var(--i) * 30ms);
 }
 
 /* Shared by tiles, samples and keys (keys read these through var() fallbacks). Declared after .filled and .mini so they win. */
@@ -787,10 +965,6 @@
 
 /* ---------- Stats ---------- */
 
-.foot {
-  grid-area: foot;
-}
-
 .stats {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -842,34 +1016,109 @@
 /* ---------- Wide screens: two columns ---------- */
 
 @media (min-width: 820px) {
+  /* Folding animates the info column, the gap, the left padding and the dialog width together on one
+     curve. Their changes cancel out, so the game column holds its width (no keyboard reflow) and simply
+     glides to the centre while the dialog narrows evenly around it. */
   .panel {
-    grid-template-columns: 256px minmax(0, 1fr);
-    grid-template-rows: auto 1fr auto;
+    --info-w: 280px;
+    --gap: 32px;
+    --pad: 28px; /* around the game */
+    --pad-info: 16px; /* beside the info card */
+    --play-w: 488px;
+
+    grid-template-columns: var(--info-w) minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
     grid-template-areas:
-      "head play"
-      "help play"
-      "foot play";
-    column-gap: 32px;
-    row-gap: 0;
-    width: min(100%, 820px);
-    padding: 16px 28px 16px 16px;
+      "info bar"
+      "info play";
+    column-gap: var(--gap);
+    width: calc(var(--pad-info) + var(--info-w) + var(--gap) + var(--play-w) + var(--pad));
+    max-width: 100%;
+    padding: 16px var(--pad) 16px var(--pad-info);
     border-radius: 32px;
+    transition:
+      width var(--wb-fold-ms) var(--wb-fold-ease),
+      grid-template-columns var(--wb-fold-ms) var(--wb-fold-ease),
+      column-gap var(--wb-fold-ms) var(--wb-fold-ease),
+      padding-left var(--wb-fold-ms) var(--wb-fold-ease);
   }
 
-  .introCard {
+  .panel[data-info="closed"] {
+    grid-template-columns: 0px minmax(0, 1fr);
+    column-gap: 0px;
+    width: calc(var(--play-w) + 2 * var(--pad));
+    padding-left: var(--pad);
+  }
+
+  .bar {
+    margin-bottom: 0;
+  }
+
+  .infoChevron { rotate: 0deg; }
+  .panel[data-info="closed"] .infoChevron { rotate: 180deg; }
+
+  @media (hover: hover) {
+    .infoToggle:hover .infoChevron { translate: -2px 0; }
+    .panel[data-info="closed"] .infoToggle:hover .infoChevron { translate: 2px 0; }
+  }
+
+  /* The blush card. Its contents are taken out of flow, so the game alone sets the dialog's height:
+     folding never changes it, and the board doesn't move vertically. */
+  .info {
     position: relative;
     display: block;
-    grid-area: 1 / 1 / -1 / 2;
     overflow: hidden;
     border: 1px solid var(--wb-line);
     border-radius: 22px;
     background:
       radial-gradient(120% 60% at 100% 100%, rgb(var(--rgb-primary) / 0.12), transparent 65%),
       var(--wb-intro-bg);
+    transition:
+      opacity 180ms ease,
+      visibility 0s;
+  }
+
+  .panel[data-info="closed"] .info {
+    opacity: 0;
+    transition:
+      opacity var(--wb-fold-ms) ease-in,
+      visibility 0s linear var(--wb-fold-ms);
+  }
+
+  /* Fixed at the open width, so the text is clipped by the closing card rather than re-wrapping. */
+  .infoClip {
+    position: absolute;
+    inset: 0 auto 0 0;
+    z-index: 1;
+    width: calc(var(--info-w) - 2px);
+    overflow: hidden;
+  }
+
+  .infoInner {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    height: 100%;
+    padding: 20px 20px 18px;
+    transition:
+      opacity 180ms ease 60ms,
+      translate var(--wb-fold-ms) var(--wb-fold-ease);
+  }
+
+  .panel[data-info="closed"] .infoInner {
+    opacity: 0;
+    translate: -14px 0;
+    transition:
+      opacity 120ms ease,
+      translate var(--wb-fold-ms) var(--wb-fold-ease);
+  }
+
+  .sparks {
+    display: block;
   }
 
   /* A faint dotted paper texture that fades out under the title. */
-  .introCard::before {
+  .info::before {
     position: absolute;
     inset: 0;
     background-image: radial-gradient(rgb(var(--rgb-primary) / 0.16) 1px, transparent 1.3px);
@@ -891,33 +1140,48 @@
   .spark:nth-child(2) { top: 44px; right: 42px; color: var(--wb-sparkle-a); font-size: 9px; animation-delay: -1.1s; }
   .spark:nth-child(3) { right: 20px; bottom: 96px; color: var(--wb-sparkle-a); font-size: 10px; animation-delay: -2.2s; }
 
-  /* Above the card (which is positioned), inset to sit inside it. */
+  /* The rules take the slack and keep the stats pinned to the foot of the card; on short screens only
+     the rules scroll. The padding / negative margin leave room for the toggle's focus ring. */
   .head,
-  .help,
-  .foot {
-    position: relative;
-    padding-inline: 22px;
+  .foot { flex: none; }
+
+  .help {
+    flex: 1 1 auto;
+    min-height: 0;
+    margin: 0 -6px;
+    padding: 12px 6px 4px;
+    overflow: hidden auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
   }
 
-  .head { padding-top: 24px; }
-  .help { padding-top: 18px; }
-  .foot { padding-top: 16px; padding-bottom: 20px; }
+  .foot { padding-top: 12px; }
 
   .title { font-size: 1.5rem; }
 
+  .helpCard { gap: 10px; margin-top: 8px; padding: 12px; }
+
+  .rules { gap: 5px; }
+
+  .guide { gap: 6px; padding-top: 10px; }
+
+  .examples { gap: 8px; padding: 9px 10px; }
+
   .example {
     grid-template-columns: minmax(0, 1fr);
-    gap: 6px;
+    gap: 4px;
   }
+
+  .caption { line-height: 1.35; }
 
   .play {
     gap: 22px;
-    padding: 18px 0 8px;
+    padding: 14px 0 8px;
   }
 
   .stage {
-    --tile: clamp(38px, calc((100vh - 340px) / 6), 60px);
-    --tile: clamp(38px, calc((100dvh - 340px) / 6), 60px);
+    --tile: clamp(38px, calc((100vh - 380px) / 6), 60px);
+    --tile: clamp(38px, calc((100dvh - 380px) / 6), 60px);
   }
 
   .board,
@@ -933,7 +1197,7 @@
     flex-direction: column-reverse;
     align-items: center;
     gap: 0;
-    padding: 9px 4px 8px;
+    padding: 7px 4px 6px;
   }
 
   .stats dd { font-size: 1.12rem; }
@@ -944,25 +1208,43 @@
   50% { opacity: 0.7; scale: 1.1; }
 }
 
+/* Tablets: a slimmer card and gap, so the open dialog still fits; the game keeps its full width. */
+@media (min-width: 820px) and (max-width: 1023px) {
+  .panel {
+    --info-w: 248px;
+    --gap: 24px;
+    --pad: 24px;
+  }
+
+  .infoInner { padding-inline: 16px; }
+
+  .examples {
+    --mini: 21px;
+    --mini-gap: 3px;
+  }
+}
+
 @media (max-width: 480px) {
   .overlay {
     padding: 12px;
   }
 
   .panel {
-    row-gap: 12px;
-    padding: 18px 16px 14px;
+    padding: 14px 14px 14px;
     border-radius: 24px;
   }
 
-  .close {
-    top: 14px;
-    right: 14px;
-  }
+  .bar { margin-bottom: 12px; }
 
   .title { font-size: 1.28rem; }
 
   .helpCard { padding: 12px; }
+
+  /* Name tiles over their caption: a six-letter row and a sentence don't share a phone's width. */
+  .example {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+  }
 
   .play { gap: 14px; }
 
@@ -986,16 +1268,25 @@
     animation: none !important;
   }
 
+  /* The fold snaps between its two states. */
+  .panel,
+  .bar *,
+  .info,
+  .infoInner,
   .tile,
   .key,
-  .close,
-  .close svg,
+  .mini,
   .chevron,
   .helpToggle,
   .helpBody {
     transition-duration: 0.01ms !important;
   }
 
+  .panel,
+  .bar *,
+  .info,
+  .infoInner,
+  .mini,
   .helpBody {
     transition-delay: 0s !important;
   }

@@ -1,17 +1,25 @@
 "use client";
 
 import gsap from "gsap";
-import { useCallback, useEffect, useId, useLayoutEffect, useRef } from "react";
+import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import type { PointerEvent } from "react";
 import { createPortal } from "react-dom";
 import WordBreakGame from "./WordBreakGame";
+import { STACKED, loadInfoOpen, saveInfoOpen } from "./wordbreakLogic";
 import styles from "./WordBreak.module.css";
 
 const FOCUSABLE = 'button:not([disabled]), [href], [tabindex]:not([tabindex="-1"])';
 
 const reducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-/** Dialog shell: GSAP in/out, scroll lock, Escape, focus trap. Focus is restored by the trigger. */
+const subscribeStacked = (onChange: () => void) => {
+  const query = window.matchMedia(STACKED);
+  query.addEventListener("change", onChange);
+  return () => query.removeEventListener("change", onChange);
+};
+const isStacked = () => window.matchMedia(STACKED).matches;
+
+/** Dialog shell: GSAP in/out, scroll lock, Escape, focus trap, info-panel fold. Focus is restored by the trigger. */
 export default function WordBreakModal({ onClose }: { onClose: () => void }) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -20,6 +28,16 @@ export default function WordBreakModal({ onClose }: { onClose: () => void }) {
   const entranceRef = useRef<gsap.core.Timeline | null>(null);
   const titleId = useId();
   const descriptionId = useId();
+
+  // The info panel (title, rules, stats) follows the viewport — open beside the board on wide screens,
+  // folded away on phones — until the visitor toggles it; that choice then sticks for the session.
+  const stacked = useSyncExternalStore(subscribeStacked, isStacked, () => false);
+  const [infoChoice, setInfoChoice] = useState<boolean | null>(() => loadInfoOpen());
+  const infoOpen = infoChoice ?? !stacked;
+  const toggleInfo = useCallback(() => {
+    setInfoChoice(!infoOpen);
+    saveInfoOpen(!infoOpen);
+  }, [infoOpen]);
 
   const requestClose = useCallback(() => {
     if (closingRef.current) return;
@@ -102,8 +120,9 @@ export default function WordBreakModal({ onClose }: { onClose: () => void }) {
       const panel = panelRef.current;
       if (event.key !== "Tab" || !panel) return;
 
+      // Skip the folded info panel: it is inert, so focusing into it would silently fail.
       const items = Array.from(panel.querySelectorAll<HTMLElement>(FOCUSABLE)).filter(
-        (item) => item.getClientRects().length > 0
+        (item) => item.getClientRects().length > 0 && !item.closest("[inert]")
       );
       const active = document.activeElement;
       if (items.length === 0) {
@@ -150,8 +169,15 @@ export default function WordBreakModal({ onClose }: { onClose: () => void }) {
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
         tabIndex={-1}
+        data-info={infoOpen ? "open" : "closed"}
       >
-        <WordBreakGame titleId={titleId} descriptionId={descriptionId} onClose={requestClose} />
+        <WordBreakGame
+          titleId={titleId}
+          descriptionId={descriptionId}
+          infoOpen={infoOpen}
+          onToggleInfo={toggleInfo}
+          onClose={requestClose}
+        />
       </div>
     </div>,
     document.body

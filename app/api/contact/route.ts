@@ -1,7 +1,7 @@
 import nodemailer from "nodemailer";
 import { resolveMx, resolve4, resolve6 } from "node:dns/promises";
 import { createHash } from "node:crypto";
-import { isValidPhone, normalizePhone } from "@/lib/contactValidation";
+import { isContactTopic, isValidPhone, normalizePhone } from "@/lib/contactValidation";
 
 export const runtime = "nodejs";
 
@@ -25,6 +25,7 @@ type ContactPayload = {
   email: string;
   phone: string;
   message: string;
+  topic: string;
 };
 
 // Keyed by a hash of the client IP so the store never retains raw addresses.
@@ -86,7 +87,7 @@ function validatePayload(value: unknown): ContactPayload | null {
     return null;
   }
 
-  const { name, email, phone, message } = value as Record<string, unknown>;
+  const { name, email, phone, message, topic } = value as Record<string, unknown>;
 
   if (
     typeof name !== "string" ||
@@ -122,11 +123,17 @@ function validatePayload(value: unknown): ContactPayload | null {
     return null;
   }
 
+  // Topic is optional; when sent it must be one of the form's own choices.
+  if (topic !== undefined && topic !== "" && !isContactTopic(topic)) {
+    return null;
+  }
+
   return {
     name: trimmedName,
     email: trimmedEmail,
     phone: normalizePhone(phone),
     message: trimmedMessage,
+    topic: isContactTopic(topic) ? topic : "",
   };
 }
 
@@ -287,8 +294,8 @@ export async function POST(request: Request) {
       from: `"Portfolio Contact Form" <${gmailUser}>`,
       to: recipient,
       replyTo: `"${payload.name}" <${payload.email}>`,
-      subject: `New Portfolio Inquiry — ${payload.name}`,
-      text: `New Portfolio Inquiry\n\nName: ${payload.name}\nEmail: ${payload.email}\nPhone: ${payload.phone || "Not provided"}\n\nMessage:\n${payload.message}\n\nSubmitted: ${submittedAt}`,
+      subject: `New Portfolio Inquiry — ${payload.name}${payload.topic ? ` · ${payload.topic}` : ""}`,
+      text: `New Portfolio Inquiry\n\nName: ${payload.name}\nEmail: ${payload.email}\nPhone: ${payload.phone || "Not provided"}\nTopic: ${payload.topic || "Not specified"}\n\nMessage:\n${payload.message}\n\nSubmitted: ${submittedAt}`,
       html: buildContactEmailHtml({ ...payload, submittedAt }),
     });
 
@@ -316,6 +323,7 @@ function buildContactEmailHtml(payload: ContactPayload & { submittedAt: string }
   const name = escapeHtml(payload.name);
   const email = escapeHtml(payload.email);
   const phone = escapeHtml(payload.phone || "Not provided");
+  const topic = escapeHtml(payload.topic || "Not specified");
   const message = escapeHtml(payload.message).replace(/\n/g, "<br />");
   const submittedAt = escapeHtml(payload.submittedAt);
   const replyHref = `mailto:${encodeURIComponent(payload.email)}`;
@@ -355,9 +363,15 @@ function buildContactEmailHtml(payload: ContactPayload & { submittedAt: string }
                     </td>
                   </tr>
                   <tr>
-                    <td style="padding:16px 20px;">
+                    <td style="padding:16px 20px; border-bottom:1px solid #e8d4de;">
                       <p style="margin:0 0 4px; font-size:11px; text-transform:uppercase; letter-spacing:0.5px; color:#6e5964; font-weight:600;">Phone</p>
                       <p style="margin:0; font-size:15px; color:#3b2a34;">${phone}</p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding:16px 20px;">
+                      <p style="margin:0 0 4px; font-size:11px; text-transform:uppercase; letter-spacing:0.5px; color:#6e5964; font-weight:600;">Topic</p>
+                      <p style="margin:0; font-size:15px; color:#3b2a34;">${topic}</p>
                     </td>
                   </tr>
                 </table>

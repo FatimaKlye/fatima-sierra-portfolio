@@ -113,6 +113,10 @@ export function statusFor(guesses: string[], answer: string): GameStatus {
 const GAME_KEY = "wordbreak:game:v1";
 const STATS_KEY = "wordbreak:stats:v1";
 const HELP_KEY = "wordbreak:help:v1";
+const INFO_KEY = "wordbreak:info:v1";
+
+/** Below this width the dialog stacks into one column. Must match the breakpoint in WordBreak.module.css. */
+export const STACKED = "(max-width: 819px)";
 
 export type SavedGame = { day: number; guesses: string[]; draft: string };
 
@@ -140,18 +144,18 @@ const isWord = (value: unknown): value is string => typeof value === "string" &&
 const isCount = (value: unknown): value is number => Number.isInteger(value) && (value as number) >= 0;
 const isDayOrNull = (value: unknown): value is number | null => value === null || Number.isInteger(value);
 
-function read(key: string): unknown {
+function read(key: string, storage = () => window.localStorage): unknown {
   try {
-    const raw = window.localStorage.getItem(key);
+    const raw = storage().getItem(key);
     return raw ? JSON.parse(raw) : null;
   } catch {
     return null;
   }
 }
 
-function write(key: string, value: unknown) {
+function write(key: string, value: unknown, storage = () => window.localStorage) {
   try {
-    window.localStorage.setItem(key, JSON.stringify(value));
+    storage().setItem(key, JSON.stringify(value));
   } catch {
     // Private mode / full storage: the game still plays, it just won't remember.
   }
@@ -185,6 +189,18 @@ export function loadHelpOpen(): boolean | null {
 
 export function saveHelpOpen(open: boolean) {
   write(HELP_KEY, open);
+}
+
+const session = () => window.sessionStorage;
+
+/** Whether the info panel (title, rules, stats) is shown — null until toggled this browsing session. */
+export function loadInfoOpen(): boolean | null {
+  const saved = read(INFO_KEY, session);
+  return typeof saved === "boolean" ? saved : null;
+}
+
+export function saveInfoOpen(open: boolean) {
+  write(INFO_KEY, open, session);
 }
 
 export function loadStats(): Stats {

@@ -1,11 +1,12 @@
 "use client";
 
 import gsap from "gsap";
-import { ChevronDown, Delete, X } from "lucide-react";
+import { ChevronDown, ChevronLeft, Delete, X } from "lucide-react";
 import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties, MouseEvent } from "react";
 import {
   MAX_GUESSES,
+  STACKED,
   WORD_LENGTH,
   answerForDay,
   evaluateGuess,
@@ -43,13 +44,15 @@ const STATE_LABEL: Record<TileState, string> = {
   present: "in the word, wrong spot",
   absent: "not in the word",
 };
-/** Below this width the dialog stacks into one column. Must match the breakpoint in WordBreak.module.css. */
-const STACKED = "(max-width: 819px)";
-/** "How to play" samples: one highlighted letter per word shows what each colour means. */
+/**
+ * "How to play" samples: one highlighted letter per word shows what each colour means. They spell
+ * Fatima Klye Sierra — illustrations only, never evaluated or checked against the word list, which is
+ * why their lengths needn't match WORD_LENGTH.
+ */
 const EXAMPLES: { word: string; index: number; state: TileState; caption: string }[] = [
-  { word: "blush", index: 0, state: "correct", caption: "is in the word, right spot" },
-  { word: "charm", index: 3, state: "present", caption: "is in the word, wrong spot" },
-  { word: "petal", index: 2, state: "absent", caption: "is not in the word" },
+  { word: "fatima", index: 0, state: "correct", caption: "is in the word and in the correct position." },
+  { word: "klye", index: 0, state: "present", caption: "is in the word but in the wrong position." },
+  { word: "sierra", index: 0, state: "absent", caption: "is not in the word." },
 ];
 
 const cx = (...names: (string | false | null | undefined)[]) => names.filter(Boolean).join(" ");
@@ -57,9 +60,16 @@ const reducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)"
 // On-screen keys never take focus on click, so a physical Enter always submits the guess.
 const keepFocus = (event: MouseEvent) => event.preventDefault();
 
-type Props = { titleId: string; descriptionId: string; onClose: () => void };
+type Props = {
+  titleId: string;
+  descriptionId: string;
+  /** Whether the info panel (title, rules, stats) is shown; owned by the dialog, which sizes around it. */
+  infoOpen: boolean;
+  onToggleInfo: () => void;
+  onClose: () => void;
+};
 
-export default function WordBreakGame({ titleId, descriptionId, onClose }: Props) {
+export default function WordBreakGame({ titleId, descriptionId, infoOpen, onToggleInfo, onClose }: Props) {
   const [words, setWords] = useState<Words | null>(() => wordsCache);
   const [loadAttempt, setLoadAttempt] = useState(0);
   const [loadFailed, setLoadFailed] = useState(false);
@@ -78,6 +88,7 @@ export default function WordBreakGame({ titleId, descriptionId, onClose }: Props
   const timers = useRef<number[]>([]);
   const keyboardRef = useRef<HTMLDivElement>(null);
   const helpId = useId();
+  const infoId = useId();
 
   const answer = words ? answerForDay(game.day, words.answers) : null;
   const evaluations = useMemo(
@@ -270,86 +281,136 @@ export default function WordBreakGame({ titleId, descriptionId, onClose }: Props
 
   return (
     <>
-      {/* The blush card behind the title, rules and stats on wide screens. */}
-      <div className={styles.introCard} aria-hidden="true">
-        <span className={styles.spark}>✦</span>
-        <span className={styles.spark}>♥</span>
-        <span className={styles.spark}>✦</span>
-      </div>
-
-      <header className={styles.head} data-enter>
-        <p className={styles.eyebrow}>
-          <span className={styles.issue}>
-            <span aria-hidden="true">✦</span> No. {puzzleNumber(game.day)}
-          </span>
-          <span className={styles.daily}>Daily word</span>
-        </p>
-        <h2 id={titleId} className={styles.title}>
-          A Little <span>Word Break</span>
-        </h2>
-        <p id={descriptionId} className={styles.subtitle}>
-          One word. Every day.
-        </p>
-      </header>
-
-      <button type="button" className={styles.close} aria-label="Close word game" onClick={onClose}>
-        <X size={16} strokeWidth={2.2} aria-hidden="true" />
-      </button>
-
-      <section className={styles.help} data-enter>
+      {/* Above the board in both layouts: the info toggle, a compact title shown while the info is folded, close. */}
+      <div className={styles.bar} data-enter>
         <button
           type="button"
-          className={styles.helpToggle}
-          aria-expanded={helpOpen}
-          aria-controls={helpId}
+          className={styles.infoToggle}
+          aria-expanded={infoOpen}
+          aria-controls={infoId}
           onMouseDown={keepFocus}
-          onClick={toggleHelp}
+          onClick={onToggleInfo}
         >
-          <span className={styles.helpMark} aria-hidden="true">
-            ?
-          </span>
-          How to play
-          <ChevronDown className={styles.chevron} size={14} strokeWidth={2.2} aria-hidden="true" />
+          <ChevronLeft className={styles.infoChevron} size={15} strokeWidth={2.4} aria-hidden="true" />
+          Info
         </button>
+        <p className={styles.barTitle} aria-hidden="true">
+          <span>✦</span> No. {puzzleNumber(game.day)} · Word Break
+        </p>
+        <button type="button" className={styles.close} aria-label="Close word game" onClick={onClose}>
+          <X size={16} strokeWidth={2.2} aria-hidden="true" />
+        </button>
+      </div>
 
-        <div id={helpId} className={styles.helpBody} data-open={helpOpen || undefined}>
-          <div className={styles.helpClip}>
-            <div className={styles.helpCard}>
-              <ol className={styles.rules}>
-                <li>
-                  <span>
-                    Guess the hidden word in <strong>{MAX_GUESSES} tries</strong>.
-                  </span>
-                </li>
-                <li>
-                  <span>
-                    Each guess must be a <strong>valid {WORD_LENGTH}-letter word</strong>.
-                  </span>
-                </li>
-                <li>
-                  <span>After each guess, the tile colors show how close you are.</span>
-                </li>
-              </ol>
-              <ul className={styles.examples}>
-                {EXAMPLES.map(({ word, index, state, caption }, n) => (
-                  <li key={word} className={styles.example} style={{ "--n": n } as CSSProperties}>
-                    <span className={styles.sample} aria-hidden="true">
-                      {[...word].map((letter, i) => (
-                        <span key={i} className={cx(styles.mini, i === index && styles[state], i === index && styles.miniFlip)}>
-                          {letter}
+      {/* Inert while folded, so it leaves the tab order and the accessibility tree (the dialog's name still resolves). */}
+      <aside id={infoId} className={styles.info} aria-label="Game info" inert={!infoOpen}>
+        <div className={styles.sparks} aria-hidden="true">
+          <span className={styles.spark}>✦</span>
+          <span className={styles.spark}>♥</span>
+          <span className={styles.spark}>✦</span>
+        </div>
+
+        <div className={styles.infoClip}>
+          <div className={styles.infoInner}>
+            <header className={styles.head} data-enter>
+              <p className={styles.eyebrow}>
+                <span className={styles.issue}>
+                  <span aria-hidden="true">✦</span> No. {puzzleNumber(game.day)}
+                </span>
+                <span className={styles.daily}>Daily word</span>
+              </p>
+              <h2 id={titleId} className={styles.title}>
+                A Little <span>Word Break</span>
+              </h2>
+              <p id={descriptionId} className={styles.subtitle}>
+                One word. Every day.
+              </p>
+            </header>
+
+            <section className={styles.help} data-enter>
+              <button
+                type="button"
+                className={styles.helpToggle}
+                aria-expanded={helpOpen}
+                aria-controls={helpId}
+                onMouseDown={keepFocus}
+                onClick={toggleHelp}
+              >
+                <span className={styles.helpMark} aria-hidden="true">
+                  ?
+                </span>
+                How to play
+                <ChevronDown className={styles.chevron} size={14} strokeWidth={2.2} aria-hidden="true" />
+              </button>
+
+              <div id={helpId} className={styles.helpBody} data-open={helpOpen || undefined}>
+                <div className={styles.helpClip}>
+                  <div className={styles.helpCard}>
+                    <ol className={styles.rules}>
+                      <li>
+                        <span>
+                          Guess the hidden word in <strong>{MAX_GUESSES} tries</strong>.
                         </span>
-                      ))}
-                    </span>
-                    <span className={styles.caption}>
-                      <strong>{word[index].toUpperCase()}</strong> {caption}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+                      </li>
+                      <li>
+                        <span>
+                          Each guess must be a <strong>valid {WORD_LENGTH}-letter word</strong>.
+                        </span>
+                      </li>
+                      <li>
+                        <span>After each guess, the tile colors reveal how close you are.</span>
+                      </li>
+                    </ol>
+                    <div className={styles.guide}>
+                      <p className={styles.guideHead}>
+                        <span className={styles.guideTitle}>Color guide</span>
+                        <span className={styles.guideTag}>Examples only</span>
+                      </p>
+                      <ul className={styles.examples} aria-label="Sample tiles spelled from Fatima Klye Sierra, not real guesses">
+                        {EXAMPLES.map(({ word, index, state, caption }, n) => (
+                          <li key={word} className={styles.example} style={{ "--n": n } as CSSProperties}>
+                            <span className={styles.sample} aria-hidden="true">
+                              {[...word].map((letter, i) => (
+                                <span
+                                  key={i}
+                                  className={cx(styles.mini, i === index && styles[state], i === index && styles.miniFlip)}
+                                  style={{ "--i": i } as CSSProperties}
+                                >
+                                  {letter}
+                                </span>
+                              ))}
+                            </span>
+                            <span className={styles.caption}>
+                              <strong>{word[index].toUpperCase()}</strong> {caption}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <footer className={styles.foot} data-enter>
+              <dl className={styles.stats}>
+                <div>
+                  <dt>Played</dt>
+                  <dd>{stats.played}</dd>
+                </div>
+                <div>
+                  <dt>Streak</dt>
+                  <dd>{streak}</dd>
+                </div>
+                <div>
+                  <dt>Best</dt>
+                  <dd>{stats.maxStreak}</dd>
+                </div>
+              </dl>
+            </footer>
           </div>
         </div>
-      </section>
+      </aside>
 
       <div className={styles.play}>
         <div className={styles.stage}>
@@ -497,23 +558,6 @@ export default function WordBreakGame({ titleId, descriptionId, onClose }: Props
           </div>
         )}
       </div>
-
-      <footer className={styles.foot} data-enter>
-        <dl className={styles.stats}>
-          <div>
-            <dt>Played</dt>
-            <dd>{stats.played}</dd>
-          </div>
-          <div>
-            <dt>Streak</dt>
-            <dd>{streak}</dd>
-          </div>
-          <div>
-            <dt>Best</dt>
-            <dd>{stats.maxStreak}</dd>
-          </div>
-        </dl>
-      </footer>
 
       <p className={styles.srOnly} aria-live="polite">
         {announcement}

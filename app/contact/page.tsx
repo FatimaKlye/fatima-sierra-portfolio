@@ -6,7 +6,7 @@ export const metadata: Metadata = pageMetadata({
   path: "/contact",
   title: "Contact | Fatima Sierra",
   description:
-    "Get in touch with Fatima Klye M. Sierra, a web and mobile developer open to internships and new roles. Available immediately.",
+    "Say hello to Fatima Klye M. Sierra, a web and mobile developer. Have an idea, an opportunity, a recommendation, or just want to say hi? Send a message or reach out directly.",
 });
 
 export default function ContactPage() {

@@ -5,6 +5,21 @@ const MAX_PHONE_DIGITS = 15;
 export const PHONE_INPUT_FILTER = /[^0-9+\s().-]/g;
 export const MAX_PHONE_LENGTH = 24;
 
+/** The optional "What's on your mind?" choices; the server accepts only these exact values. */
+export const CONTACT_TOPICS = [
+  "Just saying hi",
+  "Project or collaboration",
+  "Career opportunity",
+  "Recommendation or feedback",
+  "Something else",
+] as const;
+
+export type ContactTopic = (typeof CONTACT_TOPICS)[number];
+
+export function isContactTopic(value: unknown): value is ContactTopic {
+  return typeof value === "string" && (CONTACT_TOPICS as readonly string[]).includes(value);
+}
+
 export function normalizePhone(value: string): string {
   return value.trim().replace(/\s+/g, " ");
 }
