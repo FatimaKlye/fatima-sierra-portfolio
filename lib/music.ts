@@ -1,7 +1,6 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import { readAudioTags } from "./audioTags";
 import { DEFAULT_TRACK_ID, TRACKS, type CategoryId } from "./musicLibrary";
 
 /*
@@ -22,15 +21,12 @@ export type PanelState = "closed" | "open" | "minimized";
 
 export type Track = {
   id: string;
-  kind: "curated" | "local";
   title: string;
   artist: string;
-  album: string | null;
-  category: CategoryId | null;
+  album: string;
+  category: CategoryId;
   src: string;
-  duration: number | null;
-  /** Object URL of embedded cover art (visitors' own files only). */
-  art: string | null;
+  duration: number;
 };
 
 export type MusicState = {
@@ -43,14 +39,11 @@ export type MusicState = {
   shuffle: boolean;
   repeat: RepeatMode;
   panel: PanelState;
-  localTracks: Track[];
-  /** The latest problem worth telling the visitor about (blocked playback, a file that won't play). */
+  /** The latest problem worth telling the visitor about (blocked playback, a song that won't load). */
   notice: string | null;
 };
 
 export type MusicProgress = { current: number; duration: number };
-
-export type AddFilesResult = { added: Track[]; rejected: { name: string; reason: string }[] };
 
 const DEFAULT_VOLUME = 0.35;
 const VOLUME_KEY = "music-volume";
@@ -58,19 +51,15 @@ const PREFS_KEY = "music-prefs";
 const FADE_IN = 0.6;
 const FADE_OUT = 0.35;
 const RESTART_THRESHOLD = 3; // Previous restarts the song once it's this many seconds in
-const PROBE_TIMEOUT = 8000;
-const AUDIO_EXT = /\.(mp3|m4a|aac|mp4|wav|wave|ogg|oga|opus|webm|flac|weba)$/i;
 
 export const CURATED: Track[] = TRACKS.map((track) => ({
   id: track.id,
-  kind: "curated",
   title: track.title,
   artist: track.artist,
   album: track.album,
   category: track.category,
   src: track.src,
   duration: track.duration,
-  art: null,
 }));
 const CURATED_IDS = CURATED.map((track) => track.id);
 
@@ -95,7 +84,6 @@ const SERVER_STATE: MusicState = {
   shuffle: false,
   repeat: "all",
   panel: "closed",
-  localTracks: [],
   notice: null,
 };
 const SERVER_PROGRESS: MusicProgress = { current: 0, duration: 0 };
@@ -139,9 +127,7 @@ let engine: Engine | null = null;
 let wantsPlay = false;
 // Bumped by every play/pause/track change so a slow promise can't override a newer choice.
 let generation = 0;
-let failedInARow = 0;
 let shuffleHistory: string[] = [];
-let localCount = 0;
 let panelOpener: HTMLElement | null = null;
 const listeners = new Set<() => void>();
 const progressListeners = new Set<() => void>();
@@ -170,13 +156,12 @@ function setProgress(next: MusicProgress) {
 }
 
 function savePrefs() {
-  const curated = CURATED_IDS.includes(state.trackId) ? state.trackId : undefined;
-  const prefs: Prefs = { trackId: curated, shuffle: state.shuffle, repeat: state.repeat, muted: state.muted };
+  const prefs: Prefs = { trackId: state.trackId, shuffle: state.shuffle, repeat: state.repeat, muted: state.muted };
   writeStorage(PREFS_KEY, JSON.stringify(prefs));
 }
 
 export function findTrack(id: string): Track | undefined {
-  return CURATED.find((track) => track.id === id) ?? state.localTracks.find((track) => track.id === id);
+  return CURATED.find((track) => track.id === id);
 }
 
 export function getCurrentTrack(): Track {
@@ -194,7 +179,6 @@ function getEngine(): Engine {
   audio.addEventListener("seeked", syncProgress);
   audio.addEventListener("emptied", syncProgress);
   audio.addEventListener("playing", () => {
-    failedInARow = 0;
     if (wantsPlay) setState({ status: "playing", notice: null });
     syncMediaSession();
   });
@@ -277,7 +261,7 @@ function silence(current: Engine) {
 function syncProgress() {
   if (!engine) return;
   const { audio } = engine;
-  const duration = Number.isFinite(audio.duration) ? audio.duration : (getCurrentTrack().duration ?? 0);
+  const duration = Number.isFinite(audio.duration) ? audio.duration : getCurrentTrack().duration;
   setProgress({ current: audio.currentTime || 0, duration });
   updatePositionState(audio, duration);
 }
@@ -287,7 +271,7 @@ function loadTrack(current: Engine, track: Track) {
   silence(current);
   current.audio.dataset.trackId = track.id;
   current.audio.src = track.src;
-  setProgress({ current: 0, duration: track.duration ?? 0 });
+  setProgress({ current: 0, duration: track.duration });
   syncMediaSession();
 }
 
@@ -389,7 +373,7 @@ function selectTrack(id: string) {
   setState({ trackId: id, status: state.status === "error" ? "paused" : state.status, notice: null });
   savePrefs();
   if (engine) loadTrack(engine, track);
-  else setProgress({ current: 0, duration: track.duration ?? 0 });
+  else setProgress({ current: 0, duration: track.duration });
 }
 
 function activeQueue(): string[] {
@@ -457,28 +441,6 @@ function handleEnded() {
 function handleError() {
   if (!engine?.audio.error || !engine.audio.getAttribute("src")) return;
   const track = getCurrentTrack();
-  failedInARow += 1;
-
-  if (track.kind === "local") {
-    const resume = wantsPlay;
-    const remaining = state.localTracks.filter((entry) => entry.id !== track.id);
-    wantsPlay = false;
-    generation++;
-    setState({
-      localTracks: remaining,
-      queue: state.queue.filter((id) => id !== track.id),
-      notice: `“${track.title}” can't be played in this browser, so it was skipped.`,
-    });
-    releaseTrack(track);
-    const next = remaining[0]?.id;
-    if (resume && next && failedInARow < remaining.length + 1) playTrack(next);
-    else {
-      selectTrack(next ?? DEFAULT_TRACK_ID);
-      setState({ status: "paused" });
-    }
-    return;
-  }
-
   wantsPlay = false;
   generation++;
   setState({ status: "error", notice: `“${track.title}” couldn't load. Check your connection and press play to retry.` });
@@ -565,113 +527,6 @@ export function getPanelOpener(): HTMLElement | null {
   return panelOpener?.isConnected ? panelOpener : null;
 }
 
-/* Visitors' own music --------------------------------------------------------
- * Files stay on the visitor's device: each becomes an object URL for this tab only. Nothing is
- * uploaded or stored, and the list is gone after a reload. */
-
-function probeDuration(src: string): Promise<number> {
-  return new Promise((resolve, reject) => {
-    const probe = new Audio();
-    const done = (finish: () => void) => {
-      window.clearTimeout(timer);
-      probe.removeAttribute("src");
-      probe.load();
-      finish();
-    };
-    const timer = window.setTimeout(() => done(() => reject(new Error("timeout"))), PROBE_TIMEOUT);
-    probe.preload = "metadata";
-    probe.addEventListener("loadedmetadata", () => done(() => resolve(probe.duration)), { once: true });
-    probe.addEventListener("error", () => done(() => reject(new Error("decode"))), { once: true });
-    probe.src = src;
-  });
-}
-
-const stripExtension = (name: string) => name.replace(/\.[^.]+$/, "").replace(/_+/g, " ").trim() || name;
-
-async function toLocalTrack(file: File, canPlay: (type: string) => boolean): Promise<Track> {
-  const looksLikeAudio = file.type.startsWith("audio/") || file.type === "video/mp4" || file.type === "video/webm" || AUDIO_EXT.test(file.name);
-  if (!looksLikeAudio) throw new Error("Not an audio file");
-  if (file.type && !canPlay(file.type)) throw new Error("This browser can't play this format");
-
-  const src = URL.createObjectURL(file);
-  let duration: number;
-  try {
-    duration = await probeDuration(src);
-  } catch {
-    URL.revokeObjectURL(src);
-    throw new Error("This browser can't play this format");
-  }
-
-  const tags = await readAudioTags(file).catch(() => null);
-  localCount += 1;
-  return {
-    id: `local-${localCount}`,
-    kind: "local",
-    title: tags?.title || stripExtension(file.name),
-    artist: tags?.artist || "From your device",
-    album: tags?.album || null,
-    category: null,
-    src,
-    duration: Number.isFinite(duration) ? duration : null,
-    art: tags?.picture ? URL.createObjectURL(tags.picture) : null,
-  };
-}
-
-/** Adds the visitor's chosen files to "Your music". Unplayable files are reported, not added. */
-export async function addLocalFiles(files: Iterable<File>): Promise<AddFilesResult> {
-  const tester = document.createElement("audio");
-  const canPlay = (type: string) => tester.canPlayType(type) !== "";
-  const result: AddFilesResult = { added: [], rejected: [] };
-
-  for (const file of files) {
-    try {
-      result.added.push(await toLocalTrack(file, canPlay));
-    } catch (error) {
-      result.rejected.push({ name: file.name, reason: error instanceof Error ? error.message : "Couldn't read file" });
-    }
-  }
-  if (result.added.length) setState({ localTracks: [...state.localTracks, ...result.added] });
-  return result;
-}
-
-function releaseTrack(track: Track) {
-  URL.revokeObjectURL(track.src);
-  if (track.art) URL.revokeObjectURL(track.art);
-}
-
-export function removeLocalTrack(id: string) {
-  const track = state.localTracks.find((entry) => entry.id === id);
-  if (!track) return;
-  const remaining = state.localTracks.filter((entry) => entry.id !== id);
-  setState({ localTracks: remaining, queue: state.queue.filter((entry) => entry !== id) });
-
-  if (state.trackId === id) {
-    const resume = wantsPlay;
-    wantsPlay = false;
-    generation++;
-    if (engine) {
-      silence(engine);
-      engine.audio.pause();
-      engine.audio.removeAttribute("src");
-      delete engine.audio.dataset.trackId;
-      engine.audio.load();
-    }
-    const fallback = remaining[0]?.id ?? DEFAULT_TRACK_ID;
-    setState({ queue: remaining.length ? remaining.map((entry) => entry.id) : CURATED_IDS });
-    if (resume) {
-      setState({ status: "paused" });
-      playTrack(fallback);
-    } else {
-      selectTrack(fallback);
-    }
-  }
-  releaseTrack(track);
-}
-
-export function clearLocalTracks() {
-  [...state.localTracks].forEach((track) => removeLocalTrack(track.id));
-}
-
 /* Media Session: lock-screen and hardware media keys ------------------------- */
 
 function setupMediaSession() {
@@ -699,8 +554,8 @@ function syncMediaSession() {
     navigator.mediaSession.metadata = new MediaMetadata({
       title: track.title,
       artist: track.artist,
-      album: track.album ?? "Fatima's Jukebox",
-      artwork: track.art ? [{ src: track.art }] : [{ src: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
+      album: track.album,
+      artwork: [{ src: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
     });
     navigator.mediaSession.playbackState = wantsPlay ? "playing" : "paused";
   } catch {

@@ -1,27 +1,25 @@
 "use client";
 
 import gsap from "gsap";
-import { useEffect, useId, useMemo, useRef, useState } from "react";
-import type { ChangeEvent, CSSProperties, DragEvent, KeyboardEvent, ReactNode } from "react";
+import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
+import type { CSSProperties, KeyboardEvent, ReactNode } from "react";
 import {
+  ChevronDown,
   CircleAlert,
   ExternalLink,
-  HardDrive,
   ListMusic,
   LoaderCircle,
   Maximize2,
   Minus,
-  Music2,
   Pause,
   Play,
   Repeat,
   Repeat1,
+  Scale,
   Search,
   Shuffle,
   SkipBack,
   SkipForward,
-  Trash2,
-  Upload,
   Volume1,
   Volume2,
   VolumeX,
@@ -30,8 +28,6 @@ import {
 import {
   CURATED,
   JUKEBOX_PANEL_ID,
-  addLocalFiles,
-  clearLocalTracks,
   closeJukebox,
   cycleRepeat,
   dismissNotice,
@@ -44,7 +40,6 @@ import {
   playTrack,
   preloadMusic,
   previousTrack,
-  removeLocalTrack,
   seekTo,
   setMusicVolume,
   toggleMusic,
@@ -53,18 +48,16 @@ import {
   useMusic,
   useMusicProgress,
 } from "@/lib/music";
-import type { Track } from "@/lib/music";
-import { CATEGORIES, TRACKS, categoryById, selectionCode } from "@/lib/musicLibrary";
+import { CATEGORIES, CC0_LEGAL_CODE, CC0_URL, TRACKS, categoryById, selectionCode } from "@/lib/musicLibrary";
 import type { CategoryId, CuratedTrack } from "@/lib/musicLibrary";
 import Soundwave from "./Soundwave";
 import TrackArt from "./TrackArt";
 import styles from "./Jukebox.module.css";
 
-type Tab = "jukebox" | "local";
-type Crate = CategoryId | "all";
+type Section = "browse" | "credits";
 
-const ACCEPT = "audio/*,.mp3,.m4a,.aac,.wav,.ogg,.oga,.opus,.flac,.webm";
 const REPEAT_LABEL = { all: "Repeat all", one: "Repeat this song", off: "Repeat off" } as const;
+const LIBRARY_QUEUE = TRACKS.map((track) => track.id);
 
 const reducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -73,6 +66,12 @@ function formatTime(seconds: number | null | undefined): string {
   const whole = Math.floor(seconds);
   return `${Math.floor(whole / 60)}:${String(whole % 60).padStart(2, "0")}`;
 }
+
+// Fixed locale and time zone, so the server and the browser print the same date.
+const formatDate = (iso: string) =>
+  new Date(`${iso}T00:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
+
+const host = (url: string) => new URL(url).hostname.replace(/^www\./, "");
 
 // Precomputed once: the jukebox code, art seed and search text for every curated track.
 const CURATED_INFO = new Map(
@@ -86,6 +85,18 @@ const CURATED_INFO = new Map(
   })
 );
 
+const TRACKS_BY_CATEGORY = new Map(CATEGORIES.map((category) => [category.id, TRACKS.filter((track) => track.category === category.id)]));
+
+// The licensing panel lists one entry per release: tracks that share a proof page share a license record.
+const RELEASES = Array.from(
+  TRACKS.reduce((releases, track) => {
+    releases.set(track.license.proof, [...(releases.get(track.license.proof) ?? []), track]);
+    return releases;
+  }, new Map<string, CuratedTrack[]>()),
+  ([proof, tracks]) => ({ proof, tracks, first: tracks[0] })
+);
+const LAST_VERIFIED = formatDate(TRACKS.map((track) => track.license.verified).sort().at(-1)!);
+
 const matches = (haystack: string, query: string) =>
   query
     .toLowerCase()
@@ -93,11 +104,11 @@ const matches = (haystack: string, query: string) =>
     .filter(Boolean)
     .every((word) => haystack.includes(word));
 
-/** Moves focus between a list's rows with the arrow keys, Home and End. */
+/** Moves focus between the visible rows of a list with the arrow keys, Home and End. */
 function handleRowKeys(event: KeyboardEvent<HTMLElement>) {
   const keys = ["ArrowDown", "ArrowUp", "Home", "End"];
   if (!keys.includes(event.key)) return;
-  const rows = Array.from(event.currentTarget.querySelectorAll<HTMLButtonElement>("[data-row]"));
+  const rows = Array.from(event.currentTarget.querySelectorAll<HTMLButtonElement>("[data-row]")).filter((row) => !row.closest("[hidden]"));
   const index = rows.indexOf(document.activeElement as HTMLButtonElement);
   if (index < 0) return;
   event.preventDefault();
@@ -110,11 +121,6 @@ function handleRowKeys(event: KeyboardEvent<HTMLElement>) {
           ? Math.min(rows.length - 1, index + 1)
           : Math.max(0, index - 1);
   rows[next]?.focus();
-}
-
-function artFor(track: Track, className: string) {
-  const seed = CURATED_INFO.get(track.id)?.seed ?? 0;
-  return <TrackArt className={className} category={track.category} seed={seed} image={track.art} />;
 }
 
 function IconButton({
@@ -146,7 +152,7 @@ function IconButton({
 
 function MiniEq() {
   return (
-    <span className={styles.miniEq}>
+    <span className={styles.miniEq} aria-hidden="true">
       <span />
       <span />
       <span />
@@ -155,41 +161,105 @@ function MiniEq() {
 }
 
 /**
- * Fatima's Jukebox: the site's music player, opened from the hero vinyl. One instance lives in the
- * root layout so it (and the music) carries across every page. It can be minimised to a small dock
- * or closed outright; neither stops the song.
+ * An accordion body that eases its height open and shut. React sets `hidden` only on the first
+ * render; after that the tween owns it, so a closing section stays visible until it has folded away.
+ */
+function Collapse({
+  open,
+  id,
+  labelledBy,
+  className,
+  children,
+}: {
+  open: boolean;
+  id: string;
+  labelledBy: string;
+  className?: string;
+  children: ReactNode;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const was = useRef(open);
+  const [initiallyOpen] = useState(open);
+
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el || was.current === open) return;
+    was.current = open;
+    gsap.killTweensOf(el);
+    const settle = { clearProps: "height,minHeight,opacity,overflow" };
+
+    if (reducedMotion()) {
+      el.hidden = !open;
+      gsap.set(el, settle);
+    } else if (open) {
+      el.hidden = false;
+      gsap.fromTo(
+        el,
+        { height: 0, minHeight: 0, opacity: 0, overflow: "hidden" },
+        { height: "auto", opacity: 1, duration: 0.42, ease: "power3.out", ...settle }
+      );
+    } else {
+      gsap.to(el, {
+        height: 0,
+        minHeight: 0,
+        opacity: 0,
+        overflow: "hidden",
+        duration: 0.28,
+        ease: "power2.inOut",
+        onComplete: () => {
+          el.hidden = true;
+          gsap.set(el, settle);
+        },
+      });
+    }
+  }, [open]);
+
+  useEffect(() => {
+    const el = ref.current;
+    return () => {
+      if (el) gsap.killTweensOf(el);
+    };
+  }, []);
+
+  return (
+    <div ref={ref} id={id} role="region" aria-labelledby={labelledBy} className={className} hidden={!initiallyOpen}>
+      {children}
+    </div>
+  );
+}
+
+/**
+ * Fatima's Jukebox: the site's music player, opened from the hero vinyl or the navbar. One instance
+ * lives in the root layout so it (and the music) carries across every page. Now Playing is always in
+ * view; the library and the licensing record sit behind two accordions, one open at a time. The
+ * panel can be minimised to a small dock or closed; neither stops the song.
  */
 export default function Jukebox() {
   const music = useMusic();
   const { current, duration } = useMusicProgress();
-  const [tab, setTab] = useState<Tab>("jukebox");
-  const [crate, setCrate] = useState<Crate>("all");
+  const [section, setSection] = useState<Section | null>(null);
+  const [openCategory, setOpenCategory] = useState<CategoryId | null>(null);
   const [query, setQuery] = useState("");
-  const [fileReport, setFileReport] = useState<string | null>(null);
-  const [addingFiles, setAddingFiles] = useState(false);
-  const [dragOver, setDragOver] = useState(false);
 
   const panelRef = useRef<HTMLElement>(null);
   const dockRef = useRef<HTMLDivElement>(null);
   const dockExpandRef = useRef<HTMLButtonElement>(null);
   const labelRef = useRef<HTMLSpanElement>(null);
   const metaRef = useRef<HTMLDivElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const prevPanel = useRef(music.panel);
   const prevTrack = useRef(music.trackId);
 
-  const titleId = useId();
-  const jukeboxTabId = useId();
-  const localTabId = useId();
-  const jukeboxPanelId = useId();
-  const localPanelId = useId();
-  const tabIds = { jukebox: jukeboxTabId, local: localTabId };
-  const panelIds = { jukebox: jukeboxPanelId, local: localPanelId };
+  const uid = useId();
+  const titleId = `${uid}-title`;
+  const sectionIds = {
+    browse: { head: `${uid}-browse-head`, body: `${uid}-browse` },
+    credits: { head: `${uid}-credits-head`, body: `${uid}-credits` },
+  };
 
   const open = music.panel === "open";
   // From the hook's snapshot, not the live store, so hydration renders what the server did.
-  const track = music.localTracks.find((entry) => entry.id === music.trackId) ?? CURATED.find((entry) => entry.id === music.trackId) ?? CURATED[0];
-  const info = CURATED_INFO.get(track.id);
+  const track = CURATED.find((entry) => entry.id === music.trackId) ?? CURATED[0];
+  const info = CURATED_INFO.get(track.id)!;
   const active = music.status === "playing" || music.status === "loading";
   const playing = music.status === "playing";
   const shownDuration = duration || track.duration || 0;
@@ -197,19 +267,10 @@ export default function Jukebox() {
   const effectiveVolume = music.muted ? 0 : percent;
   const VolumeIcon = effectiveVolume === 0 ? VolumeX : effectiveVolume < 50 ? Volume1 : Volume2;
 
-  const curated = useMemo(
-    () =>
-      TRACKS.filter(
-        (entry) => (crate === "all" || entry.category === crate) && matches(CURATED_INFO.get(entry.id)!.haystack, query)
-      ),
-    [crate, query]
-  );
-  const local = useMemo(
-    () => music.localTracks.filter((entry) => matches(`${entry.title} ${entry.artist} ${entry.album ?? ""}`.toLowerCase(), query)),
-    [music.localTracks, query]
-  );
+  const searching = query.trim().length > 0;
+  const results = useMemo(() => TRACKS.filter((entry) => matches(CURATED_INFO.get(entry.id)!.haystack, query)), [query]);
 
-  // Panel in and out. It stays mounted (so search and scroll survive) and is hidden with autoAlpha.
+  // Panel in and out. It stays mounted (so search, open sections and scroll survive) and hides with autoAlpha.
   useEffect(() => {
     const panel = panelRef.current;
     const was = prevPanel.current;
@@ -225,13 +286,13 @@ export default function Jukebox() {
       } else {
         gsap.fromTo(
           panel,
-          { opacity: 0, visibility: "visible", y: 28, scale: 0.92, rotate: -1.5 },
-          { opacity: 1, y: 0, scale: 1, rotate: 0, duration: 0.62, ease: "expo.out" }
+          { opacity: 0, visibility: "visible", y: 24, scale: 0.95 },
+          { opacity: 1, y: 0, scale: 1, duration: 0.55, ease: "expo.out" }
         );
         gsap.fromTo(
           panel.querySelectorAll("[data-reveal]"),
-          { autoAlpha: 0, y: 12 },
-          { autoAlpha: 1, y: 0, duration: 0.5, ease: "power3.out", stagger: 0.045, delay: 0.08, clearProps: "transform,opacity,visibility" }
+          { autoAlpha: 0, y: 10 },
+          { autoAlpha: 1, y: 0, duration: 0.45, ease: "power3.out", stagger: 0.04, delay: 0.06, clearProps: "transform,opacity,visibility" }
         );
       }
       panel.focus({ preventScroll: true });
@@ -240,7 +301,7 @@ export default function Jukebox() {
 
     const hadFocus = panel.contains(document.activeElement);
     gsap.killTweensOf(panel);
-    gsap.to(panel, still ? { autoAlpha: 0, duration: 0.15 } : { autoAlpha: 0, y: 18, scale: 0.96, duration: 0.26, ease: "power2.in" });
+    gsap.to(panel, still ? { autoAlpha: 0, duration: 0.15 } : { autoAlpha: 0, y: 16, scale: 0.97, duration: 0.24, ease: "power2.in" });
     if (!hadFocus) return;
     if (music.panel === "minimized") {
       // The dock renders in this same commit; focus its expand button once it's painted.
@@ -258,7 +319,7 @@ export default function Jukebox() {
   // The dock pops up from the corner.
   useEffect(() => {
     if (music.panel !== "minimized" || !dockRef.current || reducedMotion()) return;
-    gsap.fromTo(dockRef.current, { autoAlpha: 0, y: 20, scale: 0.9 }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.5, ease: "back.out(1.7)" });
+    gsap.fromTo(dockRef.current, { autoAlpha: 0, y: 16, scale: 0.92 }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.45, ease: "back.out(1.6)" });
   }, [music.panel]);
 
   // A new song drops onto the platter: the label spins in and the title slides up.
@@ -274,9 +335,16 @@ export default function Jukebox() {
       );
     }
     if (metaRef.current) {
-      gsap.fromTo(metaRef.current.children, { y: 10, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.45, ease: "power3.out", stagger: 0.05 });
+      gsap.fromTo(metaRef.current.children, { y: 8, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.4, ease: "power3.out", stagger: 0.04 });
     }
   }, [music.trackId]);
+
+  const toggleSection = (next: Section) => {
+    const opening = section !== next;
+    setSection(opening ? next : null);
+    // Open the library on the crate that holds the current song, so it's never lost in the list.
+    if (opening && next === "browse" && !openCategory) setOpenCategory(track.category);
+  };
 
   const handleRow = (id: string, queue: string[]) => {
     if (id === music.trackId) toggleMusic();
@@ -289,43 +357,6 @@ export default function Jukebox() {
     closeJukebox();
   };
 
-  const handleTabKeys = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
-    event.preventDefault();
-    const next: Tab = tab === "jukebox" ? "local" : "jukebox";
-    setTab(next);
-    document.getElementById(tabIds[next])?.focus();
-  };
-
-  const handleFiles = async (files: FileList | null) => {
-    if (!files?.length) return;
-    setAddingFiles(true);
-    setFileReport(null);
-    const { added, rejected } = await addLocalFiles(Array.from(files));
-    setAddingFiles(false);
-
-    const parts: string[] = [];
-    if (added.length) parts.push(`Added ${added.length} song${added.length === 1 ? "" : "s"}.`);
-    if (rejected.length) {
-      const names = rejected.slice(0, 3).map((entry) => `${entry.name} (${entry.reason.toLowerCase()})`);
-      parts.push(`Skipped ${names.join(", ")}${rejected.length > 3 ? ` and ${rejected.length - 3} more` : ""}.`);
-    }
-    setFileReport(parts.join(" "));
-    if (fileInputRef.current) fileInputRef.current.value = "";
-    if (added.length) {
-      setQuery("");
-      // Their songs, their choice: start the first one straight away.
-      const queue = [...music.localTracks, ...added].map((entry) => entry.id);
-      playTrack(added[0].id, queue);
-    }
-  };
-
-  const handleDrop = (event: DragEvent<HTMLLabelElement>) => {
-    event.preventDefault();
-    setDragOver(false);
-    void handleFiles(event.dataTransfer.files);
-  };
-
   const announcement =
     music.notice ??
     (music.status === "playing"
@@ -336,12 +367,10 @@ export default function Jukebox() {
           ? "Music unavailable"
           : "");
 
-  const rowLabel = (title: string, artist: string, isCurrent: boolean, prefix = "") =>
-    `${prefix}${title} by ${artist}${isCurrent ? (active ? ", playing. Select to pause" : ", selected. Select to play") : ""}`;
-
-  const renderCuratedRow = (entry: CuratedTrack, queue: string[]) => {
-    const entryInfo = CURATED_INFO.get(entry.id)!;
+  const renderRow = (entry: CuratedTrack, queue: string[]) => {
+    const { code } = CURATED_INFO.get(entry.id)!;
     const isCurrent = entry.id === music.trackId;
+    const state = isCurrent ? (active ? ", playing. Select to pause" : ", selected. Select to play") : "";
     return (
       <li key={entry.id}>
         <button
@@ -350,12 +379,13 @@ export default function Jukebox() {
           className={styles.row}
           aria-current={isCurrent ? "true" : undefined}
           data-playing={(isCurrent && active) || undefined}
-          aria-label={rowLabel(entry.title, entry.artist, isCurrent, `${entryInfo.code}, `)}
+          aria-label={`${code}, ${entry.title} by ${entry.artist}${state}`}
           onClick={() => handleRow(entry.id, queue)}
         >
-          <span className={styles.code}>{entryInfo.code}</span>
-          <TrackArt className={styles.rowArt} category={entry.category} seed={entryInfo.seed} />
-          <span className={styles.rowText}>
+          <span className={styles.code} aria-hidden="true">
+            {code}
+          </span>
+          <span className={styles.rowText} aria-hidden="true">
             <span className={styles.rowTitle}>{entry.title}</span>
             <span className={styles.rowSub}>
               {entry.artist} · {entry.mood}
@@ -370,9 +400,48 @@ export default function Jukebox() {
     );
   };
 
-  const renderCurated = () => {
-    const queue = curated.map((entry) => entry.id);
-    if (!curated.length) {
+  const renderCrates = () =>
+    CATEGORIES.map((category) => {
+      const inCrate = TRACKS_BY_CATEGORY.get(category.id)!;
+      const isOpen = openCategory === category.id;
+      const holdsCurrent = track.category === category.id;
+      const headId = `${uid}-crate-${category.id}-head`;
+      const bodyId = `${uid}-crate-${category.id}`;
+      return (
+        <div key={category.id} className={styles.crate} data-open={isOpen || undefined}>
+          <button
+            id={headId}
+            type="button"
+            data-row
+            className={styles.crateHead}
+            aria-expanded={isOpen}
+            aria-controls={bodyId}
+            data-current={holdsCurrent || undefined}
+            onClick={() => setOpenCategory(isOpen ? null : category.id)}
+          >
+            <span className={styles.crateLetter} aria-hidden="true">
+              {category.letter}
+            </span>
+            <span className={styles.crateText}>
+              <span className={styles.crateLabel}>{category.label}</span>
+              <span className={styles.crateBlurb}>{category.blurb}</span>
+            </span>
+            {holdsCurrent && active && <MiniEq />}
+            <span className={styles.crateCount}>
+              {inCrate.length}
+              <span className="sr-only"> songs</span>
+            </span>
+            <ChevronDown className={styles.chevron} size={15} aria-hidden="true" />
+          </button>
+          <Collapse open={isOpen} id={bodyId} labelledBy={headId}>
+            <ul className={styles.list}>{inCrate.map((entry) => renderRow(entry, LIBRARY_QUEUE))}</ul>
+          </Collapse>
+        </div>
+      );
+    });
+
+  const renderResults = () => {
+    if (!results.length) {
       return (
         <p className={styles.empty}>
           No songs match “{query}”.{" "}
@@ -382,115 +451,44 @@ export default function Jukebox() {
         </p>
       );
     }
-    // Browsing everything: show the crates as labelled groups, like the cards in a jukebox window.
-    if (crate === "all" && !query.trim()) {
-      return CATEGORIES.map((category) => {
-        const inCrate = curated.filter((entry) => entry.category === category.id);
-        if (!inCrate.length) return null;
-        return (
-          <div key={category.id} className={styles.group} role="group" aria-label={category.label}>
-            <p className={styles.groupHead} aria-hidden="true">
-              <span className={styles.groupLetter}>{category.letter}</span>
-              {category.label}
-              {category.featured && <span className={styles.featured}>Featured</span>}
-            </p>
-            <ul className={styles.list}>{inCrate.map((entry) => renderCuratedRow(entry, queue))}</ul>
-          </div>
-        );
-      });
-    }
-    return <ul className={styles.list}>{curated.map((entry) => renderCuratedRow(entry, queue))}</ul>;
-  };
-
-  const renderLocal = () => {
-    const queue = local.map((entry) => entry.id);
+    const queue = results.map((entry) => entry.id);
     return (
       <>
-        <label
-          className={styles.drop}
-          data-over={dragOver || undefined}
-          onDragOver={(event) => {
-            event.preventDefault();
-            setDragOver(true);
-          }}
-          onDragLeave={() => setDragOver(false)}
-          onDrop={handleDrop}
-        >
-          <input
-            ref={fileInputRef}
-            className={styles.fileInput}
-            type="file"
-            accept={ACCEPT}
-            multiple
-            onChange={(event: ChangeEvent<HTMLInputElement>) => void handleFiles(event.target.files)}
-          />
-          <span className={styles.dropIcon} aria-hidden="true">
-            {addingFiles ? <LoaderCircle className={styles.spin} size={18} /> : <Upload size={18} />}
-          </span>
-          <span className={styles.dropText}>
-            <strong>{addingFiles ? "Reading your songs…" : "Play your own music"}</strong>
-            <span>Choose or drop MP3, M4A, WAV, OGG, FLAC or WebM files</span>
-          </span>
-        </label>
-        <p className={styles.privacy}>
-          <HardDrive size={13} aria-hidden="true" />
-          Songs play straight from your device. Nothing is uploaded or saved, and the list clears when you reload.
+        <p className={styles.resultCount} aria-live="polite">
+          {results.length} {results.length === 1 ? "song" : "songs"}
         </p>
-        {fileReport && (
-          <p className={styles.report} role="status">
-            {fileReport}
-          </p>
-        )}
-        {music.localTracks.length > 0 &&
-          (local.length ? (
-            <ul className={styles.list}>
-              {local.map((entry, index) => {
-                const isCurrent = entry.id === music.trackId;
-                return (
-                  <li key={entry.id} className={styles.localItem}>
-                    <button
-                      type="button"
-                      data-row
-                      className={styles.row}
-                      aria-current={isCurrent ? "true" : undefined}
-                      data-playing={(isCurrent && active) || undefined}
-                      aria-label={rowLabel(entry.title, entry.artist, isCurrent)}
-                      onClick={() => handleRow(entry.id, queue)}
-                    >
-                      <span className={styles.code}>{String(index + 1).padStart(2, "0")}</span>
-                      {artFor(entry, styles.rowArt)}
-                      <span className={styles.rowText}>
-                        <span className={styles.rowTitle}>{entry.title}</span>
-                        <span className={styles.rowSub}>{entry.artist}</span>
-                      </span>
-                      <span className={styles.rowEnd} aria-hidden="true">
-                        <MiniEq />
-                        <span className={styles.rowTime}>{formatTime(entry.duration)}</span>
-                      </span>
-                    </button>
-                    <IconButton label={`Remove ${entry.title}`} className={styles.removeButton} onClick={() => removeLocalTrack(entry.id)}>
-                      <Trash2 size={14} aria-hidden="true" />
-                    </IconButton>
-                  </li>
-                );
-              })}
-            </ul>
-          ) : (
-            <p className={styles.empty}>
-              None of your songs match “{query}”.{" "}
-              <button type="button" className={styles.linkButton} onClick={() => setQuery("")}>
-                Clear search
-              </button>
-            </p>
-          ))}
-        {music.localTracks.length > 1 && (
-          <button type="button" className={styles.linkButton} onClick={() => clearLocalTracks()}>
-            Remove all my songs
-          </button>
-        )}
+        <ul className={styles.list}>{results.map((entry) => renderRow(entry, queue))}</ul>
       </>
     );
   };
+
+  const sectionHead = (id: Section, icon: ReactNode, title: string, sub: string) => (
+    <button
+      id={sectionIds[id].head}
+      type="button"
+      className={styles.sectionHead}
+      aria-expanded={section === id}
+      aria-controls={sectionIds[id].body}
+      onClick={() => toggleSection(id)}
+    >
+      <span className={styles.sectionIcon} aria-hidden="true">
+        {icon}
+      </span>
+      <span className={styles.sectionText}>
+        <span className={styles.sectionTitle}>{title}</span>
+        <span className={styles.sectionSub}>{sub}</span>
+      </span>
+      <ChevronDown className={styles.chevron} size={16} aria-hidden="true" />
+    </button>
+  );
+
+  const extLink = (href: string, children: ReactNode, context: string) => (
+    <a href={href} target="_blank" rel="noopener noreferrer">
+      {children}
+      <ExternalLink size={10} aria-hidden="true" />
+      <span className="sr-only"> {context} (opens in a new tab)</span>
+    </a>
+  );
 
   return (
     <>
@@ -507,10 +505,12 @@ export default function Jukebox() {
         onKeyDown={handlePanelKeys}
       >
         <header className={styles.top} data-reveal>
-          <p className={styles.brand}>
-            <span className={styles.brandDot} aria-hidden="true" />
-            <span id={titleId}>Fatima&rsquo;s Jukebox</span>
-          </p>
+          <div className={styles.heading}>
+            <p id={titleId} className={styles.brand}>
+              Fatima&rsquo;s Jukebox
+            </p>
+            <p className={styles.tagline}>Your little soundtrack while browsing.</p>
+          </div>
           <div className={styles.windowButtons}>
             <IconButton label="Minimize player. Music keeps playing" onClick={minimizeJukebox}>
               <Minus size={16} aria-hidden="true" />
@@ -521,12 +521,12 @@ export default function Jukebox() {
           </div>
         </header>
 
-        {/* Now playing: a little turntable, the song, and a live soundwave. */}
-        <div className={styles.stage} data-reveal data-playing={playing || undefined} data-status={music.status}>
+        {/* Now playing: a little turntable and the song. Always in view. */}
+        <div className={styles.now} data-reveal data-playing={playing || undefined} data-status={music.status}>
           <div className={styles.deck} aria-hidden="true">
             <span className={styles.record}>
               <span ref={labelRef} className={styles.recordLabel}>
-                {artFor(track, styles.labelArt)}
+                <TrackArt className={styles.labelArt} category={track.category} seed={info.seed} />
               </span>
               <span className={styles.spindle} />
             </span>
@@ -535,7 +535,9 @@ export default function Jukebox() {
             </span>
           </div>
           <div ref={metaRef} className={styles.meta}>
-            <span className={styles.tag}>{info ? `${info.code} · ${categoryById(info.track.category).label}` : "Your music"}</span>
+            <p className={styles.eyebrow}>
+              {info.code} · {categoryById(track.category).label}
+            </p>
             <p className={styles.title} title={track.title}>
               {track.title}
             </p>
@@ -586,13 +588,14 @@ export default function Jukebox() {
             aria-label={active ? "Pause" : music.status === "error" ? "Retry" : "Play"}
             onClick={toggleMusic}
             onPointerEnter={preloadMusic}
+            onFocus={preloadMusic}
           >
             {music.status === "loading" ? (
-              <LoaderCircle className={styles.spin} size={24} aria-hidden="true" />
+              <LoaderCircle className={styles.spin} size={22} aria-hidden="true" />
             ) : active ? (
-              <Pause size={22} aria-hidden="true" fill="currentColor" />
+              <Pause size={20} aria-hidden="true" fill="currentColor" />
             ) : (
-              <Play size={22} aria-hidden="true" fill="currentColor" className={styles.playIcon} />
+              <Play size={20} aria-hidden="true" fill="currentColor" className={styles.playIcon} />
             )}
           </button>
           <IconButton label="Next song" onClick={() => nextTrack()} className={styles.skipButton}>
@@ -605,7 +608,7 @@ export default function Jukebox() {
 
         <div className={styles.volume} data-reveal>
           <IconButton label={music.muted ? "Unmute" : "Mute"} pressed={music.muted} onClick={toggleMute} className={styles.muteButton}>
-            <VolumeIcon size={16} aria-hidden="true" />
+            <VolumeIcon size={15} aria-hidden="true" />
           </IconButton>
           <input
             type="range"
@@ -624,107 +627,101 @@ export default function Jukebox() {
           </span>
         </div>
 
-        <div className={styles.library} data-reveal>
-          <div className={styles.tabs} role="tablist" aria-label="Music source" onKeyDown={handleTabKeys}>
-            {(["jukebox", "local"] as const).map((id) => (
-              <button
-                key={id}
-                id={tabIds[id]}
-                type="button"
-                role="tab"
-                className={styles.tab}
-                aria-selected={tab === id}
-                aria-controls={panelIds[id]}
-                tabIndex={tab === id ? 0 : -1}
-                onClick={() => setTab(id)}
-              >
-                {id === "jukebox" ? <ListMusic size={14} aria-hidden="true" /> : <Music2 size={14} aria-hidden="true" />}
-                {id === "jukebox" ? "Jukebox" : "Your music"}
-                {id === "local" && music.localTracks.length > 0 && <span className={styles.count}>{music.localTracks.length}</span>}
-              </button>
-            ))}
+        <div className={styles.sections} data-reveal>
+          <div className={styles.section} data-open={section === "browse" || undefined}>
+            {sectionHead("browse", <ListMusic size={15} />, "Browse Music", `${TRACKS.length} songs in ${CATEGORIES.length} genres, with search`)}
+            <Collapse open={section === "browse"} id={sectionIds.browse.body} labelledBy={sectionIds.browse.head} className={styles.sectionBody}>
+              <label className={styles.search}>
+                <Search size={14} aria-hidden="true" />
+                <input
+                  type="search"
+                  value={query}
+                  placeholder="Search songs, artists, moods"
+                  aria-label="Search the jukebox"
+                  onChange={(event) => setQuery(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Escape" && query) {
+                      event.stopPropagation();
+                      setQuery("");
+                    }
+                  }}
+                />
+              </label>
+              <div className={styles.browseList} onKeyDown={handleRowKeys}>
+                {searching ? renderResults() : renderCrates()}
+              </div>
+            </Collapse>
           </div>
 
-          <label className={styles.search}>
-            <Search size={15} aria-hidden="true" />
-            <input
-              type="search"
-              value={query}
-              placeholder={tab === "jukebox" ? "Search songs, artists, vibes" : "Search your songs"}
-              aria-label={tab === "jukebox" ? "Search the jukebox" : "Search your music"}
-              onChange={(event) => setQuery(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === "Escape" && query) {
-                  event.stopPropagation();
-                  setQuery("");
-                }
-              }}
-            />
-          </label>
+          <div className={styles.section} data-open={section === "credits" || undefined}>
+            {sectionHead("credits", <Scale size={15} />, "Music Licensing & Credits", "Verified license for every track")}
+            <Collapse open={section === "credits"} id={sectionIds.credits.body} labelledBy={sectionIds.credits.head} className={styles.sectionBody}>
+              <div className={styles.credits}>
+                <p className={styles.creditsIntro}>
+                  Music featured in this portfolio is used under the applicable licenses listed below. Track ownership and attribution
+                  remain with their respective creators, where applicable.
+                </p>
 
-          {tab === "jukebox" && (
-            <div className={styles.crates} role="group" aria-label="Genres">
-              <button type="button" className={styles.crate} aria-pressed={crate === "all"} onClick={() => setCrate("all")}>
-                All
-              </button>
-              {CATEGORIES.map((category) => (
-                <button
-                  key={category.id}
-                  type="button"
-                  className={styles.crate}
-                  aria-pressed={crate === category.id}
-                  data-featured={category.featured || undefined}
-                  title={category.blurb}
-                  onClick={() => setCrate(category.id)}
-                >
-                  <span className={styles.crateLetter} aria-hidden="true">
-                    {category.letter}
-                  </span>
-                  {category.label}
-                </button>
-              ))}
-            </div>
-          )}
+                <div className={styles.cc0}>
+                  <p className={styles.cc0Title}>CC0 1.0 — Public Domain Dedication</p>
+                  <p>
+                    Every track in the jukebox is released under CC0 1.0. CC0 permits use, modification and redistribution without
+                    requiring permission or attribution, subject to the limits of the dedication and any other rights that may apply.
+                  </p>
+                  <p className={styles.cc0Links}>
+                    {extLink(CC0_URL, "Deed", "CC0 1.0 summary")}
+                    {extLink(CC0_LEGAL_CODE, "Legal code", "CC0 1.0 full legal text")}
+                  </p>
+                </div>
 
-          <div
-            id={panelIds.jukebox}
-            role="tabpanel"
-            aria-labelledby={tabIds.jukebox}
-            className={styles.scroller}
-            hidden={tab !== "jukebox"}
-            onKeyDown={handleRowKeys}
-          >
-            {tab === "jukebox" && renderCurated()}
-          </div>
-          <div
-            id={panelIds.local}
-            role="tabpanel"
-            aria-labelledby={tabIds.local}
-            className={styles.scroller}
-            hidden={tab !== "local"}
-            onKeyDown={handleRowKeys}
-          >
-            {tab === "local" && renderLocal()}
+                <p className={styles.method}>
+                  Each license was checked individually on the creator&rsquo;s own release page, which states it. Last verified{" "}
+                  {LAST_VERIFIED}.
+                </p>
+
+                <ul className={styles.releases}>
+                  {RELEASES.map(({ proof, tracks, first }) => (
+                    <li key={proof} className={styles.release}>
+                      <p className={styles.releaseHead}>
+                        <span className={styles.releaseArtist}>{first.artist}</span>
+                        <span className={styles.releaseAlbum}>{first.album}</span>
+                      </p>
+                      <p className={styles.releaseTracks}>
+                        {tracks.map((entry) => (
+                          <span key={entry.id}>
+                            <span className={styles.releaseCode}>{CURATED_INFO.get(entry.id)!.code}</span> {entry.title}
+                          </span>
+                        ))}
+                      </p>
+                      <dl className={styles.facts}>
+                        <dt>License</dt>
+                        <dd>{extLink(first.license.url, "CC0 1.0 Universal", `license for ${first.album}`)}</dd>
+                        <dt>Source</dt>
+                        <dd>{extLink(proof, host(proof), `release page for ${first.album} by ${first.artist}, stating the license`)}</dd>
+                        <dt>Audio file</dt>
+                        <dd>{extLink(first.license.file, host(first.license.file), `download of ${first.album}`)}</dd>
+                        <dt>Credit</dt>
+                        <dd>
+                          {first.license.creditRequest ? (
+                            <>
+                              {first.license.creditRequest.text} {extLink(first.license.creditRequest.url, "Artist FAQ", `from ${first.artist}`)}
+                            </>
+                          ) : (
+                            "Not required by CC0. Credited here anyway."
+                          )}
+                        </dd>
+                        <dt>Verified</dt>
+                        <dd>
+                          <time dateTime={first.license.verified}>{formatDate(first.license.verified)}</time>
+                        </dd>
+                      </dl>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </Collapse>
           </div>
         </div>
-
-        <details className={styles.credits} data-reveal>
-          <summary>All jukebox songs are CC0 · Credits</summary>
-          <p>Every curated song is dedicated to the public domain (CC0 1.0) by its artist. Thank you for sharing your music.</p>
-          <ul>
-            {TRACKS.map((entry) => (
-              <li key={entry.id}>
-                <span>
-                  {entry.title} · {entry.artist}
-                </span>
-                <a href={entry.license.proof} target="_blank" rel="noopener noreferrer">
-                  Source <ExternalLink size={11} aria-hidden="true" />
-                  <span className="sr-only"> for {entry.title} (opens in a new tab)</span>
-                </a>
-              </li>
-            ))}
-          </ul>
-        </details>
       </section>
 
       {music.panel === "minimized" && (
@@ -737,7 +734,7 @@ export default function Jukebox() {
             aria-label={`Open jukebox. ${active ? "Playing" : "Selected"}: ${track.title} by ${track.artist}`}
           >
             <span className={styles.dockDisc} aria-hidden="true">
-              {artFor(track, styles.labelArt)}
+              <TrackArt className={styles.labelArt} category={track.category} seed={info.seed} />
             </span>
             <span className={styles.dockText} aria-hidden="true">
               <span className={styles.dockTitle}>{track.title}</span>
@@ -751,6 +748,11 @@ export default function Jukebox() {
           <IconButton label="Close mini player. Music keeps playing" onClick={closeJukebox} className={styles.dockClose}>
             <X size={14} aria-hidden="true" />
           </IconButton>
+          <span
+            className={styles.dockProgress}
+            aria-hidden="true"
+            style={{ "--fill": `${shownDuration ? (current / shownDuration) * 100 : 0}%` } as CSSProperties}
+          />
         </div>
       )}
 

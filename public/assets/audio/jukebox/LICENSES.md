@@ -5,8 +5,11 @@ Every track in this folder is dedicated to the public domain by its artist under
 modifying, and distributing the music, including streaming it on a website, with no permission
 or payment needed. Credit isn't required, but the artists are credited in the player anyway.
 
-Verified: 2026-10-27. Each license was checked on a page the artist controls (their Free Music
-Archive album page or their OpenGameArt submission), never only on a third-party mirror.
+Verified: 2026-10-27, re-checked 2026-10-28. Each license was checked on a page the artist
+controls (their Free Music Archive album page or their OpenGameArt submission), never only on a
+third-party mirror. On the re-check, every link in the table below returned HTTP 200, every proof
+page still stated CC0, and every track was confirmed on its proof page by name (HoliznaCC0: by
+the file list inside the CC0 zip, see the notes).
 
 Processing: each file was loudness-normalised (EBU R128, −15 LUFS) and re-encoded to 128 kbps
 MP3 with only its title, artist, and license as tags. CC0 places no restriction on this.
@@ -36,13 +39,16 @@ MP3 with only its title, artist, and license as tags. CC0 places no restriction 
 - **Loyalty Freak Music.** Each FMA album page above reads "The songs in this album are licensed
   under: CC0 1.0 Universal." The artist's FAQ (https://loyaltyfreakmusic.com/faq/) says 98% of
   their work is CC0 and to check each album's description, which is why each album was checked
-  one by one. The artist's Bandcamp shows "CC BY 4.0" for the same albums. Bandcamp offers no CC0
+  one by one. The same FAQ says "Normally, even if it's CC0, you will need to attribute me the
+  work", so the jukebox's licensing panel credits them and links that FAQ. The artist's Bandcamp shows "CC BY 4.0" for the same albums. Bandcamp offers no CC0
   option, and FMA and the artist's own site both state CC0. The player credits the artist
   regardless, which also meets CC BY. The artist asks that the music not be sent to streaming
   distributors, registered with YouTube Content ID, or used for AI training. A website background
   player does none of these.
 - **HoliznaCC0.** The OpenGameArt page lists the license as CC0 and says "This music is public
-  domain Cc0, so use it how you want!"
+  domain Cc0, so use it how you want!" The page doesn't name the tracks; its only file is
+  `happy_electronic.zip`, whose file list includes "06 HoliznaCC0 - Happy Dance", "11 HoliznaCC0 -
+  Love Love Love" and "03 HoliznaCC0 - Back In The 80s".
 - **Zane Little Music.** Each OpenGameArt page lists the license as CC0. The City Pop crate holds
   their retro jazz-funk fusion tracks. "Midnight Cruiser" and "Freeway Fumes" were written as
   homages to the soundtrack of the Japanese PS2 game *Road Trip Adventure*. They are funky, retro,

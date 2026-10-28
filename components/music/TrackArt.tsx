@@ -1,29 +1,25 @@
 "use client";
 
-/* eslint-disable @next/next/no-img-element -- local object URLs from the visitor's own files */
-
 import { useId } from "react";
 import type { CategoryId } from "@/lib/musicLibrary";
 
 /*
  * Little drawn sleeves for the jukebox, one motif per crate, all in the site's pinks, burgundy and
- * cream. Drawing them means no album artwork to license. A visitor's own file shows its embedded
- * cover when it has one.
+ * cream. Drawing them means no album artwork to license.
  */
 
 type Palette = [bg: string, mid: string, ink: string];
 
-const PALETTES: Record<CategoryId | "local", Palette> = {
+const PALETTES: Record<CategoryId, Palette> = {
   pop: ["#ffd9e7", "#f39ac0", "#a63d68"],
   indie: ["#fff1e2", "#f6c2d4", "#b04a72"],
   rnb: ["#3a1627", "#8f3c60", "#f6dde7"],
   citypop: ["#ffe6d4", "#ef8fae", "#6d2443"],
   dance: ["#2a1c24", "#db82a8", "#fff1e2"],
   funk: ["#7b2c4d", "#e8a0bf", "#fff4e8"],
-  local: ["#f6dde7", "#c982a2", "#5a2038"],
 };
 
-function Motif({ category, ink, mid, variant }: { category: CategoryId | "local"; ink: string; mid: string; variant: number }) {
+function Motif({ category, ink, mid, variant }: { category: CategoryId; ink: string; mid: string; variant: number }) {
   switch (category) {
     case "pop": // a burst of sparkles
       return (
@@ -70,7 +66,7 @@ function Motif({ category, ink, mid, variant }: { category: CategoryId | "local"
           <path d="M56 14 30 54h18l-6 32 28-44H52l4-28Z" fill={mid} stroke={ink} strokeWidth="2.5" strokeLinejoin="round" />
         </g>
       );
-    case "funk": // a disco ball
+    default: // funk: a disco ball
       return (
         <g>
           <path d="M50 8v14" stroke={ink} strokeWidth="2" />
@@ -85,29 +81,19 @@ function Motif({ category, ink, mid, variant }: { category: CategoryId | "local"
           <path d={`M${70 + variant} 30l3 6 6 3-6 3-3 6-3-6-6-3 6-3Z`} fill={ink} />
         </g>
       );
-    default: // a note, for the visitor's own songs
-      return (
-        <g fill={ink}>
-          <path d="M42 26v38.5A10 10 0 1 0 48 74V40l22-6v22.5A10 10 0 1 0 76 66V20Z" />
-        </g>
-      );
   }
 }
 
 type Props = {
-  category: CategoryId | null;
+  category: CategoryId;
   /** Varies the motif a little between tracks in the same crate. */
   seed?: number;
-  image?: string | null;
   className?: string;
 };
 
-export default function TrackArt({ category, seed = 0, image, className }: Props) {
+export default function TrackArt({ category, seed = 0, className }: Props) {
   const id = useId();
-  if (image) return <img className={className} src={image} alt="" draggable={false} />;
-
-  const key = category ?? "local";
-  const [bg, mid, ink] = PALETTES[key];
+  const [bg, mid, ink] = PALETTES[category];
   const variant = seed % 3;
   return (
     <svg className={className} viewBox="0 0 100 100" aria-hidden="true" focusable="false" preserveAspectRatio="xMidYMid slice">
@@ -118,7 +104,7 @@ export default function TrackArt({ category, seed = 0, image, className }: Props
         </radialGradient>
       </defs>
       <rect width="100" height="100" fill={bg} />
-      <Motif category={key} ink={ink} mid={mid} variant={variant} />
+      <Motif category={category} ink={ink} mid={mid} variant={variant} />
       <rect width="100" height="100" fill={`url(#${id}-bg)`} />
     </svg>
   );

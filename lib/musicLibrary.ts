@@ -1,7 +1,8 @@
 /*
  * The jukebox's curated library. Every track here is released under CC0 1.0 (public domain
- * dedication) by its artist, checked one release at a time on 2026-10-27 against the artist's
- * own upload. See public/assets/audio/jukebox/LICENSES.md for the full licensing record.
+ * dedication) by its artist, checked one release at a time against the artist's own upload (first
+ * on 2026-10-27, re-checked on 2026-10-28). See public/assets/audio/jukebox/LICENSES.md for the
+ * full licensing record. The jukebox's licensing panel is built from these fields, so keep them exact.
  *
  * The files are local copies, loudness-normalised and re-encoded to 128 kbps MP3 so the whole
  * library stays light. Only add a track after confirming its license the same way; a genre with no
@@ -9,6 +10,7 @@
  */
 
 export const CC0_URL = "https://creativecommons.org/publicdomain/zero/1.0/";
+export const CC0_LEGAL_CODE = "https://creativecommons.org/publicdomain/zero/1.0/legalcode";
 
 export type CategoryId = "pop" | "indie" | "rnb" | "citypop" | "dance" | "funk";
 
@@ -28,7 +30,10 @@ export type TrackLicense = {
   proof: string;
   /** Where the audio file itself was downloaded from. */
   file: string;
+  /** ISO date the license was last checked on the proof page. */
   verified: string;
+  /** CC0 needs no credit, but some artists ask for it: their request, and where they make it. */
+  creditRequest: { text: string; url: string } | null;
 };
 
 export type CuratedTrack = {
@@ -56,7 +61,7 @@ export const CATEGORIES: MusicCategory[] = [
 ];
 
 const AUDIO = "/assets/audio/jukebox";
-const VERIFIED = "2026-10-27";
+const VERIFIED = "2026-10-28";
 
 const HOLIZNA = {
   artist: "HoliznaCC0",
@@ -69,6 +74,8 @@ const HOLIZNA = {
 const LFM = {
   artist: "Loyalty Freak Music",
   artistUrl: "https://loyaltyfreakmusic.com/",
+  // From the artist's FAQ: "Normally, even if it's CC0, you will need to attribute me the work."
+  credit: { text: "“Music by Loyalty Freak Music.” The artist asks to be credited, even on CC0 releases.", url: "https://loyaltyfreakmusic.com/faq/" },
 };
 
 const FMA_LFM = "https://freemusicarchive.org/music/Loyalty_Freak_Music";
@@ -80,12 +87,13 @@ const ZANE = {
   artistUrl: "https://opengameart.org/users/zane-little-music",
 };
 
-const cc0 = (proof: string, file: string): TrackLicense => ({
+const cc0 = (proof: string, file: string, creditRequest: TrackLicense["creditRequest"] = null): TrackLicense => ({
   name: "CC0 1.0 Universal",
   url: CC0_URL,
   proof,
   file,
   verified: VERIFIED,
+  creditRequest,
 });
 
 const holizna = (id: string, title: string, duration: number, mood: string): CuratedTrack => ({
@@ -138,7 +146,7 @@ const lfm = (from: LfmAlbum, id: string, title: string, duration: number, mood: 
   src: `${AUDIO}/lfm-${id}.mp3`,
   duration,
   mood,
-  license: cc0(from.fma, from.ia),
+  license: cc0(from.fma, from.ia, LFM.credit),
 });
 
 const zane = (id: string, page: string, file: string, title: string, duration: number, mood: string): CuratedTrack => ({

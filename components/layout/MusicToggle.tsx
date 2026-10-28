@@ -3,8 +3,8 @@
 import gsap from "gsap";
 import { useEffect, useId, useRef, useState } from "react";
 import type { ChangeEvent, CSSProperties, FocusEvent, KeyboardEvent, PointerEvent } from "react";
-import { ListMusic, Volume1, Volume2, VolumeX } from "lucide-react";
-import { JUKEBOX_PANEL_ID, findTrack, openJukebox, setMusicVolume, toggleMusic, useMusic } from "@/lib/music";
+import { ListMusic, Minimize2, Volume1, Volume2, VolumeX } from "lucide-react";
+import { JUKEBOX_PANEL_ID, findTrack, minimizeJukebox, openJukebox, setMusicVolume, toggleMusic, useMusic } from "@/lib/music";
 import styles from "./MusicToggle.module.css";
 
 const BAR_COUNT = 4;
@@ -258,12 +258,18 @@ export default function MusicToggle() {
           aria-expanded={panel === "open"}
           aria-controls={JUKEBOX_PANEL_ID}
           onClick={(event) => {
-            openJukebox(event.currentTarget);
+            // Open from here, or tuck an open player into its mini dock; the music carries on either way.
+            if (panel === "open") minimizeJukebox();
+            else openJukebox(event.currentTarget);
             hide();
           }}
         >
-          <ListMusic size={14} strokeWidth={2} aria-hidden="true" />
-          Open jukebox
+          {panel === "open" ? (
+            <Minimize2 size={14} strokeWidth={2} aria-hidden="true" />
+          ) : (
+            <ListMusic size={14} strokeWidth={2} aria-hidden="true" />
+          )}
+          {panel === "open" ? "Minimize jukebox" : "Open jukebox"}
         </button>
       </div>
     </div>
