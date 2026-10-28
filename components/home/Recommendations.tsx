@@ -1,96 +1,53 @@
-"use client";
+import { RECOMMENDATIONS, type Recommendation } from "./recommendationsData";
+import RecommendationsShowcase, { type ShowcaseEntry } from "./RecommendationsShowcase";
 
-import { useRef, type PointerEvent } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { PUBLISHED_RECOMMENDATIONS } from "./recommendationsData";
-import styles from "./Recommendations.module.css";
+const dateLabel = (date: string) => {
+  const [year, month, day] = date.split("-").map(Number);
+  if (!year || !month) return date;
+  return new Intl.DateTimeFormat("en-US", {
+    year: "numeric",
+    month: "long",
+    ...(day ? { day: "numeric" } : {}),
+    timeZone: "UTC",
+  }).format(new Date(Date.UTC(year, month - 1, day || 1)));
+};
+
+const initialsOf = (name: string) => {
+  const parts = name.split(/\s+/).filter((part) => /^\p{L}{2,}/u.test(part));
+  return ((parts[0]?.[0] ?? "") + (parts.length > 1 ? parts[parts.length - 1][0] : "")).toUpperCase();
+};
 
 /**
- * Homepage social proof: genuine, permission-given recommendations in a
- * horizontal band (scroll, swipe, drag or arrow keys). With none published
- * yet it shows a short, truthful placeholder instead of filler quotes.
+ * Only what may be public crosses to the browser: the quote, highlight and
+ * date are dropped unless the writer has approved the wording.
+ */
+function toEntry(entry: Recommendation): ShowcaseEntry {
+  const quote = entry.status === "approved" && entry.quote ? entry.quote : null;
+  return {
+    id: entry.id,
+    name: entry.name,
+    initials: initialsOf(entry.name),
+    role: entry.role,
+    organization: entry.organization,
+    team: entry.team,
+    relationship: entry.relationship,
+    context: entry.context,
+    quote,
+    highlight: quote && entry.highlight && quote.includes(entry.highlight) ? entry.highlight : undefined,
+    date: quote && entry.date ? { label: dateLabel(entry.date), iso: entry.date } : undefined,
+    photo: entry.photo,
+    linkedin: entry.linkedin,
+  };
+}
+
+/**
+ * Homepage social proof ("The people I've worked with"). Shows approved
+ * recommendations; until there are any, the first collaborator is featured
+ * with their verified details only.
  */
 export default function Recommendations({ number }: { number: string }) {
-  const trackRef = useRef<HTMLDivElement>(null);
-  const drag = useRef<{ x: number; scroll: number } | null>(null);
+  const approved = RECOMMENDATIONS.filter((entry) => entry.status === "approved" && entry.quote);
+  const entries = (approved.length ? approved : RECOMMENDATIONS.slice(0, 1)).map(toEntry);
 
-  // Mouse drag-to-scroll; touch and trackpads already scroll natively.
-  const onPointerDown = (event: PointerEvent<HTMLDivElement>) => {
-    const track = trackRef.current;
-    if (event.pointerType !== "mouse" || !track || track.scrollWidth <= track.clientWidth) return;
-    drag.current = { x: event.clientX, scroll: track.scrollLeft };
-    track.setPointerCapture(event.pointerId);
-    track.dataset.dragging = "";
-  };
-
-  const onPointerMove = (event: PointerEvent<HTMLDivElement>) => {
-    const track = trackRef.current;
-    if (!drag.current || !track) return;
-    track.scrollLeft = drag.current.scroll - (event.clientX - drag.current.x);
-  };
-
-  const endDrag = (event: PointerEvent<HTMLDivElement>) => {
-    const track = trackRef.current;
-    if (!drag.current || !track) return;
-    drag.current = null;
-    track.releasePointerCapture(event.pointerId);
-    delete track.dataset.dragging;
-  };
-
-  const hasRecommendations = PUBLISHED_RECOMMENDATIONS.length > 0;
-
-  return (
-    <section className={styles.section} id="recommendations" aria-labelledby="recommendations-title" data-nav-label="Recommendations">
-      <header className={styles.header}>
-        <p className={styles.number}>{number}</p>
-        <h2 id="recommendations-title" className={styles.title}>
-          The people I&apos;ve <em>worked with.</em>
-        </h2>
-        <p className={styles.intro}>Feedback from mentors, instructors, and teammates I&apos;ve collaborated with.</p>
-      </header>
-
-      {hasRecommendations ? (
-        <div
-          ref={trackRef}
-          className={styles.track}
-          tabIndex={0}
-          role="region"
-          aria-label="Recommendations — scroll sideways for more"
-          onPointerDown={onPointerDown}
-          onPointerMove={onPointerMove}
-          onPointerUp={endDrag}
-          onPointerCancel={endDrag}
-        >
-          {PUBLISHED_RECOMMENDATIONS.map((entry) => (
-            <figure className={styles.quote} key={entry.id}>
-              <p className={styles.relationship}>{entry.relationship}</p>
-              <blockquote className={styles.text}>
-                <p>{entry.quote}</p>
-              </blockquote>
-              <figcaption className={styles.person}>
-                <span>
-                  <strong>{entry.name}</strong>
-                  <small>{entry.role}</small>
-                </span>
-                {entry.photo && (
-                  <Image className={styles.avatar} src={entry.photo} alt="" width={52} height={52} draggable={false} />
-                )}
-              </figcaption>
-            </figure>
-          ))}
-        </div>
-      ) : (
-        <div className={styles.empty}>
-          <p>
-            This space is reserved for recommendations from the instructors, advisers and teammates I&apos;ve worked
-            with — each one shared here with their permission.
-          </p>
-          <Link className="ui-btn ui-btn--secondary ui-btn--sm" href="/contact">
-            Worked with me? Share a few words
-          </Link>
-        </div>
-      )}
-    </section>
-  );
+  return <RecommendationsShowcase number={number} entries={entries} />;
 }
