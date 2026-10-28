@@ -32,7 +32,7 @@ export default function AboutStory() {
   return (
     <section className={styles.about} aria-labelledby="about-title">
       <EditorialMotion>
-        <AboutOpening headingLevel={1} eyebrow="About me" variant="full" />
+        <AboutOpening eyebrow="About me" />
 
         {/* Marquee: kitchen and code verbs, alternating ------------------- */}
         <div className={styles.marquee} aria-hidden="true">

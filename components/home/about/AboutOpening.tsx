@@ -1,82 +1,43 @@
-import Link from "next/link";
 import { HERO_CONTENT } from "@/components/about/aboutData";
 import AboutCollage from "./AboutCollage";
+import AboutTitle from "./AboutTitle";
 import { ABOUT_PORTRAIT, COLLAGE_PHOTOS, COLLEGE, MEDALS, SENIOR_HIGH } from "./aboutStoryData";
 import styles from "./AboutStory.module.css";
 
-function TitleWord({ children, className }: { children: string; className?: string }) {
-  return (
-    <span className={styles.mask}>
-      <span className={className ? `${styles.word} ${className}` : styles.word} data-word>
-        {children}
-      </span>
-    </span>
-  );
-}
-
-type AboutOpeningProps = {
-  /** h1 on the dedicated /about page, h2 inside the homepage. */
-  headingLevel: 1 | 2;
-  eyebrow: string;
-  /** "preview" swaps the fact row for a link to the full story. */
-  variant: "full" | "preview";
-};
-
 /**
- * "From cooking to coding" opening: title, lead and the arched portrait.
- * Shared by the homepage preview and the full /about story so both stay identical.
+ * "From cooking to coding" opening of the full /about story: title, lead, facts
+ * and the arched portrait. The homepage uses AboutPreview, which shares the title.
  */
-export default function AboutOpening({ headingLevel, eyebrow, variant }: AboutOpeningProps) {
-  const Heading = headingLevel === 1 ? "h1" : "h2";
-
+export default function AboutOpening({ eyebrow }: { eyebrow: string }) {
   return (
-    <div
-      className={`${styles.container} ${styles.opening} ${variant === "preview" ? styles.openingCentered : ""}`}
-      {...(variant === "full" ? { id: "intro", "data-nav-label": "Intro", "data-nav-intro": "" } : {})}
-    >
+    <div className={`${styles.container} ${styles.opening}`} id="intro" data-nav-label="Intro" data-nav-intro="">
       <div className={styles.openingCopy}>
         <p className={styles.eyebrow} data-reveal>{eyebrow}</p>
-        <Heading id="about-title" className={styles.title}>
-          <span className={styles.titleLine}>
-            <TitleWord>From</TitleWord> <TitleWord className={styles.kitchenWord}>cooking</TitleWord>
-          </span>{" "}
-          <span className={`${styles.titleLine} ${styles.titleLineIndent}`}>
-            <TitleWord>to</TitleWord> <TitleWord className={styles.codeWord}>coding.</TitleWord>
-            <span className={styles.caret} aria-hidden="true" />
-          </span>
-        </Heading>
+        <AboutTitle as="h1" />
 
         <p className={styles.lead} data-reveal>
           I&apos;m Fatima — a {HERO_CONTENT.statusLabel} who learned to build things in a kitchen first. The
           patience and precision I picked up at the stove now go into every screen I design, build, and test.
         </p>
 
-        {variant === "full" ? (
-          <dl className={styles.facts} data-stagger>
-            <div>
-              <dt>Started in</dt>
-              <dd>Home Economics · {SENIOR_HIGH.institution}</dd>
-            </div>
-            <div>
-              <dt>Studying</dt>
-              <dd>
-                {COLLEGE.detail.replace("Bachelor of Science in", "BS")} · {COLLEGE.institution}
-              </dd>
-            </div>
-            <div>
-              <dt>Building</dt>
-              <dd>Web &amp; mobile applications</dd>
-            </div>
-          </dl>
-        ) : (
-          <Link className={`ui-btn ui-btn--primary ${styles.inlineCta}`} href="/about" data-reveal>
-            Explore My Story
-          </Link>
-        )}
+        <dl className={styles.facts} data-stagger>
+          <div>
+            <dt>Started in</dt>
+            <dd>Home Economics · {SENIOR_HIGH.institution}</dd>
+          </div>
+          <div>
+            <dt>Studying</dt>
+            <dd>
+              {COLLEGE.detail.replace("Bachelor of Science in", "BS")} · {COLLEGE.institution}
+            </dd>
+          </div>
+          <div>
+            <dt>Building</dt>
+            <dd>Web &amp; mobile applications</dd>
+          </div>
+        </dl>
       </div>
 
-      {/* The homepage hero already shows the portrait, so the preview is text-only. */}
-      {variant === "full" && (
       <AboutCollage primary={ABOUT_PORTRAIT} photos={COLLAGE_PHOTOS}>
         <svg className={styles.journeyLine} viewBox="0 0 400 520" fill="none" aria-hidden="true">
           <path
@@ -96,7 +57,6 @@ export default function AboutOpening({ headingLevel, eyebrow, variant }: AboutOp
           </div>
         )}
       </AboutCollage>
-      )}
     </div>
   );
 }
