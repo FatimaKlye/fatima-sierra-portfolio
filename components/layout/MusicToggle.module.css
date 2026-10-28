@@ -283,6 +283,48 @@
   box-shadow: 0 0 0 4px rgb(var(--rgb-primary) / 0.32);
 }
 
+/* The current song, and the way into the full jukebox from any page. */
+.track {
+  margin: 4px 0 6px;
+  overflow: hidden;
+  color: var(--color-text-primary);
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.track span {
+  color: var(--color-text-muted);
+  font-weight: 400;
+}
+
+.jukebox {
+  display: flex;
+  width: 100%;
+  min-height: 32px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 4px;
+  border: 1px solid rgb(var(--rgb-primary) / 0.35);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--color-primary);
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 180ms ease, border-color 180ms ease;
+}
+
+@media (hover: hover) {
+  .jukebox:hover {
+    border-color: var(--color-primary);
+    background: var(--color-soft-blush);
+  }
+}
+
 @media (max-width: 480px) {
   .popover {
     width: 188px;

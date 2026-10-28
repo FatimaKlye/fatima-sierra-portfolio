@@ -3,8 +3,8 @@
 import gsap from "gsap";
 import { useEffect, useId, useRef, useState } from "react";
 import type { ChangeEvent, CSSProperties, FocusEvent, KeyboardEvent, PointerEvent } from "react";
-import { Volume1, Volume2, VolumeX } from "lucide-react";
-import { setMusicVolume, toggleMusic, useMusic } from "@/lib/music";
+import { ListMusic, Volume1, Volume2, VolumeX } from "lucide-react";
+import { JUKEBOX_PANEL_ID, findTrack, openJukebox, setMusicVolume, toggleMusic, useMusic } from "@/lib/music";
 import styles from "./MusicToggle.module.css";
 
 const BAR_COUNT = 4;
@@ -19,7 +19,9 @@ const reducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)"
  * focus, or a tap on touch screens) reveals a small card with the action and a volume slider.
  */
 export default function MusicToggle() {
-  const { status, volume } = useMusic();
+  const { status, volume: level, muted, trackId, panel } = useMusic();
+  const volume = muted ? 0 : level;
+  const track = findTrack(trackId);
   const [open, setOpen] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -208,6 +210,7 @@ export default function MusicToggle() {
         aria-label="Background music"
         aria-pressed={active}
         aria-describedby={labelId}
+        data-jukebox-opener
         onClick={handleClick}
       >
         <span ref={ringRef} className={styles.ring} aria-hidden="true" />
@@ -243,6 +246,25 @@ export default function MusicToggle() {
             style={{ "--fill": `${percent}%` } as CSSProperties}
           />
         </label>
+        {track && (
+          <p className={styles.track} title={`${track.title} · ${track.artist}`}>
+            {track.title} <span>· {track.artist}</span>
+          </p>
+        )}
+        <button
+          type="button"
+          className={styles.jukebox}
+          aria-haspopup="dialog"
+          aria-expanded={panel === "open"}
+          aria-controls={JUKEBOX_PANEL_ID}
+          onClick={(event) => {
+            openJukebox(event.currentTarget);
+            hide();
+          }}
+        >
+          <ListMusic size={14} strokeWidth={2} aria-hidden="true" />
+          Open jukebox
+        </button>
       </div>
     </div>
   );

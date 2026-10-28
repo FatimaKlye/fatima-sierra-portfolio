@@ -6,6 +6,7 @@ import SiteHeader from "@/components/layout/SiteHeader";
 import IntroGate from "@/components/intro/IntroGate";
 import { INTRO_SCRIPT } from "@/components/intro/introScript";
 import FairyDust from "@/components/motion/FairyDust";
+import Jukebox from "@/components/music/Jukebox";
 import ScrollManager from "@/components/navigation/ScrollManager";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 import { THEME_SCRIPT } from "@/lib/themeScript";
@@ -45,6 +46,8 @@ export default function RootLayout({
         <ScrollManager />
         <SiteHeader />
         <SectionNav />
+        {/* One jukebox for the whole visit: music and the player carry across client-side navigation. */}
+        <Jukebox />
         {children}
         <SiteFooter />
         <FairyDust />
