@@ -1,643 +1,672 @@
-/* Kitchen → code desk (homepage About). Pieces sit on the desk by percentage
-   (--x, --y, --w, --r) and each is its own size container, so the type inside
-   them scales with the piece instead of the viewport. Illustration colours are
-   fixed so the paper, cupcake and stickers keep their look in both themes. */
+/* Kitchen → code composition (homepage About). Three layered prints — the
+   journal, the plate and the note — sit on the scene by percentage, and the
+   scene is a size container, so the type inside them scales with it (cqi)
+   instead of with the viewport. The change itself is driven by custom
+   properties that one GSAP timeline animates: --reveal on the journal,
+   --open on the plate and --rise on the note (all 0 → 1). */
 
 .stage {
-  --ink-pink: #a63d68;
-  --paper: #fffaf3;
-  --paper-back: #efe0d4;
-  --paper-fold: #d6bead;
+  --rose: #b5658a;
+  --paper: #fffaf4;
   --paper-ink: #3b2a34;
-  --paper-rule: rgb(166 61 104 / 0.14);
-  --desk-code: #2a1c24;
-  --editor: #3a2731;
+  --paper-muted: #8a7480;
+  --paper-rule: rgb(59 42 52 / 0.08);
+  --linen: #f1e4dc;
+  --linen-deep: #e5d1c6;
+  --editor-top: #2e1f28;
+  --editor-bottom: #1d151a;
   --code-text: #f3e8ee;
-  --code-muted: #a88b99;
-  --code-kw: #f3a6c6;
-  --code-fn: #ffd9e8;
-  --code-prop: #d7a6c2;
-  --code-str: #f2c3a5;
-  --frost: #fde4ee;
-  --wrapper: #b8476f;
-  --cherry: #8b2f52;
-  --steel: #b3a2ab;
-  --tape: rgb(201 130 162 / 0.5);
-  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
-  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --code-muted: #8f7683;
+  --code-kw: #f0a3c4;
+  --code-fn: #ffe1ec;
+  --code-prop: #d9b0c5;
+  --code-str: #f4c7a8;
+  --print-shadow: 0 1px 2px rgb(59 42 52 / 0.06), 0 14px 28px -14px rgb(59 42 52 / 0.22), 0 40px 70px -36px rgb(59 42 52 / 0.32);
+  --glass: rgb(255 255 255 / 0.62);
+  --noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .23 0 0 0 0 .16 0 0 0 0 .2 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 
   position: relative;
-  padding-bottom: 26px; /* the switch straddles the desk's bottom edge */
 }
 
 :global(html[data-theme="dark"]) .stage {
-  --paper: #f4eae2;
-  --desk-code: #2c1f28;
-  --editor: #3c2b35;
-  --tape: rgb(219 130 168 / 0.42);
+  --rose: #d48aab;
+  --paper: #221b1f;
+  --paper-ink: #f3ecef;
+  --paper-muted: #a89ba2;
+  --paper-rule: rgb(255 255 255 / 0.07);
+  --linen: #2a2125;
+  --linen-deep: #1f191c;
+  --editor-top: #1a1317;
+  --editor-bottom: #110c0f;
+  --print-shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 14px 28px -14px rgb(0 0 0 / 0.5), 0 40px 70px -36px rgb(0 0 0 / 0.65);
+  --glass: rgb(34 27 31 / 0.6);
 }
 
-.desk {
+.scene {
   position: relative;
-  aspect-ratio: 10 / 8.4;
-  border-radius: clamp(22px, 2.6vw, 34px);
-  background: var(--color-surface);
-  isolation: isolate;
-}
-
-.gingham,
-.grid {
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-}
-
-.gingham {
-  background-image:
-    linear-gradient(90deg, rgb(var(--rgb-primary) / 0.07) 50%, transparent 0),
-    linear-gradient(rgb(var(--rgb-primary) / 0.07) 50%, transparent 0);
-  background-size: 38px 38px;
-}
-
-.grid {
-  opacity: 0;
-  background-color: var(--desk-code);
-  background-image: radial-gradient(rgb(243 166 198 / 0.24) 1.2px, transparent 1.7px);
-  background-size: 22px 22px;
-}
-
-/* Pieces ------------------------------------------------------------------------ */
-
-.piece {
-  position: absolute;
-  z-index: var(--z, 1);
-  top: var(--y);
-  left: var(--x);
-  width: var(--w);
-  rotate: var(--r, 0deg);
+  aspect-ratio: 1.35;
   container-type: inline-size;
 }
 
-.art {
-  display: block;
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-
-.art > svg {
+/* Soft ambient light behind the prints: warm linen in the kitchen, a deeper rose in code. */
+.glow {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
+  inset: -10% -6%;
+  z-index: 0;
+  background:
+    radial-gradient(48% 52% at 34% 42%, rgb(201 130 162 / 0.16), transparent 72%),
+    radial-gradient(40% 44% at 78% 78%, rgb(241 228 220 / 0.7), transparent 70%);
+  pointer-events: none;
 }
 
-@keyframes wiggle {
-  0%, 100% { rotate: 0deg; }
-  25% { rotate: -6deg; }
-  55% { rotate: 5deg; }
-  80% { rotate: -2deg; }
+.glowCode {
+  opacity: 0;
+  background:
+    radial-gradient(50% 54% at 34% 42%, rgb(166 61 104 / 0.18), transparent 72%),
+    radial-gradient(42% 46% at 78% 72%, rgb(42 28 36 / 0.14), transparent 70%);
 }
 
-@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
-  .cupcake:hover .art,
-  .whisk:hover .art,
-  .timer:hover .art,
-  .medal:hover .art {
-    animation: wiggle 620ms var(--ease-out);
-  }
+:global(html[data-theme="dark"]) .glow {
+  background: radial-gradient(48% 52% at 34% 42%, rgb(219 130 168 / 0.1), transparent 72%);
 }
 
-/* Notebook: the code editor lies underneath; the recipe on top is masked away
-   from its bottom-right corner by --peek (hover, px) plus --peel (0 → 1, the
-   whole page). 186cqw is the sheet's width + height, the full diagonal sweep. */
-.notebook {
-  --x: 9%;
-  --y: 11%;
-  --w: 60%;
-  --r: -2.5deg;
-  --z: 2;
-  --peel: 0;
+:global(html[data-theme="dark"]) .glowCode {
+  background: radial-gradient(50% 54% at 34% 42%, rgb(166 61 104 / 0.2), transparent 72%);
+}
+
+/* Journal ↔ editor ----------------------------------------------------------------- */
+
+.journal {
+  --reveal: 0;
   --peek: 0px;
 
-  aspect-ratio: 100 / 86;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  width: 66%;
+  height: 74%;
+  overflow: hidden;
+  border: 1px solid var(--paper-rule);
   border-radius: 14px;
-  box-shadow: 0 22px 44px -22px rgb(var(--rgb-shadow) / 0.4);
+  box-shadow: var(--print-shadow);
   cursor: pointer;
+  font-size: clamp(11px, 2.1cqi, 15px);
 }
 
 .sheet {
-  display: grid;
   position: absolute;
   inset: 0;
-  grid-template-rows: 13cqw 1fr;
-  padding: 3.5cqw 7cqw 6cqw;
-  border-radius: inherit;
-}
-
-.editor {
-  background: var(--editor);
-  color: var(--code-text);
-}
-
-.recipe {
-  --cut: calc((var(--peek) + var(--peel) * 186cqw) * 0.7071);
-
-  background: var(--paper);
-  color: var(--paper-ink);
-  -webkit-mask-image: linear-gradient(315deg, transparent var(--cut), #000 var(--cut));
-  mask-image: linear-gradient(315deg, transparent var(--cut), #000 var(--cut));
+  display: grid;
+  grid-template-rows: auto auto 1fr;
 }
 
 .sheetHead {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 2cqw;
+  gap: 1em;
+  height: 2.6em;
   margin: 0;
-  font-size: 2.6cqw;
-  font-weight: 600;
+  padding: 0 1.4em;
+  border-bottom: 1px solid var(--paper-rule);
+  font-size: 0.68em;
+  font-weight: 500;
   letter-spacing: 0.16em;
   text-transform: uppercase;
 }
 
-.recipe .sheetHead {
-  color: var(--ink-pink);
-}
-
-.editor .sheetHead {
-  color: var(--code-muted);
-  letter-spacing: 0.04em;
-  text-transform: none;
-}
-
-.dots {
+.titleRow {
   display: flex;
-  gap: 1.4cqw;
-}
-
-.dots i {
-  width: 2.2cqw;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: rgb(255 255 255 / 0.2);
-}
-
-.dots i:first-child {
-  background: var(--code-kw);
+  align-items: center;
+  height: 3.4em;
+  margin: 0;
 }
 
 .rows {
   display: grid;
-  grid-template-rows: repeat(7, 1fr);
+  grid-auto-rows: 1fr;
   margin: 0;
-  padding: 0;
+  padding: 0 0 0.4em;
   list-style: none;
 }
 
 .rows li {
-  display: flex;
+  display: grid;
   align-items: center;
-  gap: 2.6cqw;
   min-width: 0;
-  overflow: hidden;
-  white-space: pre;
+  white-space: nowrap;
 }
 
-.recipe .rows li {
-  border-bottom: 1px solid var(--paper-rule);
-  font-size: 4.1cqw;
+/* The paper page: warm stock, a faint binding shadow and hairline rules. */
+.paper {
+  background:
+    linear-gradient(90deg, rgb(59 42 52 / 0.06), transparent 4%),
+    var(--noise),
+    linear-gradient(170deg, var(--paper), color-mix(in srgb, var(--paper) 92%, var(--rose)));
+  color: var(--paper-ink);
+}
+
+.paper .sheetHead {
+  color: var(--paper-muted);
+}
+
+.paper .sheetHead span:last-child {
+  transition: opacity 300ms ease;
+}
+
+.paper .titleRow {
+  height: 1.7em;
+  padding: 0 0.7em;
+  font-size: 2em;
+  font-weight: 500;
+  letter-spacing: -0.035em;
+}
+
+.paper .rows li {
+  grid-template-columns: 6.6em 1fr;
+  margin: 0 1.4em;
+  border-top: 1px solid var(--paper-rule);
+}
+
+.qty {
+  color: var(--rose);
+  font-size: 0.68em;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.paper .rows li:last-child > span:last-child {
+  color: var(--rose);
   font-weight: 500;
 }
 
-.recipe .rows li:first-child {
-  color: var(--ink-pink);
-  font-size: 5.6cqw;
-  font-weight: 600;
-  letter-spacing: -0.03em;
+/* The editor beneath, wiped in from the left by --reveal (and peeked by --peek). */
+.editor {
+  clip-path: inset(0 max(0%, calc((1 - var(--reveal)) * 100% - var(--peek))) 0 0);
+  background:
+    radial-gradient(70% 60% at 100% 0%, rgb(219 130 168 / 0.14), transparent 70%),
+    linear-gradient(165deg, var(--editor-top), var(--editor-bottom));
+  color: var(--code-text);
 }
 
-.check {
-  flex: none;
-  width: 3.2cqw;
-  aspect-ratio: 1;
-  border: 1.5px solid rgb(166 61 104 / 0.45);
+.editor .sheetHead {
+  justify-content: flex-start;
+  border-bottom-color: rgb(255 255 255 / 0.07);
+  color: var(--code-muted);
+  letter-spacing: 0.06em;
+  text-transform: none;
+}
+
+.dots {
+  display: inline-flex;
+  gap: 0.45em;
+}
+
+.dots i {
+  width: 0.75em;
+  height: 0.75em;
   border-radius: 50%;
+  background: rgb(255 255 255 / 0.16);
 }
 
-.check[data-done] {
-  border-color: var(--ink-pink);
-  background: radial-gradient(circle, var(--ink-pink) 45%, transparent 50%);
+.dots i:first-child {
+  background: #e58fb2;
 }
 
+.tab {
+  padding: 0.35em 0.9em;
+  border-radius: 6px;
+  background: rgb(255 255 255 / 0.06);
+  color: var(--code-text);
+}
+
+.editor .titleRow,
 .editor .rows li {
-  font-size: 3.7cqw;
+  display: grid;
+  grid-template-columns: 2.4em 1fr;
+  padding-left: 0.6em;
+  font-size: 0.92em;
+  white-space: pre;
 }
 
 .ln {
-  flex: none;
-  width: 3.4cqw;
+  padding-right: 1em;
   color: var(--code-muted);
-  font-size: 2.8cqw;
+  font-size: 0.82em;
+  font-variant-numeric: tabular-nums;
   text-align: right;
+  opacity: 0.7;
 }
 
 .kw { color: var(--code-kw); }
-.fn { color: var(--code-fn); font-weight: 600; }
+.fn { color: var(--code-fn); font-weight: 500; }
 .prop { color: var(--code-prop); }
 .str { color: var(--code-str); }
 .muted { color: var(--code-muted); }
 
-/* The lifted corner: the back of the page, folded over along the cut. */
-.flap {
+.seam {
   position: absolute;
-  right: 0;
+  top: 0;
   bottom: 0;
-  width: calc(var(--peek) + var(--peel) * 186cqw);
-  aspect-ratio: 1;
-  clip-path: polygon(0 0, 100% 0, 0 100%);
-  background: linear-gradient(315deg, var(--paper-fold) 42%, var(--paper-back) 74%);
+  left: calc(var(--reveal) * 100%);
+  width: 1px;
+  opacity: 0;
+  background: linear-gradient(transparent, var(--rose) 20%, var(--rose) 80%, transparent);
+  box-shadow: 0 0 18px 3px rgb(219 130 168 / 0.45);
   pointer-events: none;
 }
 
-.tape {
+/* A quiet glass chip replaces the page number while the journal is hovered. */
+.hint {
   position: absolute;
-  z-index: 1;
-  top: -2.6cqw;
-  width: 17cqw;
-  height: 5.6cqw;
-  background: var(--tape);
-}
-
-.tapeLeft { left: 6cqw; rotate: -7deg; }
-.tapeRight { right: 6cqw; rotate: 6deg; }
-
-/* Cupcake → phone */
-.cupcake {
-  --x: 70%;
-  --y: 29%;
-  --w: 25%;
-  --r: 5deg;
-  --z: 3;
-
-  aspect-ratio: 120 / 140;
-}
-
-.cupcake .art {
-  filter: drop-shadow(0 10px 12px rgb(var(--rgb-shadow) / 0.16));
-}
-
-.frosting { fill: var(--frost); }
-.sprinkles rect:nth-child(3n + 1) { fill: var(--ink-pink); }
-.sprinkles rect:nth-child(3n + 2) { fill: #f3a6c6; }
-.sprinkles rect:nth-child(3n) { fill: #8fb3c9; }
-.wrapper { fill: var(--wrapper); }
-
-.wrapperStripes {
-  fill: none;
-  stroke: rgb(255 255 255 / 0.24);
-  stroke-linecap: round;
-  stroke-width: 3;
-}
-
-.stem {
-  fill: none;
-  stroke: #6b4a3a;
-  stroke-linecap: round;
-  stroke-width: 2.4;
-}
-
-.cherry { fill: var(--cherry); }
-.cherryShine { fill: rgb(255 255 255 / 0.7); }
-
-.phone,
-.cursor {
-  transform: scale(0);
-}
-
-.phoneBody { fill: var(--desk-code); }
-.phoneScreen { fill: var(--paper); }
-.phoneNotch { fill: var(--desk-code); }
-.phoneAccent { fill: var(--ink-pink); }
-.phoneTile { fill: var(--frost); }
-.phoneFrost { fill: #f6c4d8; }
-.phoneWrapper { fill: var(--wrapper); }
-.phoneCherry { fill: var(--cherry); }
-.phoneLine { fill: rgb(166 61 104 / 0.22); }
-
-/* Whisk → cursor */
-.whisk {
-  --x: 76%;
-  --y: 4%;
-  --w: 9.5%;
-  --r: 18deg;
-  --z: 3;
-
-  aspect-ratio: 64 / 120;
-}
-
-.whiskWires {
-  fill: none;
-  stroke: var(--steel);
-  stroke-linecap: round;
-  stroke-width: 2.6;
-}
-
-.whiskCollar { fill: var(--steel); }
-.whiskHandle { fill: var(--ink-pink); }
-
-.cursorShape {
-  fill: var(--ink-pink);
-  stroke: #fff;
-  stroke-linejoin: round;
-  stroke-width: 3.5;
-}
-
-/* Oven timer → build */
-.timer {
-  --x: 4%;
-  --y: 65%;
-  --w: 27%;
-  --r: -5deg;
-  --z: 4;
-
-  aspect-ratio: 1.25;
-}
-
-.note,
-.terminal {
-  display: grid;
-  position: absolute;
-  inset: 0;
-  align-content: center;
-  gap: 1.5cqw;
-  padding: 8cqw 10cqw;
-  border-radius: 6px;
-  box-shadow: 0 16px 30px -18px rgb(var(--rgb-shadow) / 0.45);
-}
-
-.note {
-  background: #fbd9e6;
-  color: var(--paper-ink);
-  font-size: 7.4cqw;
-}
-
-/* A strip of tape holding the note down. */
-.note::before {
-  position: absolute;
-  top: -4cqw;
-  left: 50%;
-  width: 34cqw;
-  height: 9cqw;
-  background: var(--tape);
-  content: "";
-  translate: -50% 0;
-  rotate: 3deg;
-}
-
-.noteKicker {
-  color: var(--ink-pink);
-  font-size: 6.4cqw;
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-}
-
-.note strong {
-  font-size: 21cqw;
-  font-weight: 600;
-  letter-spacing: -0.04em;
-  line-height: 1;
-}
-
-.terminal {
-  background: #1f151b;
-  color: var(--code-text);
-  font-size: 7cqw;
-  opacity: 0;
-}
-
-.terminal strong {
-  color: var(--code-kw);
-  font-size: 9.6cqw;
-  font-weight: 600;
-}
-
-.termMuted {
-  color: var(--code-muted);
-}
-
-/* Gold medal sticker — real, so it stays put in both kitchens. */
-.medal {
-  --x: 1.5%;
-  --y: 2%;
-  --w: 17%;
-  --r: -12deg;
-  --z: 5;
-
-  aspect-ratio: 1;
-}
-
-.medalBadge {
-  display: grid;
-  position: absolute;
-  inset: 0;
-  place-content: center;
-  border-radius: 50%;
-  background: var(--ink-pink);
-  box-shadow:
-    0 0 0 3.5cqw #fffaf3,
-    0 14px 26px -12px rgb(var(--rgb-shadow) / 0.5);
-  color: #fff6f9;
-  line-height: 1.1;
-  text-align: center;
-  outline: 1.5px dashed rgb(255 255 255 / 0.55);
-  outline-offset: -8cqw;
-}
-
-.medalKicker {
-  font-size: 8.5cqw;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-}
-
-.medalTitle {
-  font-size: 12cqw;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-}
-
-.medalLabel {
-  margin-top: 2cqw;
-  font-size: 7.4cqw;
-  opacity: 0.85;
-}
-
-/* Switch ------------------------------------------------------------------------ */
-
-.switch {
-  display: inline-flex;
-  position: absolute;
-  z-index: 6;
-  bottom: 0;
-  left: 50%;
-  align-items: center;
-  gap: 12px;
-  min-height: 52px;
-  padding: 7px 18px;
-  border: 0;
+  top: 0.55em;
+  right: 0.9em;
+  padding: 0.35em 0.9em;
+  border: 1px solid var(--paper-rule);
   border-radius: 999px;
-  background: var(--color-card);
-  box-shadow:
-    0 0 0 1px rgb(var(--rgb-primary) / 0.14),
-    0 16px 34px -14px rgb(var(--rgb-shadow-tint) / 0.5);
-  color: var(--color-text-muted);
-  font-size: 0.8rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  cursor: pointer;
-  translate: -50% 0;
-  -webkit-tap-highlight-color: transparent;
-  transition: translate 320ms var(--ease-out), box-shadow 320ms ease;
+  background: var(--glass);
+  backdrop-filter: blur(8px);
+  color: var(--paper-ink);
+  font-size: 0.64em;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0;
+  translate: 0 -4px;
+  transition: opacity 300ms ease, translate 400ms var(--ease-out);
+  pointer-events: none;
 }
 
-@media (hover: hover) {
-  .switch:hover {
-    translate: -50% -2px;
-    box-shadow:
-      0 0 0 1px rgb(var(--rgb-primary) / 0.3),
-      0 20px 38px -14px rgb(var(--rgb-shadow-tint) / 0.6);
+.stage[data-coded] .hint {
+  border-color: rgb(255 255 255 / 0.1);
+  background: rgb(255 255 255 / 0.08);
+  color: var(--code-text);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .journal:hover .hint {
+    opacity: 1;
+    translate: 0 0;
+  }
+
+  .journal:hover .paper .sheetHead span:last-child {
+    opacity: 0;
   }
 }
 
+/* Plate ↔ website ------------------------------------------------------------------- */
+
+.plate {
+  --open: 0;
+
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  z-index: 3;
+  width: 48%;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: var(--print-shadow);
+}
+
+.plateKitchen {
+  position: absolute;
+  inset: 0;
+  background:
+    var(--noise),
+    radial-gradient(90% 80% at 30% 20%, color-mix(in srgb, var(--linen) 70%, white), transparent 70%),
+    linear-gradient(140deg, var(--linen), var(--linen-deep));
+}
+
+.cover {
+  object-fit: cover;
+  object-position: top left;
+}
+
+/* A flat-lay ceramic plate in soft light, with two rose-glazed sweets on it. */
+.dish {
+  position: absolute;
+  top: 50%;
+  left: 52%;
+  width: 46%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  translate: -50% -50%;
+  background:
+    radial-gradient(circle at 42% 38%, #ffffff 0 46%, #f4ebe6 47% 54%, #fffdfb 55% 63%, #efe3dc 64% 70%, transparent 71%);
+  box-shadow: 8px 18px 30px -12px rgb(80 50 62 / 0.35), inset 0 -3px 8px rgb(80 50 62 / 0.06);
+}
+
+.dish::before,
+.dish::after {
+  position: absolute;
+  border-radius: 50%;
+  content: "";
+}
+
+.dish::before {
+  top: 30%;
+  left: 26%;
+  width: 26%;
+  aspect-ratio: 1;
+  background: radial-gradient(circle at 34% 30%, #f8d6e2, #d08aa5 62%, #a85a78);
+  box-shadow: 4px 8px 12px -4px rgb(120 50 80 / 0.35);
+}
+
+.dish::after {
+  top: 46%;
+  left: 50%;
+  width: 19%;
+  aspect-ratio: 1;
+  background: radial-gradient(circle at 34% 30%, #fff6ef, #f0dccd 60%, #d9bca8);
+  box-shadow: 4px 8px 12px -4px rgb(120 80 60 / 0.3);
+}
+
+.plateCaption {
+  position: absolute;
+  bottom: 1.1em;
+  left: 1.3em;
+  color: color-mix(in srgb, var(--paper-ink) 62%, transparent);
+  font-size: clamp(9px, 1.35cqi, 11px);
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.plateCode {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  clip-path: circle(calc(var(--open) * 80%) at 52% 50%);
+  background: #fff;
+}
+
+.browserBar {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  height: 2.4em;
+  padding: 0 1em;
+  border-bottom: 1px solid rgb(59 42 52 / 0.08);
+  background: #f7f1f3;
+  color: #6e5964;
+  font-size: clamp(9px, 1.3cqi, 11px);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+
+.browserBar .dots i {
+  background: rgb(59 42 52 / 0.14);
+}
+
+:global(html[data-theme="dark"]) .browserBar {
+  border-bottom-color: rgb(255 255 255 / 0.06);
+  background: #1f181c;
+  color: #a89ba2;
+}
+
+:global(html[data-theme="dark"]) .browserBar .dots i {
+  background: rgb(255 255 255 / 0.14);
+}
+
+.shotWrap {
+  position: relative;
+  overflow: hidden;
+}
+
+.shotWrap .cover {
+  transition: scale 900ms var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .stage[data-coded] .plate:hover .shotWrap .cover {
+    scale: 1.04;
+  }
+}
+
+/* Medal note ↔ phone -------------------------------------------------------------- */
+
+.note {
+  --rise: 0;
+
+  position: absolute;
+  top: 4%;
+  right: 2%;
+  z-index: 2;
+  width: 22%;
+  aspect-ratio: 9 / 17;
+  border: 1px solid var(--paper-rule);
+  border-radius: 12px;
+  background: var(--noise), var(--paper);
+  box-shadow: var(--print-shadow);
+  color: var(--paper-ink);
+}
+
+.noteCopy {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 1.3em 1.1em;
+  font-size: clamp(10px, 1.7cqi, 13px);
+}
+
+.noteKicker,
+.noteFoot {
+  color: var(--rose);
+  font-size: 0.72em;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.noteList {
+  display: grid;
+  gap: 0.8em;
+  margin: 1.2em 0 0;
+  padding: 0;
+  list-style: none;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+
+.noteList li + li {
+  padding-top: 0.8em;
+  border-top: 1px solid var(--paper-rule);
+}
+
+.noteFoot {
+  margin-top: auto;
+  padding-top: 0.9em;
+  border-top: 1px solid var(--paper-rule);
+  color: var(--paper-muted);
+}
+
+.phone {
+  position: absolute;
+  inset: -1px;
+  overflow: hidden;
+  clip-path: inset(calc((1 - var(--rise)) * 100%) 0 0 0 round 14px);
+  border: 4px solid #140e11;
+  border-radius: 14px;
+  background: #140e11;
+}
+
+.phoneShot {
+  object-fit: cover;
+  object-position: top;
+  border-radius: 10px;
+}
+
+/* Caption + switch ------------------------------------------------------------------ */
+
+.foot {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  width: 48%;
+}
+
+.caption {
+  height: 1.6em;
+  margin: 0;
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.captionTrack {
+  display: grid;
+}
+
+.captionTrack b {
+  margin-right: 0.8em;
+  color: var(--color-primary);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.switch {
+  position: relative;
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 4px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--glass);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 24px -16px rgb(59 42 52 / 0.4);
+  color: var(--color-text-muted);
+  font: inherit;
+  cursor: pointer;
+  transition: border-color 300ms ease, box-shadow 400ms ease;
+}
+
 .switch:focus-visible {
-  outline: 3px solid rgb(var(--rgb-primary) / 0.32);
+  outline: 2px solid var(--color-primary);
   outline-offset: 3px;
 }
 
-.switchLabel {
-  transition: color 320ms ease;
-}
-
-.switch[aria-checked="false"] .switchLabel:first-child,
-.switch[aria-checked="true"] .switchLabel:last-child {
-  color: var(--color-primary);
-}
-
-.track {
-  position: relative;
-  width: 58px;
-  height: 32px;
+.indicator {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 4px;
+  width: calc(50% - 4px);
   border-radius: 999px;
-  background: rgb(var(--rgb-primary) / 0.16);
-  transition: background-color 420ms ease;
+  background: var(--color-text-primary);
+  box-shadow: 0 6px 14px -6px rgb(59 42 52 / 0.5);
+  transition: translate 650ms var(--ease-out);
 }
 
-.switch[aria-checked="true"] .track {
-  background: var(--color-primary);
+.stage[data-coded] .indicator {
+  translate: 100% 0;
 }
 
-.thumb {
-  display: grid;
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 26px;
-  height: 26px;
-  place-items: center;
-  border-radius: 50%;
-  background: var(--color-card);
-  box-shadow: 0 3px 8px rgb(var(--rgb-shadow) / 0.22);
-  color: var(--color-primary);
-  transition: translate 560ms var(--spring);
-}
-
-.switch[aria-checked="true"] .thumb {
-  translate: 26px 0;
-}
-
-.thumb svg {
-  grid-area: 1 / 1;
-  width: 15px;
-  height: 15px;
-  transition: opacity 280ms ease, rotate 560ms var(--spring);
-}
-
-.thumb svg + svg,
-.switch[aria-checked="true"] .thumb svg:first-child {
-  opacity: 0;
-  rotate: -90deg;
-}
-
-.switch[aria-checked="true"] .thumb svg + svg {
-  opacity: 1;
-  rotate: 0deg;
-}
-
-/* Burst: sprinkles (or code glyphs) thrown from the track when the switch flips. */
-.burst {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  pointer-events: none;
-}
-
-.burst > span {
-  --sprinkle: var(--ink-pink);
-
-  position: absolute;
-  top: -1.5px;
-  left: -4px;
-  width: 8px;
-  height: 3px;
-  border-radius: 2px;
-  background: var(--sprinkle);
-  opacity: 0;
-}
-
-.burst > span:nth-child(3n + 1) { --sprinkle: #f3a6c6; }
-.burst > span:nth-child(3n + 2) { --sprinkle: #b5658a; }
-
-.burst[data-kind="code"] > span {
-  top: -7px;
-  width: auto;
-  height: auto;
-  background: none;
-  color: var(--sprinkle);
+.option {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 9px 18px;
   font-size: 12px;
-  font-weight: 700;
-  line-height: 1;
-  white-space: nowrap;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  transition: color 400ms ease;
 }
 
-.burst[data-kind="code"] > span::before {
-  content: attr(data-glyph);
+.option svg {
+  width: 14px;
+  height: 14px;
+}
+
+.stage:not([data-coded]) [data-option="kitchen"],
+.stage[data-coded] [data-option="code"] {
+  color: var(--color-background);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .switch:hover {
+    border-color: var(--color-secondary);
+    box-shadow: 0 14px 30px -16px rgb(166 61 104 / 0.45);
+  }
+
+  .stage:not([data-coded]) .switch:hover [data-option="code"],
+  .stage[data-coded] .switch:hover [data-option="kitchen"] {
+    color: var(--color-text-primary);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .hint,
+  .indicator,
+  .option,
   .switch,
-  .track,
-  .thumb,
-  .thumb svg {
+  .shotWrap .cover,
+  .paper .sheetHead span:last-child {
     transition: none;
   }
 }
 
-/* Phone: a taller desk, with the pieces regrouped around a larger notebook. */
+/* Responsive ---------------------------------------------------------------------- */
+
+/* Phones: the journal spans the width; plate and phone overlap its lower edge,
+   and the caption and switch drop below the scene. */
 @media (max-width: 640px) {
-  .desk {
-    aspect-ratio: 10 / 12;
+  .scene {
+    aspect-ratio: 0.86;
   }
 
-  .notebook { --x: 5%; --y: 12%; --w: 78%; --r: -2deg; }
-  .medal { --x: 72%; --y: 1%; --w: 22%; --r: 10deg; }
-  .whisk { --x: 86%; --y: 26%; --w: 10%; --r: 14deg; }
-  .cupcake { --x: 64%; --y: 62%; --w: 29%; --r: 4deg; }
-  .timer { --x: 4%; --y: 68%; --w: 36%; }
+  .journal {
+    width: 100%;
+    height: 66%;
+    font-size: clamp(10px, 2.9cqi, 13px);
+  }
 
-  .recipe .rows li { font-size: 4.4cqw; }
-  .editor .rows li { font-size: 4cqw; }
+  .plate {
+    right: auto;
+    left: 0;
+    width: 64%;
+  }
+
+  .note {
+    top: auto;
+    right: 3%;
+    bottom: 0;
+    width: 29%;
+  }
+
+  .noteCopy {
+    padding: 1em 0.9em;
+    font-size: clamp(9px, 2.6cqi, 12px);
+  }
+
+  .plateCaption,
+  .browserBar {
+    font-size: clamp(8px, 2.2cqi, 10px);
+  }
+
+  .foot {
+    position: static;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    width: auto;
+    margin-top: 22px;
+  }
 }

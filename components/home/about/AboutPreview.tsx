@@ -2,7 +2,7 @@ import Link from "next/link";
 import EditorialMotion from "@/components/motion/EditorialMotion";
 import AboutTitle from "./AboutTitle";
 import KitchenToCode from "./KitchenToCode";
-import { PREVIEW_STORY } from "./aboutStoryData";
+import { MEDALS, PREVIEW_STORY, PROJECT_COUNT } from "./aboutStoryData";
 import styles from "./AboutPreview.module.css";
 
 const Arrow = () => (
@@ -13,7 +13,7 @@ const Arrow = () => (
 
 /**
  * Homepage About Me feature: the shared headline and Fatima's story in her own
- * words beside the kitchen → code desk, the section's interactive centrepiece.
+ * words beside the kitchen → code composition, the section's interactive centrepiece.
  * Links to the full /about story.
  */
 export default function AboutPreview({ eyebrow }: { eyebrow: string }) {
@@ -32,10 +32,21 @@ export default function AboutPreview({ eyebrow }: { eyebrow: string }) {
         <div className={styles.story} data-stagger>
           <p className={styles.storyText}>
             {PREVIEW_STORY.opening}
-            <span className={styles.kitchenPhrase}>{PREVIEW_STORY.kitchen}</span>
+            {PREVIEW_STORY.kitchen}
             {PREVIEW_STORY.body}
             <em>{PREVIEW_STORY.highlight}</em>.
           </p>
+
+          <dl className={styles.ledger}>
+            <div data-side="kitchen">
+              <dt>Then</dt>
+              <dd>{MEDALS.length ? MEDALS.map((medal) => medal.label).join(" · ") : "The kitchen"}</dd>
+            </div>
+            <div data-side="code">
+              <dt>Now</dt>
+              <dd>Web &amp; mobile apps · {PROJECT_COUNT} projects</dd>
+            </div>
+          </dl>
 
           <div className={styles.storyFoot}>
             <Link className={`ui-btn ui-btn--primary ${styles.cta}`} href="/about" data-magnetic>

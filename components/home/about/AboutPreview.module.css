@@ -1,6 +1,6 @@
 /* Homepage "From cooking to coding." feature. The headline and Fatima's story
-   hold the left column; the right is a playful kitchen desk (KitchenToCode) that
-   turns into a developer's desk. The /about page keeps its own skin in
+   hold the left column; the right is an editorial kitchen composition
+   (KitchenToCode) that turns into a developer's workspace. The /about page keeps its own skin in
    AboutStory.module.css. */
 
 .section {
@@ -133,25 +133,51 @@
   text-wrap: pretty;
 }
 
-/* A rose drop cap opens the story like a printed feature. */
-.storyText::first-letter {
-  float: left;
-  margin: 0.06em 0.1em 0 0;
-  color: var(--about-rose);
-  font-size: 3.4em;
-  font-weight: 600;
-  line-height: 0.8;
-}
-
-.kitchenPhrase {
-  color: var(--about-rose);
-  font-weight: 500;
-}
-
 .storyText em {
-  color: var(--color-primary);
+  color: var(--color-text-primary);
   font-style: normal;
   font-weight: 500;
+}
+
+/* Then / Now: two hairline-ruled facts; the one matching the switch is lit. */
+.ledger {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin: clamp(24px, 2.6vw, 32px) 0 0;
+}
+
+.ledger > div {
+  padding-top: 14px;
+  border-top: 1px solid var(--color-border);
+  transition: border-color 600ms ease, opacity 600ms ease;
+}
+
+.ledger dt {
+  margin-bottom: 6px;
+  color: var(--color-primary);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.ledger dd {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.section:not(:has([data-coded])) .ledger [data-side="kitchen"],
+.section:has([data-coded]) .ledger [data-side="code"] {
+  border-color: var(--about-rose);
+}
+
+.section:not(:has([data-coded])) .ledger [data-side="code"],
+.section:has([data-coded]) .ledger [data-side="kitchen"] {
+  opacity: 0.55;
 }
 
 .storyFoot {
@@ -217,6 +243,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .ledger > div,
   .kitchenWord,
   .ctaLabel > span,
   .ctaIcon,
