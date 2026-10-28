@@ -93,9 +93,12 @@ export default async function HeroSection() {
               </em>
             </h1>
             <p className={styles.heroLead} data-hero-reveal="lead">
-              A BS Information Technology student at {college.institution}, developing web and mobile applications
-              using Next.js, React, Flutter, and Supabase. My work includes <strong>IGNIS SAFE</strong>, a fire safety
-              learning application and web management system developed for the BFP Dasmariñas City Fire Station.
+              I&apos;m a BSIT student at NU Dasmariñas, turning ideas into practical digital experiences. I helped
+              develop{" "}
+              <Link className={styles.leadLink} href="/projects/ignis-safe-website">
+                IGNIS SAFE
+              </Link>
+              , a fire safety learning and management platform for BFP Dasmariñas.
             </p>
 
             <div className={styles.actions}>

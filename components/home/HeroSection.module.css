@@ -122,39 +122,44 @@
   stroke-width: 4;
 }
 
-/* Fixed size and an em-based measure (~65 characters), tuned so every line
-   already fills ~90% before justifying — word spacing stays even and
-   "National University – Dasmariñas" never leaves a stretched first line. */
+/* A short, ragged-right intro: a ~34em measure sets it in three easy lines on
+   desktop, with open leading so it reads as a breath after the headline. */
 .heroLead {
-  max-width: 33em;
-  margin: 32px 0 0;
+  max-width: 34em;
+  margin: clamp(24px, 2.6vw, 32px) 0 0;
   color: var(--color-text-muted);
-  font-size: 1.0625rem;
-  line-height: 1.75;
+  font-size: 1.125rem;
+  letter-spacing: 0.005em;
+  line-height: 1.7;
   text-align: left;
   text-wrap: pretty;
 }
 
-/* Justify only when the column holds the full tuned measure (33em × 17px);
-   narrower columns would stretch the gaps, so they stay left-aligned. */
-@container hero-copy (min-width: 561px) {
-  .heroLead {
-    text-align: justify;
-    text-justify: inter-word;
-  }
-}
-
-.heroLead strong {
-  color: var(--color-text-primary);
+/* The project name doubles as a link to its case study: burgundy text over a
+   faint tinted rule that fills in solid on hover. */
+.leadLink {
+  background:
+    linear-gradient(currentColor, currentColor) 0 100% / 0 1.5px no-repeat,
+    linear-gradient(rgb(var(--rgb-primary) / 0.3), rgb(var(--rgb-primary) / 0.3)) 0 100% / 100% 1.5px no-repeat;
+  color: var(--color-primary);
   font-weight: 600;
   white-space: nowrap;
+  transition:
+    color 200ms ease,
+    background-size 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.leadLink:hover,
+.leadLink:focus-visible {
+  background-size: 100% 1.5px, 100% 1.5px;
+  color: var(--color-primary-hover);
 }
 
 .actions {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  margin-top: 32px;
+  margin-top: clamp(32px, 3.4vw, 44px);
 }
 
 .iconForward,
@@ -177,7 +182,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 6px 24px;
-  margin: 22px 0 0;
+  margin: 20px 0 0;
   padding: 0;
   list-style: none;
 }
@@ -215,7 +220,7 @@
   flex-wrap: wrap;
   align-items: baseline;
   gap: 10px 18px;
-  margin-top: 32px;
+  margin-top: clamp(32px, 3.4vw, 44px);
   padding-top: 20px;
   border-top: 1px solid var(--color-border);
 }
@@ -490,11 +495,14 @@
     font-size: clamp(2.3rem, 11vw, 3.1rem);
   }
 
-  /* A phone-width column leaves too few words per line to justify cleanly. */
   .heroLead {
-    margin-top: 22px;
-    font-size: 1rem;
-    text-align: left;
+    margin-top: 20px;
+    font-size: 1.0625rem;
+    line-height: 1.65;
+  }
+
+  .actions {
+    margin-top: 28px;
   }
 
   .actions > a {
@@ -506,6 +514,7 @@
   .iconForward,
   .iconDown,
   .iconUpRight,
+  .leadLink,
   .stackList img {
     transition: none;
   }
