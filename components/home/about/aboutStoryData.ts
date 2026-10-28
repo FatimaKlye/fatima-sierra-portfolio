@@ -78,49 +78,19 @@ export const TEAM_SKILLS = PROFESSIONAL_SKILLS;
 export const KITCHEN_VALUES = ["Patience", "Precision", "Creativity", "Problem-solving"];
 
 /* Homepage preview story ------------------------------------------------------
-   Fatima's own words, kept verbatim — only split into phrases so the meaningful
-   ones can be styled. Joining every `text` in order gives the paragraph back. */
+   Fatima's own words, kept verbatim as one paragraph. `kitchen` (rose) and
+   `highlight` (pink) are the only two phrases set apart. Reads back as
+   `${opening}${kitchen}${body}${highlight}.` */
 
-export type LoopStepId = "mix" | "taste" | "adjust";
-
-export type StoryPhrase = {
-  text: string;
-  /** kitchen = dusty rose, code = pink, mark = pink with a highlighter sweep. */
-  tone?: "kitchen" | "code" | "mark";
-  /** Ties the phrase to its row in STORY_LOOP (underlined, linked on hover). */
-  step?: LoopStepId;
+export const PREVIEW_STORY = {
+  opening: "Before I got into coding, I was ",
+  kitchen: "experimenting in the kitchen",
+  body:
+    ". I loved making something from scratch, figuring out what went wrong, and trying again until I got it right. " +
+    "When I discovered coding, I found that same curiosity in technology. " +
+    "Now, I build web and mobile apps, and what excites me most is seeing something I've worked on become ",
+  highlight: "useful to someone else",
 };
-
-export const PREVIEW_STORY: { lead: StoryPhrase[]; body: StoryPhrase[]; close: StoryPhrase[] } = {
-  lead: [
-    { text: "Before I got into coding, I was " },
-    { text: "experimenting in the kitchen", tone: "kitchen" },
-    { text: "." },
-  ],
-  body: [
-    { text: "I loved " },
-    { text: "making something from scratch", step: "mix" },
-    { text: ", " },
-    { text: "figuring out what went wrong", step: "taste" },
-    { text: ", and " },
-    { text: "trying again until I got it right", step: "adjust" },
-    { text: ". When I discovered coding, I found " },
-    { text: "that same curiosity", tone: "code" },
-    { text: " in technology." },
-  ],
-  close: [
-    { text: "Now, I build web and mobile apps, and what excites me most is seeing something I've worked on become " },
-    { text: "useful to someone else", tone: "mark" },
-    { text: "." },
-  ],
-};
-
-// The same habit, two kitchens — margin notes beside the story, one per step phrase.
-export const STORY_LOOP: { id: LoopStepId; kitchen: string; code: string }[] = [
-  { id: "mix", kitchen: "Mix", code: "build()" },
-  { id: "taste", kitchen: "Taste", code: "debug()" },
-  { id: "adjust", kitchen: "Adjust", code: "iterate()" },
-];
 
 /* "Honours, Leadership & Education" record ----------------------------------
    One chronological timeline assembled from the verified lists above. Titles,

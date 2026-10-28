@@ -1,0 +1,643 @@
+/* Kitchen → code desk (homepage About). Pieces sit on the desk by percentage
+   (--x, --y, --w, --r) and each is its own size container, so the type inside
+   them scales with the piece instead of the viewport. Illustration colours are
+   fixed so the paper, cupcake and stickers keep their look in both themes. */
+
+.stage {
+  --ink-pink: #a63d68;
+  --paper: #fffaf3;
+  --paper-back: #efe0d4;
+  --paper-fold: #d6bead;
+  --paper-ink: #3b2a34;
+  --paper-rule: rgb(166 61 104 / 0.14);
+  --desk-code: #2a1c24;
+  --editor: #3a2731;
+  --code-text: #f3e8ee;
+  --code-muted: #a88b99;
+  --code-kw: #f3a6c6;
+  --code-fn: #ffd9e8;
+  --code-prop: #d7a6c2;
+  --code-str: #f2c3a5;
+  --frost: #fde4ee;
+  --wrapper: #b8476f;
+  --cherry: #8b2f52;
+  --steel: #b3a2ab;
+  --tape: rgb(201 130 162 / 0.5);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  position: relative;
+  padding-bottom: 26px; /* the switch straddles the desk's bottom edge */
+}
+
+:global(html[data-theme="dark"]) .stage {
+  --paper: #f4eae2;
+  --desk-code: #2c1f28;
+  --editor: #3c2b35;
+  --tape: rgb(219 130 168 / 0.42);
+}
+
+.desk {
+  position: relative;
+  aspect-ratio: 10 / 8.4;
+  border-radius: clamp(22px, 2.6vw, 34px);
+  background: var(--color-surface);
+  isolation: isolate;
+}
+
+.gingham,
+.grid {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.gingham {
+  background-image:
+    linear-gradient(90deg, rgb(var(--rgb-primary) / 0.07) 50%, transparent 0),
+    linear-gradient(rgb(var(--rgb-primary) / 0.07) 50%, transparent 0);
+  background-size: 38px 38px;
+}
+
+.grid {
+  opacity: 0;
+  background-color: var(--desk-code);
+  background-image: radial-gradient(rgb(243 166 198 / 0.24) 1.2px, transparent 1.7px);
+  background-size: 22px 22px;
+}
+
+/* Pieces ------------------------------------------------------------------------ */
+
+.piece {
+  position: absolute;
+  z-index: var(--z, 1);
+  top: var(--y);
+  left: var(--x);
+  width: var(--w);
+  rotate: var(--r, 0deg);
+  container-type: inline-size;
+}
+
+.art {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.art > svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+@keyframes wiggle {
+  0%, 100% { rotate: 0deg; }
+  25% { rotate: -6deg; }
+  55% { rotate: 5deg; }
+  80% { rotate: -2deg; }
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .cupcake:hover .art,
+  .whisk:hover .art,
+  .timer:hover .art,
+  .medal:hover .art {
+    animation: wiggle 620ms var(--ease-out);
+  }
+}
+
+/* Notebook: the code editor lies underneath; the recipe on top is masked away
+   from its bottom-right corner by --peek (hover, px) plus --peel (0 → 1, the
+   whole page). 186cqw is the sheet's width + height, the full diagonal sweep. */
+.notebook {
+  --x: 9%;
+  --y: 11%;
+  --w: 60%;
+  --r: -2.5deg;
+  --z: 2;
+  --peel: 0;
+  --peek: 0px;
+
+  aspect-ratio: 100 / 86;
+  border-radius: 14px;
+  box-shadow: 0 22px 44px -22px rgb(var(--rgb-shadow) / 0.4);
+  cursor: pointer;
+}
+
+.sheet {
+  display: grid;
+  position: absolute;
+  inset: 0;
+  grid-template-rows: 13cqw 1fr;
+  padding: 3.5cqw 7cqw 6cqw;
+  border-radius: inherit;
+}
+
+.editor {
+  background: var(--editor);
+  color: var(--code-text);
+}
+
+.recipe {
+  --cut: calc((var(--peek) + var(--peel) * 186cqw) * 0.7071);
+
+  background: var(--paper);
+  color: var(--paper-ink);
+  -webkit-mask-image: linear-gradient(315deg, transparent var(--cut), #000 var(--cut));
+  mask-image: linear-gradient(315deg, transparent var(--cut), #000 var(--cut));
+}
+
+.sheetHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2cqw;
+  margin: 0;
+  font-size: 2.6cqw;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.recipe .sheetHead {
+  color: var(--ink-pink);
+}
+
+.editor .sheetHead {
+  color: var(--code-muted);
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+
+.dots {
+  display: flex;
+  gap: 1.4cqw;
+}
+
+.dots i {
+  width: 2.2cqw;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.2);
+}
+
+.dots i:first-child {
+  background: var(--code-kw);
+}
+
+.rows {
+  display: grid;
+  grid-template-rows: repeat(7, 1fr);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rows li {
+  display: flex;
+  align-items: center;
+  gap: 2.6cqw;
+  min-width: 0;
+  overflow: hidden;
+  white-space: pre;
+}
+
+.recipe .rows li {
+  border-bottom: 1px solid var(--paper-rule);
+  font-size: 4.1cqw;
+  font-weight: 500;
+}
+
+.recipe .rows li:first-child {
+  color: var(--ink-pink);
+  font-size: 5.6cqw;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
+.check {
+  flex: none;
+  width: 3.2cqw;
+  aspect-ratio: 1;
+  border: 1.5px solid rgb(166 61 104 / 0.45);
+  border-radius: 50%;
+}
+
+.check[data-done] {
+  border-color: var(--ink-pink);
+  background: radial-gradient(circle, var(--ink-pink) 45%, transparent 50%);
+}
+
+.editor .rows li {
+  font-size: 3.7cqw;
+}
+
+.ln {
+  flex: none;
+  width: 3.4cqw;
+  color: var(--code-muted);
+  font-size: 2.8cqw;
+  text-align: right;
+}
+
+.kw { color: var(--code-kw); }
+.fn { color: var(--code-fn); font-weight: 600; }
+.prop { color: var(--code-prop); }
+.str { color: var(--code-str); }
+.muted { color: var(--code-muted); }
+
+/* The lifted corner: the back of the page, folded over along the cut. */
+.flap {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: calc(var(--peek) + var(--peel) * 186cqw);
+  aspect-ratio: 1;
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+  background: linear-gradient(315deg, var(--paper-fold) 42%, var(--paper-back) 74%);
+  pointer-events: none;
+}
+
+.tape {
+  position: absolute;
+  z-index: 1;
+  top: -2.6cqw;
+  width: 17cqw;
+  height: 5.6cqw;
+  background: var(--tape);
+}
+
+.tapeLeft { left: 6cqw; rotate: -7deg; }
+.tapeRight { right: 6cqw; rotate: 6deg; }
+
+/* Cupcake → phone */
+.cupcake {
+  --x: 70%;
+  --y: 29%;
+  --w: 25%;
+  --r: 5deg;
+  --z: 3;
+
+  aspect-ratio: 120 / 140;
+}
+
+.cupcake .art {
+  filter: drop-shadow(0 10px 12px rgb(var(--rgb-shadow) / 0.16));
+}
+
+.frosting { fill: var(--frost); }
+.sprinkles rect:nth-child(3n + 1) { fill: var(--ink-pink); }
+.sprinkles rect:nth-child(3n + 2) { fill: #f3a6c6; }
+.sprinkles rect:nth-child(3n) { fill: #8fb3c9; }
+.wrapper { fill: var(--wrapper); }
+
+.wrapperStripes {
+  fill: none;
+  stroke: rgb(255 255 255 / 0.24);
+  stroke-linecap: round;
+  stroke-width: 3;
+}
+
+.stem {
+  fill: none;
+  stroke: #6b4a3a;
+  stroke-linecap: round;
+  stroke-width: 2.4;
+}
+
+.cherry { fill: var(--cherry); }
+.cherryShine { fill: rgb(255 255 255 / 0.7); }
+
+.phone,
+.cursor {
+  transform: scale(0);
+}
+
+.phoneBody { fill: var(--desk-code); }
+.phoneScreen { fill: var(--paper); }
+.phoneNotch { fill: var(--desk-code); }
+.phoneAccent { fill: var(--ink-pink); }
+.phoneTile { fill: var(--frost); }
+.phoneFrost { fill: #f6c4d8; }
+.phoneWrapper { fill: var(--wrapper); }
+.phoneCherry { fill: var(--cherry); }
+.phoneLine { fill: rgb(166 61 104 / 0.22); }
+
+/* Whisk → cursor */
+.whisk {
+  --x: 76%;
+  --y: 4%;
+  --w: 9.5%;
+  --r: 18deg;
+  --z: 3;
+
+  aspect-ratio: 64 / 120;
+}
+
+.whiskWires {
+  fill: none;
+  stroke: var(--steel);
+  stroke-linecap: round;
+  stroke-width: 2.6;
+}
+
+.whiskCollar { fill: var(--steel); }
+.whiskHandle { fill: var(--ink-pink); }
+
+.cursorShape {
+  fill: var(--ink-pink);
+  stroke: #fff;
+  stroke-linejoin: round;
+  stroke-width: 3.5;
+}
+
+/* Oven timer → build */
+.timer {
+  --x: 4%;
+  --y: 65%;
+  --w: 27%;
+  --r: -5deg;
+  --z: 4;
+
+  aspect-ratio: 1.25;
+}
+
+.note,
+.terminal {
+  display: grid;
+  position: absolute;
+  inset: 0;
+  align-content: center;
+  gap: 1.5cqw;
+  padding: 8cqw 10cqw;
+  border-radius: 6px;
+  box-shadow: 0 16px 30px -18px rgb(var(--rgb-shadow) / 0.45);
+}
+
+.note {
+  background: #fbd9e6;
+  color: var(--paper-ink);
+  font-size: 7.4cqw;
+}
+
+/* A strip of tape holding the note down. */
+.note::before {
+  position: absolute;
+  top: -4cqw;
+  left: 50%;
+  width: 34cqw;
+  height: 9cqw;
+  background: var(--tape);
+  content: "";
+  translate: -50% 0;
+  rotate: 3deg;
+}
+
+.noteKicker {
+  color: var(--ink-pink);
+  font-size: 6.4cqw;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.note strong {
+  font-size: 21cqw;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.terminal {
+  background: #1f151b;
+  color: var(--code-text);
+  font-size: 7cqw;
+  opacity: 0;
+}
+
+.terminal strong {
+  color: var(--code-kw);
+  font-size: 9.6cqw;
+  font-weight: 600;
+}
+
+.termMuted {
+  color: var(--code-muted);
+}
+
+/* Gold medal sticker — real, so it stays put in both kitchens. */
+.medal {
+  --x: 1.5%;
+  --y: 2%;
+  --w: 17%;
+  --r: -12deg;
+  --z: 5;
+
+  aspect-ratio: 1;
+}
+
+.medalBadge {
+  display: grid;
+  position: absolute;
+  inset: 0;
+  place-content: center;
+  border-radius: 50%;
+  background: var(--ink-pink);
+  box-shadow:
+    0 0 0 3.5cqw #fffaf3,
+    0 14px 26px -12px rgb(var(--rgb-shadow) / 0.5);
+  color: #fff6f9;
+  line-height: 1.1;
+  text-align: center;
+  outline: 1.5px dashed rgb(255 255 255 / 0.55);
+  outline-offset: -8cqw;
+}
+
+.medalKicker {
+  font-size: 8.5cqw;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.medalTitle {
+  font-size: 12cqw;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.medalLabel {
+  margin-top: 2cqw;
+  font-size: 7.4cqw;
+  opacity: 0.85;
+}
+
+/* Switch ------------------------------------------------------------------------ */
+
+.switch {
+  display: inline-flex;
+  position: absolute;
+  z-index: 6;
+  bottom: 0;
+  left: 50%;
+  align-items: center;
+  gap: 12px;
+  min-height: 52px;
+  padding: 7px 18px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--color-card);
+  box-shadow:
+    0 0 0 1px rgb(var(--rgb-primary) / 0.14),
+    0 16px 34px -14px rgb(var(--rgb-shadow-tint) / 0.5);
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  translate: -50% 0;
+  -webkit-tap-highlight-color: transparent;
+  transition: translate 320ms var(--ease-out), box-shadow 320ms ease;
+}
+
+@media (hover: hover) {
+  .switch:hover {
+    translate: -50% -2px;
+    box-shadow:
+      0 0 0 1px rgb(var(--rgb-primary) / 0.3),
+      0 20px 38px -14px rgb(var(--rgb-shadow-tint) / 0.6);
+  }
+}
+
+.switch:focus-visible {
+  outline: 3px solid rgb(var(--rgb-primary) / 0.32);
+  outline-offset: 3px;
+}
+
+.switchLabel {
+  transition: color 320ms ease;
+}
+
+.switch[aria-checked="false"] .switchLabel:first-child,
+.switch[aria-checked="true"] .switchLabel:last-child {
+  color: var(--color-primary);
+}
+
+.track {
+  position: relative;
+  width: 58px;
+  height: 32px;
+  border-radius: 999px;
+  background: rgb(var(--rgb-primary) / 0.16);
+  transition: background-color 420ms ease;
+}
+
+.switch[aria-checked="true"] .track {
+  background: var(--color-primary);
+}
+
+.thumb {
+  display: grid;
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 26px;
+  height: 26px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--color-card);
+  box-shadow: 0 3px 8px rgb(var(--rgb-shadow) / 0.22);
+  color: var(--color-primary);
+  transition: translate 560ms var(--spring);
+}
+
+.switch[aria-checked="true"] .thumb {
+  translate: 26px 0;
+}
+
+.thumb svg {
+  grid-area: 1 / 1;
+  width: 15px;
+  height: 15px;
+  transition: opacity 280ms ease, rotate 560ms var(--spring);
+}
+
+.thumb svg + svg,
+.switch[aria-checked="true"] .thumb svg:first-child {
+  opacity: 0;
+  rotate: -90deg;
+}
+
+.switch[aria-checked="true"] .thumb svg + svg {
+  opacity: 1;
+  rotate: 0deg;
+}
+
+/* Burst: sprinkles (or code glyphs) thrown from the track when the switch flips. */
+.burst {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  pointer-events: none;
+}
+
+.burst > span {
+  --sprinkle: var(--ink-pink);
+
+  position: absolute;
+  top: -1.5px;
+  left: -4px;
+  width: 8px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--sprinkle);
+  opacity: 0;
+}
+
+.burst > span:nth-child(3n + 1) { --sprinkle: #f3a6c6; }
+.burst > span:nth-child(3n + 2) { --sprinkle: #b5658a; }
+
+.burst[data-kind="code"] > span {
+  top: -7px;
+  width: auto;
+  height: auto;
+  background: none;
+  color: var(--sprinkle);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.burst[data-kind="code"] > span::before {
+  content: attr(data-glyph);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .switch,
+  .track,
+  .thumb,
+  .thumb svg {
+    transition: none;
+  }
+}
+
+/* Phone: a taller desk, with the pieces regrouped around a larger notebook. */
+@media (max-width: 640px) {
+  .desk {
+    aspect-ratio: 10 / 12;
+  }
+
+  .notebook { --x: 5%; --y: 12%; --w: 78%; --r: -2deg; }
+  .medal { --x: 72%; --y: 1%; --w: 22%; --r: 10deg; }
+  .whisk { --x: 86%; --y: 26%; --w: 10%; --r: 14deg; }
+  .cupcake { --x: 64%; --y: 62%; --w: 29%; --r: 4deg; }
+  .timer { --x: 4%; --y: 68%; --w: 36%; }
+
+  .recipe .rows li { font-size: 4.4cqw; }
+  .editor .rows li { font-size: 4cqw; }
+}

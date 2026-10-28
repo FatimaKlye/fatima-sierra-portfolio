@@ -123,30 +123,40 @@
 
 /* ---------- Top bar ---------- */
 
-/* Three columns so the compact title sits dead centre over the board, whatever the buttons' widths. */
+/* The compact title takes the slack on the left; the info toggle and close sit together at the top right. */
 .bar {
   display: grid;
   grid-area: bar;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 10px;
   margin-bottom: 14px;
 }
 
+.barActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Labelled ("Hide Info" / "Show Info") and pill-shaped beside the close button, so it reads as a control. */
 .infoToggle {
   display: inline-flex;
-  justify-self: start;
+  justify-content: center;
   align-items: center;
   gap: 5px;
+  min-width: 108px;
   height: 36px;
   padding: 0 14px 0 10px;
-  border: 1px solid rgb(var(--rgb-primary) / 0.22);
+  border: 1px solid rgb(var(--rgb-primary) / 0.28);
   border-radius: 999px;
   background: var(--wb-card-bg);
+  box-shadow: 0 6px 14px -10px rgb(var(--rgb-shadow-tint) / 0.4);
   color: var(--wb-text);
   font: inherit;
   font-size: 0.76rem;
   font-weight: 500;
+  white-space: nowrap;
   cursor: pointer;
   transition:
     background-color 200ms ease,
@@ -311,7 +321,7 @@
 
 .close {
   display: grid;
-  justify-self: end;
+  flex: none;
   width: 36px;
   height: 36px;
   padding: 0;

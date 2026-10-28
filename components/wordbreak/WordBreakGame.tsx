@@ -281,25 +281,28 @@ export default function WordBreakGame({ titleId, descriptionId, infoOpen, onTogg
 
   return (
     <>
-      {/* Above the board in both layouts: the info toggle, a compact title shown while the info is folded, close. */}
+      {/* Above the board in both layouts: a compact title shown while the info is folded, then the info toggle
+          and close side by side at the top right. */}
       <div className={styles.bar} data-enter>
-        <button
-          type="button"
-          className={styles.infoToggle}
-          aria-expanded={infoOpen}
-          aria-controls={infoId}
-          onMouseDown={keepFocus}
-          onClick={onToggleInfo}
-        >
-          <ChevronLeft className={styles.infoChevron} size={15} strokeWidth={2.4} aria-hidden="true" />
-          Info
-        </button>
         <p className={styles.barTitle} aria-hidden="true">
           <span>✦</span> No. {puzzleNumber(game.day)} · Word Break
         </p>
-        <button type="button" className={styles.close} aria-label="Close word game" onClick={onClose}>
-          <X size={16} strokeWidth={2.2} aria-hidden="true" />
-        </button>
+        <div className={styles.barActions}>
+          <button
+            type="button"
+            className={styles.infoToggle}
+            aria-expanded={infoOpen}
+            aria-controls={infoId}
+            onMouseDown={keepFocus}
+            onClick={onToggleInfo}
+          >
+            <ChevronLeft className={styles.infoChevron} size={15} strokeWidth={2.4} aria-hidden="true" />
+            {infoOpen ? "Hide Info" : "Show Info"}
+          </button>
+          <button type="button" className={styles.close} aria-label="Close word game" onClick={onClose}>
+            <X size={16} strokeWidth={2.2} aria-hidden="true" />
+          </button>
+        </div>
       </div>
 
       {/* Inert while folded, so it leaves the tab order and the accessibility tree (the dialog's name still resolves). */}
