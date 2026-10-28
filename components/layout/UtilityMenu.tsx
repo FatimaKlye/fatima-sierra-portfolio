@@ -181,13 +181,8 @@ export default function UtilityMenu() {
     openJukebox(triggerRef.current);
   };
 
-  const handleTheme = (event: MouseEvent<HTMLButtonElement>) => {
-    const rect = event.currentTarget.getBoundingClientRect();
-    setTheme(getTheme() === "dark" ? "light" : "dark", {
-      x: rect.left + rect.width / 2,
-      y: rect.top + rect.height / 2,
-    });
-  };
+  // The reveal grows from the centre of the screen, so the toggle's position doesn't matter.
+  const handleTheme = () => setTheme(getTheme() === "dark" ? "light" : "dark");
 
   return (
     <>

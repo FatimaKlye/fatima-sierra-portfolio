@@ -32,60 +32,258 @@ export function useTheme(): Theme {
   return useSyncExternalStore(subscribeTheme, getTheme, () => "light");
 }
 
-const apply = (theme: Theme) => document.documentElement.setAttribute(THEME_ATTR, theme);
+/* ---------- Switching ----------
+   A theme flip restyles every element once; that part is unavoidable. What made it lag was the
+   ~190 colour transitions in component styles: each one kept restyling and repainting the page
+   for the next ~250ms. So the flip happens under <html data-theme-switching> (transitions off,
+   see globals.css), set in the same mutation so it costs no extra restyle. Lifting it restyles
+   everything once more, so that rides along with the reveal's own teardown, or waits for idle. */
 
-type ViewTransitionDocument = Document & {
-  startViewTransition?: (update: () => void) => { ready: Promise<void>; finished: Promise<void> };
-};
+const SWITCHING_ATTR = "data-theme-switching";
+/** Styles the reveal's view-transition pseudos only, so toggling it costs next to nothing. */
+const REVEAL_ATTR = "data-theme-reveal";
+const REVEAL_MS = 520;
+const REVEAL_EASING = "cubic-bezier(0.55, 0, 0.15, 1)";
+/* Budgets for slow devices. Any view transition makes the browser restyle the whole page as it
+   starts and again as it ends — on top of the flip itself. A device that can't do that quickly
+   gets the instant switch, from then on for the rest of the visit. The update callback runs right
+   after the first of those restyles, so a late one is the earliest, cheapest sign. */
+const SLOW_CAPTURE_MS = 110;
+const SLOW_START_MS = 250; // click to the heart's first frame
+const INSTANT_KEY = "fs-theme-instant";
+
+type ViewTransitionLike = { ready: Promise<void>; finished: Promise<void>; skipTransition: () => void };
+type ViewTransitionDocument = Document & { startViewTransition?: (update: () => void) => ViewTransitionLike };
+
+let running: ViewTransitionLike | null = null;
+/** The latest theme asked for; a transition's deferred update applies this, never a stale choice. */
+let target: Theme = "light";
+let generation = 0;
+let releaseTimer = 0;
+let instantOnly: boolean | null = null;
+
+function preferInstant() {
+  if (instantOnly === null) {
+    try {
+      instantOnly = window.sessionStorage.getItem(INSTANT_KEY) === "1";
+    } catch {
+      instantOnly = false;
+    }
+  }
+  return instantOnly;
+}
+
+function rememberSlow() {
+  instantOnly = true;
+  try {
+    window.sessionStorage.setItem(INSTANT_KEY, "1");
+  } catch {
+    // Remembered for this page only.
+  }
+}
+
+/** Flips the theme with transitions held off, so colours land in the same frame as the flip. */
+function commit(theme: Theme) {
+  const root = document.documentElement;
+  generation++;
+  window.clearTimeout(releaseTimer);
+  root.setAttribute(SWITCHING_ATTR, "");
+  root.setAttribute(THEME_ATTR, theme);
+}
+
+/** Re-enables transitions, unless another flip has started since `scheduled`. */
+function release(scheduled: number) {
+  if (scheduled === generation) document.documentElement.removeAttribute(SWITCHING_ATTR);
+}
+
+/** Releases once the flip has painted, at an idle moment, since it costs a full restyle. */
+function releaseSoon() {
+  const scheduled = generation;
+  window.clearTimeout(releaseTimer);
+  releaseTimer = window.setTimeout(() => {
+    if ("requestIdleCallback" in window) window.requestIdleCallback(() => release(scheduled), { timeout: 600 });
+    else release(scheduled);
+  }, 120);
+}
+
+function switchInstantly(theme: Theme) {
+  target = theme;
+  commit(theme);
+  releaseSoon();
+}
+
+/* ---------- Heart reveal ----------
+   One heart, in unit space (about 2 wide, y down, origin at its visual centre). */
+const HEART_START = [0, -0.59] as const;
+const HEART_CURVES = [
+  [0.18, -0.99, 0.92, -1.09, 1, -0.49],
+  [1.07, -0.01, 0.6, 0.41, 0, 0.91],
+  [-0.6, 0.41, -1.07, -0.01, -1, -0.49],
+  [-0.92, -1.09, -0.18, -0.99, 0, -0.59],
+] as const;
+const START_SIZE = 14; // half-width in px of the heart that first appears
+const RIM = 12; // px of rim colour between the old page and the new one
+
+/* The heart is a mask image, drawn once and then only resized. Measured on an Iris Xe laptop
+   (About page), a growing path() clip re-rasterises every frame and falls to ~40fps; this holds
+   60. The SVG box is 2.2 units wide, so a mask-size of 2.2 × scale is a heart `scale` px wide
+   in half-width. */
+const MASK_BOX = 2.2;
+const HEART_MASK = `url("data:image/svg+xml,${encodeURIComponent(
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-1.1 -1.1 2.2 2.2"><path d="M ${HEART_START.join(" ")} ${HEART_CURVES.map((c) => `C ${c.join(" ")}`).join(" ")} Z"/></svg>`
+)}")`;
+
+let outline: number[] | null = null;
+
+/** The heart's edge as a flat polygon, sampled once. */
+function heartOutline() {
+  if (outline) return outline;
+  const points: number[] = [];
+  let [x0, y0]: readonly number[] = HEART_START;
+  for (const [x1, y1, x2, y2, x3, y3] of HEART_CURVES) {
+    for (let i = 1; i <= 24; i++) {
+      const t = i / 24;
+      const m = 1 - t;
+      points.push(
+        m * m * m * x0 + 3 * m * m * t * x1 + 3 * m * t * t * x2 + t * t * t * x3,
+        m * m * m * y0 + 3 * m * m * t * y1 + 3 * m * t * t * y2 + t * t * t * y3
+      );
+    }
+    [x0, y0] = [x3, y3];
+  }
+  return (outline = points);
+}
+
+/** Distance from the heart's centre to its edge along (dx, dy), for the unit heart. */
+function edgeDistance(dx: number, dy: number) {
+  const points = heartOutline();
+  let nearest = Infinity;
+  for (let i = 0; i < points.length; i += 2) {
+    const ax = points[i];
+    const ay = points[i + 1];
+    const ex = points[(i + 2) % points.length] - ax;
+    const ey = points[(i + 3) % points.length] - ay;
+    const den = dx * ey - dy * ex;
+    if (!den) continue;
+    const t = (ax * ey - ay * ex) / den;
+    const u = (ax * dy - ay * dx) / den;
+    if (t > 0 && u >= 0 && u <= 1) nearest = Math.min(nearest, t);
+  }
+  return nearest;
+}
+
+/** The smallest heart scale that covers a w × h box centred on it, notch and corners included. */
+function coverScale(w: number, h: number) {
+  let scale = 0;
+  const steps = 16;
+  for (let i = 0; i <= steps; i++) {
+    const along = (i / steps - 0.5) * w;
+    const down = (i / steps - 0.5) * h;
+    for (const [x, y] of [[along, -h / 2], [along, h / 2], [-w / 2, down], [w / 2, down]]) {
+      const length = Math.hypot(x, y);
+      scale = Math.max(scale, length / edgeDistance(x / length, y / length));
+    }
+  }
+  return scale * 1.03;
+}
 
 /**
- * Switches theme in place — no reload, scroll or state change. Where supported, the new theme
- * spreads outward from `origin` (the toggle) as a soft circle; otherwise colours cross-fade.
+ * Grows one heart from the middle of the screen. The new theme shows inside it; the old page is
+ * cut away just outside it, and the thin gap between the two shows the rim colour (globals.css).
+ * Both masks share one timing and only their size moves — nothing is recalculated per frame.
+ * Returns the reveal's animation, which finishes in the same frame the transition is torn down.
  */
-export function setTheme(theme: Theme, origin?: { x: number; y: number }) {
+function revealHeart(): Animation {
+  // Mobile snapshots span the largest viewport (browser bars hidden), so cover that too.
+  const coarse = window.matchMedia("(pointer: coarse)").matches;
+  const end = coverScale(window.innerWidth, coarse ? Math.max(window.innerHeight, screen.height) : window.innerHeight);
+  const size = (scale: number) => `${Math.round(scale * MASK_BOX)}px`;
+  // No fill: the transition ends the frame these finish, and nothing is left attached to <html>.
+  const timing: KeyframeAnimationOptions = { duration: REVEAL_MS, easing: REVEAL_EASING };
+  const root = document.documentElement;
+  const still = { maskRepeat: "no-repeat", maskPosition: "center" };
+
+  // The old page keeps everything but the heart: a full layer minus the heart layer.
+  const page = `linear-gradient(#000 0 0), ${HEART_MASK}`;
+  root.animate(
+    [
+      { ...still, maskImage: page, maskComposite: "subtract", maskSize: `100% 100%, ${size(START_SIZE)}` },
+      { ...still, maskImage: page, maskComposite: "subtract", maskSize: `100% 100%, ${size(end + RIM)}` },
+    ],
+    { ...timing, pseudoElement: "::view-transition-old(root)" }
+  );
+  return root.animate(
+    [
+      { ...still, maskImage: HEART_MASK, maskSize: size(0) },
+      { ...still, maskImage: HEART_MASK, maskSize: size(end) },
+    ],
+    { ...timing, pseudoElement: "::view-transition-new(root)" }
+  );
+}
+
+/**
+ * Switches theme in place — no reload, scroll or React state beyond the two theme readers. Where
+ * view transitions exist, the new theme opens inside a heart from the centre of the screen;
+ * reduced motion, older browsers and slow devices get an instant switch instead.
+ */
+export function setTheme(theme: Theme) {
   try {
     window.localStorage.setItem(STORAGE_KEY, theme);
   } catch {
     // Private mode or blocked storage: the switch still applies for this visit.
   }
+
+  // A second press mid-reveal finishes the first one at once rather than stacking another.
+  if (running) {
+    running.skipTransition();
+    switchInstantly(theme);
+    return;
+  }
   if (theme === getTheme()) return;
 
-  const root = document.documentElement;
   const doc = document as ViewTransitionDocument;
-
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-    apply(theme);
+  if (
+    typeof doc.startViewTransition !== "function" ||
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+    preferInstant()
+  ) {
+    switchInstantly(theme);
     return;
   }
 
-  if (typeof doc.startViewTransition === "function" && origin) {
-    const radius = Math.hypot(
-      Math.max(origin.x, window.innerWidth - origin.x),
-      Math.max(origin.y, window.innerHeight - origin.y)
-    );
-    root.setAttribute("data-theme-switching", "");
-    const transition = doc.startViewTransition(() => apply(theme));
-    transition.ready
-      .then(() => {
-        root.animate(
-          {
-            clipPath: [
-              `circle(0px at ${origin.x}px ${origin.y}px)`,
-              `circle(${radius}px at ${origin.x}px ${origin.y}px)`,
-            ],
-          },
-          { duration: 560, easing: "cubic-bezier(0.22, 1, 0.36, 1)", pseudoElement: "::view-transition-new(root)" }
-        );
-      })
-      .catch(() => {});
-    transition.finished.catch(() => {}).finally(() => root.removeAttribute("data-theme-switching"));
-    return;
-  }
-
-  // Fallback: a brief, global colour cross-fade (see .theme-fade in globals.css).
-  root.classList.add("theme-fade");
-  apply(theme);
-  window.setTimeout(() => root.classList.remove("theme-fade"), 420);
+  target = theme;
+  const root = document.documentElement;
+  const started = performance.now();
+  const transition = doc.startViewTransition(() => {
+    const slow = performance.now() - started > SLOW_CAPTURE_MS;
+    if (!slow) root.setAttribute(REVEAL_ATTR, "");
+    commit(target);
+    if (slow) {
+      // Bail before the new page is captured: that would cost yet another full restyle.
+      rememberSlow();
+      transition.skipTransition();
+    }
+  });
+  running = transition;
+  transition.ready
+    .then(() => {
+      if (performance.now() - started > SLOW_START_MS) {
+        rememberSlow();
+        transition.skipTransition();
+        return;
+      }
+      // Lifting the hold as the heart lands folds its restyle into the teardown's.
+      const scheduled = generation;
+      revealHeart().finished.then(() => release(scheduled), () => {});
+    })
+    .catch(() => {});
+  transition.finished
+    .catch(() => {})
+    .finally(() => {
+      root.removeAttribute(REVEAL_ATTR);
+      if (running === transition) running = null;
+      releaseSoon();
+    });
 }
 
 /**
@@ -95,11 +293,14 @@ export function setTheme(theme: Theme, origin?: { x: number; y: number }) {
 export function watchThemeSources(): () => void {
   const media = window.matchMedia(SYSTEM_QUERY);
   const systemTheme = (): Theme => (media.matches ? "dark" : "light");
+  const follow = (theme: Theme) => {
+    if (theme !== getTheme()) switchInstantly(theme);
+  };
   const onSystem = () => {
-    if (!readStored()) apply(systemTheme());
+    if (!readStored()) follow(systemTheme());
   };
   const onStorage = (event: StorageEvent) => {
-    if (event.key === STORAGE_KEY) apply(readStored() ?? systemTheme());
+    if (event.key === STORAGE_KEY) follow(readStored() ?? systemTheme());
   };
   media.addEventListener("change", onSystem);
   window.addEventListener("storage", onStorage);

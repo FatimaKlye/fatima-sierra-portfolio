@@ -75,31 +75,28 @@
   color-scheme: dark;
 }
 
-/* Theme switch: the new theme opens as a circle from the toggle (see lib/theme.ts). Scoped to the
-   switch so any other view transition keeps the browser default. */
-:root[data-theme-switching]::view-transition-old(root),
-:root[data-theme-switching]::view-transition-new(root) {
+/* Theme switch (lib/theme.ts). While it is flagged, no transition runs: every colour lands in the
+   flip's own frame, instead of ~190 component tweens restyling and repainting the page per frame. */
+:root[data-theme-switching] *,
+:root[data-theme-switching] *::before,
+:root[data-theme-switching] *::after {
+  transition: none !important;
+}
+
+/* The new theme opens inside one heart from the centre of the screen; script sizes both masks.
+   Scoped to the reveal so any other view transition keeps the browser default. */
+:root[data-theme-reveal]::view-transition-old(root),
+:root[data-theme-reveal]::view-transition-new(root) {
   animation: none;
   mix-blend-mode: normal;
 }
 
-:root[data-theme-switching]::view-transition-old(root) { z-index: 1; }
-:root[data-theme-switching]::view-transition-new(root) { z-index: 2; }
+:root[data-theme-reveal]::view-transition-old(root) { z-index: 1; }
+:root[data-theme-reveal]::view-transition-new(root) { z-index: 2; }
 
-/* Fallback for browsers without view transitions: one short cross-fade of colours only. */
-html.theme-fade,
-html.theme-fade *,
-html.theme-fade *::before,
-html.theme-fade *::after {
-  transition:
-    background-color 380ms ease,
-    color 380ms ease,
-    border-color 380ms ease,
-    outline-color 380ms ease,
-    fill 380ms ease,
-    stroke 380ms ease,
-    box-shadow 380ms ease !important;
-}
+/* The heart's rim, seen in the gap between the two clips: burgundy into dark, blush into light. */
+:root[data-theme-reveal]::view-transition-group(root) { background: var(--color-soft-blush); }
+:root[data-theme="dark"][data-theme-reveal]::view-transition-group(root) { background: var(--color-brand-fill); }
 
 /* Single-colour (black) brand logos would vanish on charcoal; render them in soft white. */
 :root[data-theme="dark"] img[data-mono-icon] {

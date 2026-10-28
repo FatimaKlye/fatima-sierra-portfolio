@@ -99,13 +99,11 @@ export default function FairyDustCursor({
   const characterKey = characterSet.join("|");
   const { min: velocityMin, max: velocityMax } = initialVelocity;
 
-  // A colour change (theme switch) only re-tints the sprite cache: sparkles already in the air
-  // finish fading in their own tint instead of the whole trail being torn down.
+  // A colour change (theme switch) only re-tints the sprite cache, and lazily — on the next burst,
+  // not inside the switch's own frame. Sparkles already in the air finish in their own tint.
   const colorKeyRef = useRef(colorKey);
-  const rebuildSpritesRef = useRef<(() => void) | null>(null);
   useEffect(() => {
     colorKeyRef.current = colorKey;
-    rebuildSpritesRef.current?.();
   }, [colorKey]);
 
   useEffect(() => {
@@ -117,18 +115,19 @@ export default function FairyDustCursor({
     const characters = characterKey.split("|");
     let dpr = 1;
     let sprites: HTMLCanvasElement[] = [];
+    let spritesKey = "";
     const particles: Particle[] = [];
     let frame = 0;
     let lastTime = 0;
     let lastSpawn: { x: number; y: number } | null = null;
 
     const buildSprites = () => {
-      const palette = colorKeyRef.current.split("|");
+      spritesKey = colorKeyRef.current;
+      const palette = spritesKey.split("|");
       sprites = characters.flatMap((character) =>
         palette.map((color) => createSprite(character, color, particleSize, dpr))
       );
     };
-    rebuildSpritesRef.current = buildSprites;
 
     const resize = () => {
       dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -176,6 +175,7 @@ export default function FairyDustCursor({
       const { clientX: x, clientY: y } = event;
       if (lastSpawn && Math.hypot(x - lastSpawn.x, y - lastSpawn.y) < SPAWN_DISTANCE) return;
       lastSpawn = { x, y };
+      if (spritesKey !== colorKeyRef.current) buildSprites();
 
       for (let i = 0; i < particleCount && particles.length < MAX_PARTICLES; i++) {
         const speed = velocityMin + Math.random() * (velocityMax - velocityMin);
@@ -203,7 +203,6 @@ export default function FairyDustCursor({
     document.documentElement.addEventListener("pointerleave", onLeave);
 
     return () => {
-      rebuildSpritesRef.current = null;
       cancelAnimationFrame(frame);
       window.removeEventListener("resize", resize);
       window.removeEventListener("pointermove", onPointerMove);
