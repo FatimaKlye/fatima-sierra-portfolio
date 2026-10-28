@@ -954,9 +954,10 @@
 .cc0 {
   display: grid;
   gap: 6px;
-  padding: 10px 12px;
-  border-left: 2px solid var(--color-primary);
-  border-radius: 0 12px 12px 0;
+  padding: 12px 14px;
+  /* Transparent so it only shows in forced-colors mode, where the tint is dropped. */
+  border: 1px solid transparent;
+  border-radius: 12px;
   background: var(--jb-tint);
   color: var(--color-text-muted);
   font-size: 11.5px;

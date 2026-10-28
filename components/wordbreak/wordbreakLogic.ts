@@ -112,6 +112,7 @@ export function statusFor(guesses: string[], answer: string): GameStatus {
 
 const GAME_KEY = "wordbreak:game:v1";
 const STATS_KEY = "wordbreak:stats:v1";
+const HELP_KEY = "wordbreak:help:v1";
 
 export type SavedGame = { day: number; guesses: string[]; draft: string };
 
@@ -174,6 +175,16 @@ export function loadGame(day: number): SavedGame {
 
 export function saveGame(game: SavedGame) {
   write(GAME_KEY, game);
+}
+
+/** Whether the player last left "How to play" open — null until they've toggled it themselves. */
+export function loadHelpOpen(): boolean | null {
+  const saved = read(HELP_KEY);
+  return typeof saved === "boolean" ? saved : null;
+}
+
+export function saveHelpOpen(open: boolean) {
+  write(HELP_KEY, open);
 }
 
 export function loadStats(): Stats {

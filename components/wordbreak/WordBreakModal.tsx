@@ -43,7 +43,7 @@ export default function WordBreakModal({ onClose }: { onClose: () => void }) {
 
     entranceRef.current?.kill();
     gsap.killTweensOf([overlay, panel]);
-    gsap.to(panel, { y: 10, scale: 0.97, opacity: 0, duration: 0.22, ease: "power2.in" });
+    gsap.to(panel, { y: 14, scale: 0.96, opacity: 0, duration: 0.24, ease: "power2.in" });
     gsap.to(overlay, { opacity: 0, duration: 0.28, ease: "power2.in", onComplete: finish });
     window.setTimeout(finish, 450);
   }, [onClose]);
@@ -69,12 +69,19 @@ export default function WordBreakModal({ onClose }: { onClose: () => void }) {
           { y: 18, scale: 0.95, opacity: 0 },
           { y: 0, scale: 1, opacity: 1, duration: 0.55, ease: "back.out(1.5)", clearProps: "transform" },
           0
+        )
+        // Then the contents settle in a beat behind: title, rules, board rows, keyboard, stats.
+        .fromTo(
+          panel.querySelectorAll("[data-enter]"),
+          { y: 10, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.45, ease: "power3.out", stagger: 0.035, clearProps: "opacity,transform" },
+          0.1
         ));
       // Never leave the dialog half-faded if animation frames are throttled (see requestClose).
       settle = window.setTimeout(() => {
         // Kill after jumping to the end, or the global timeline would re-render it from its lagging clock.
         if (!closingRef.current) entrance.progress(1).kill();
-      }, 800);
+      }, 1200);
     }
 
     return () => {

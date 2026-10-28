@@ -1,8 +1,8 @@
 "use client";
 
 import gsap from "gsap";
-import { Delete, X } from "lucide-react";
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { ChevronDown, Delete, X } from "lucide-react";
+import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties, MouseEvent } from "react";
 import {
   MAX_GUESSES,
@@ -12,12 +12,14 @@ import {
   formatCountdown,
   keyboardStates,
   loadGame,
+  loadHelpOpen,
   loadStats,
   manilaDayNumber,
   msUntilNextDay,
   puzzleNumber,
   recordResult,
   saveGame,
+  saveHelpOpen,
   statusFor,
   unpackWords,
   visibleStreak,
@@ -41,6 +43,14 @@ const STATE_LABEL: Record<TileState, string> = {
   present: "in the word, wrong spot",
   absent: "not in the word",
 };
+/** Below this width the dialog stacks into one column. Must match the breakpoint in WordBreak.module.css. */
+const STACKED = "(max-width: 819px)";
+/** "How to play" samples: one highlighted letter per word shows what each colour means. */
+const EXAMPLES: { word: string; index: number; state: TileState; caption: string }[] = [
+  { word: "blush", index: 0, state: "correct", caption: "is in the word, right spot" },
+  { word: "charm", index: 3, state: "present", caption: "is in the word, wrong spot" },
+  { word: "petal", index: 2, state: "absent", caption: "is not in the word" },
+];
 
 const cx = (...names: (string | false | null | undefined)[]) => names.filter(Boolean).join(" ");
 const reducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -55,6 +65,10 @@ export default function WordBreakGame({ titleId, descriptionId, onClose }: Props
   const [loadFailed, setLoadFailed] = useState(false);
   const [game, setGame] = useState<SavedGame>(() => loadGame(manilaDayNumber()));
   const [stats, setStats] = useState<Stats>(() => loadStats());
+  // First-timers see the rules straight away; so does anyone on a wide screen, where they cost no height.
+  const [helpOpen, setHelpOpen] = useState(
+    () => loadHelpOpen() ?? (stats.played === 0 || !window.matchMedia(STACKED).matches)
+  );
   const [revealRow, setRevealRow] = useState<number | null>(null);
   const [shakeCount, setShakeCount] = useState(0);
   const [shaking, setShaking] = useState(false);
@@ -62,6 +76,8 @@ export default function WordBreakGame({ titleId, descriptionId, onClose }: Props
   const [celebrating, setCelebrating] = useState(false);
   const [announcement, setAnnouncement] = useState("");
   const timers = useRef<number[]>([]);
+  const keyboardRef = useRef<HTMLDivElement>(null);
+  const helpId = useId();
 
   const answer = words ? answerForDay(game.day, words.answers) : null;
   const evaluations = useMemo(
@@ -94,6 +110,11 @@ export default function WordBreakGame({ titleId, descriptionId, onClose }: Props
     saveGame(next);
   };
 
+  const toggleHelp = () => {
+    setHelpOpen(!helpOpen);
+    saveHelpOpen(!helpOpen);
+  };
+
   const showToast = (text: string) => {
     const id = Date.now();
     setToast({ id, text });
@@ -118,6 +139,8 @@ export default function WordBreakGame({ titleId, descriptionId, onClose }: Props
     commit({ day: current.day, guesses, draft: "" });
     // Re-read storage so another open tab's result is never overwritten or double-counted.
     if (result !== "playing") setStats(recordResult(loadStats(), current.day, result === "won"));
+    // On a phone the rules sit above the board; once play is under way, fold them (unsaved) to give it room.
+    if (window.matchMedia(STACKED).matches) setHelpOpen(false);
 
     const evaluation = evaluateGuess(guess, answer);
     busyRef.current = true;
@@ -161,18 +184,27 @@ export default function WordBreakGame({ titleId, descriptionId, onClose }: Props
   });
 
   useEffect(() => {
+    // A physical key press gives its on-screen twin a little tap, so the two keyboards feel like one.
+    const press = (key: string) => {
+      handleKeyRef.current(key);
+      if (reducedMotion()) return;
+      keyboardRef.current
+        ?.querySelector<HTMLElement>(`[data-key="${key}"]`)
+        ?.animate([{ scale: "1" }, { scale: "0.9" }, { scale: "1" }], { duration: 180, easing: "ease-out" });
+    };
+
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.defaultPrevented || event.isComposing || event.metaKey || event.ctrlKey || event.altKey) return;
       if (event.key === "Enter") {
         // A keyboard-focused button (close, retry, a tabbed-to key) keeps its own Enter.
         if (event.target instanceof HTMLButtonElement || event.repeat) return;
         event.preventDefault();
-        handleKeyRef.current("enter");
+        press("enter");
       } else if (event.key === "Backspace") {
         event.preventDefault();
-        handleKeyRef.current("backspace");
+        press("backspace");
       } else if (/^[a-z]$/i.test(event.key)) {
-        handleKeyRef.current(event.key.toLowerCase());
+        press(event.key.toLowerCase());
       }
     };
 
@@ -238,137 +270,194 @@ export default function WordBreakGame({ titleId, descriptionId, onClose }: Props
 
   return (
     <>
-      <header className={styles.head}>
-        <div>
-          <p className={styles.eyebrow}>
-            <span aria-hidden="true">✦</span> No. {puzzleNumber(game.day)}
-          </p>
-          <h2 id={titleId} className={styles.title}>
-            A Little Word Break
-          </h2>
-          <p id={descriptionId} className={styles.subtitle}>
-            One word. Every day.
-          </p>
-        </div>
-        <button type="button" className={styles.close} aria-label="Close word game" onClick={onClose}>
-          <X size={16} strokeWidth={2} aria-hidden="true" />
-        </button>
-      </header>
-
-      <div className={styles.stage}>
-        <div className={styles.toastSlot} aria-live="polite">
-          {toast && (
-            <p key={toast.id} className={styles.toast}>
-              {toast.text}
-            </p>
-          )}
-        </div>
-
-        <div className={styles.board} role="group" aria-label="Guesses">
-          {Array.from({ length: MAX_GUESSES }, (_, row) => {
-            const submitted = row < game.guesses.length;
-            const isCurrent = row === currentRow;
-            const letters = submitted ? game.guesses[row] : isCurrent ? game.draft : "";
-            const evaluation = submitted ? evaluations[row] : undefined;
-            const flipping = row === revealRow;
-            const hopping = celebrating && row === winningRow;
-            const label =
-              evaluation && !flipping
-                ? `Guess ${row + 1}: ${evaluation.map((state, i) => `${letters[i].toUpperCase()} ${STATE_LABEL[state]}`).join(", ")}`
-                : `Guess ${row + 1}: ${letters ? letters.toUpperCase().split("").join(" ") : "empty"}`;
-
-            return (
-              <div
-                // The typing row remounts on each rejected guess so the shake can replay.
-                key={isCurrent ? `current-${shakeCount}` : row}
-                className={cx(styles.row, isCurrent && shaking && styles.shake)}
-                role="group"
-                aria-label={label}
-              >
-                {Array.from({ length: WORD_LENGTH }, (_, i) => {
-                  const letter = letters[i] ?? "";
-                  const state = evaluation?.[i];
-                  return (
-                    <span
-                      key={i}
-                      className={cx(
-                        styles.tile,
-                        letter && styles.filled,
-                        isCurrent && letter && styles.typing,
-                        state && styles[state],
-                        flipping && styles.flip,
-                        hopping && styles.hop
-                      )}
-                      style={{ "--i": i } as CSSProperties}
-                      aria-hidden="true"
-                    >
-                      {letter}
-                    </span>
-                  );
-                })}
-              </div>
-            );
-          })}
-        </div>
-
-        {celebrating && <Celebration />}
+      {/* The blush card behind the title, rules and stats on wide screens. */}
+      <div className={styles.introCard} aria-hidden="true">
+        <span className={styles.spark}>✦</span>
+        <span className={styles.spark}>♥</span>
+        <span className={styles.spark}>✦</span>
       </div>
 
-      {loadFailed && !words ? (
-        <div className={styles.result}>
-          <p className={styles.resultText}>Today&rsquo;s word didn&rsquo;t load. Check your connection.</p>
-          <button
-            type="button"
-            className="ui-btn ui-btn--secondary ui-btn--sm"
-            onClick={() => {
-              setLoadFailed(false);
-              setLoadAttempt((n) => n + 1);
-            }}
-          >
-            Try again
-          </button>
+      <header className={styles.head} data-enter>
+        <p className={styles.eyebrow}>
+          <span className={styles.issue}>
+            <span aria-hidden="true">✦</span> No. {puzzleNumber(game.day)}
+          </span>
+          <span className={styles.daily}>Daily word</span>
+        </p>
+        <h2 id={titleId} className={styles.title}>
+          A Little <span>Word Break</span>
+        </h2>
+        <p id={descriptionId} className={styles.subtitle}>
+          One word. Every day.
+        </p>
+      </header>
+
+      <button type="button" className={styles.close} aria-label="Close word game" onClick={onClose}>
+        <X size={16} strokeWidth={2.2} aria-hidden="true" />
+      </button>
+
+      <section className={styles.help} data-enter>
+        <button
+          type="button"
+          className={styles.helpToggle}
+          aria-expanded={helpOpen}
+          aria-controls={helpId}
+          onMouseDown={keepFocus}
+          onClick={toggleHelp}
+        >
+          <span className={styles.helpMark} aria-hidden="true">
+            ?
+          </span>
+          How to play
+          <ChevronDown className={styles.chevron} size={14} strokeWidth={2.2} aria-hidden="true" />
+        </button>
+
+        <div id={helpId} className={styles.helpBody} data-open={helpOpen || undefined}>
+          <div className={styles.helpClip}>
+            <div className={styles.helpCard}>
+              <ol className={styles.rules}>
+                <li>
+                  <span>
+                    Guess the hidden word in <strong>{MAX_GUESSES} tries</strong>.
+                  </span>
+                </li>
+                <li>
+                  <span>
+                    Each guess must be a <strong>valid {WORD_LENGTH}-letter word</strong>.
+                  </span>
+                </li>
+                <li>
+                  <span>After each guess, the tile colors show how close you are.</span>
+                </li>
+              </ol>
+              <ul className={styles.examples}>
+                {EXAMPLES.map(({ word, index, state, caption }, n) => (
+                  <li key={word} className={styles.example} style={{ "--n": n } as CSSProperties}>
+                    <span className={styles.sample} aria-hidden="true">
+                      {[...word].map((letter, i) => (
+                        <span key={i} className={cx(styles.mini, i === index && styles[state], i === index && styles.miniFlip)}>
+                          {letter}
+                        </span>
+                      ))}
+                    </span>
+                    <span className={styles.caption}>
+                      <strong>{word[index].toUpperCase()}</strong> {caption}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </div>
-      ) : finished ? (
-        <div className={styles.result}>
-          <p className={styles.resultTitle}>{status === "won" ? WIN_LINES[game.guesses.length - 1] : "So close."}</p>
-          <p className={styles.resultText}>
-            {status === "won" ? (
-              <>
-                Solved in <strong>{game.guesses.length}</strong>/{MAX_GUESSES}
-              </>
-            ) : (
-              <>
-                Today&rsquo;s word was <strong className={styles.answer}>{answer}</strong>
-              </>
+      </section>
+
+      <div className={styles.play}>
+        <div className={styles.stage}>
+          <div className={styles.toastSlot} aria-live="polite">
+            {toast && (
+              <p key={toast.id} className={styles.toast}>
+                {toast.text}
+              </p>
             )}
-          </p>
-          <dl className={styles.stats}>
-            <div>
-              <dt>Played</dt>
-              <dd>{stats.played}</dd>
-            </div>
-            <div>
-              <dt>Streak</dt>
-              <dd>{streak}</dd>
-            </div>
-            <div>
-              <dt>Best</dt>
-              <dd>{stats.maxStreak}</dd>
-            </div>
-          </dl>
-          <p className={styles.next}>
-            Next word in <Countdown />
-          </p>
+          </div>
+
+          <div className={styles.board} role="group" aria-label="Guesses">
+            {Array.from({ length: MAX_GUESSES }, (_, row) => {
+              const submitted = row < game.guesses.length;
+              const isCurrent = row === currentRow;
+              const letters = submitted ? game.guesses[row] : isCurrent ? game.draft : "";
+              const evaluation = submitted ? evaluations[row] : undefined;
+              const flipping = row === revealRow;
+              const hopping = celebrating && row === winningRow;
+              const label =
+                evaluation && !flipping
+                  ? `Guess ${row + 1}: ${evaluation.map((state, i) => `${letters[i].toUpperCase()} ${STATE_LABEL[state]}`).join(", ")}`
+                  : `Guess ${row + 1}: ${letters ? letters.toUpperCase().split("").join(" ") : "empty"}`;
+
+              return (
+                <div
+                  // The typing row remounts on each rejected guess so the shake can replay.
+                  key={isCurrent ? `current-${shakeCount}` : row}
+                  className={cx(styles.row, isCurrent && shaking && styles.shake)}
+                  role="group"
+                  aria-label={label}
+                  data-enter
+                >
+                  {Array.from({ length: WORD_LENGTH }, (_, i) => {
+                    const letter = letters[i] ?? "";
+                    const state = evaluation?.[i];
+                    return (
+                      <span
+                        key={i}
+                        className={cx(
+                          styles.tile,
+                          letter && styles.filled,
+                          isCurrent && letter && styles.typing,
+                          // A soft marker on the square the next letter will land in.
+                          isCurrent && !revealing && i === letters.length && styles.caret,
+                          state && styles[state],
+                          flipping && styles.flip,
+                          hopping && styles.hop
+                        )}
+                        style={{ "--i": i } as CSSProperties}
+                        aria-hidden="true"
+                      >
+                        {letter}
+                      </span>
+                    );
+                  })}
+                </div>
+              );
+            })}
+          </div>
+
+          {celebrating && <Celebration />}
         </div>
-      ) : (
-        <>
-          <div className={styles.keyboard} role="group" aria-label="Keyboard">
+
+        {loadFailed && !words ? (
+          <div className={styles.result}>
+            <p className={styles.resultText}>Today&rsquo;s word didn&rsquo;t load. Check your connection.</p>
+            <button
+              type="button"
+              className="ui-btn ui-btn--secondary ui-btn--sm"
+              onClick={() => {
+                setLoadFailed(false);
+                setLoadAttempt((n) => n + 1);
+              }}
+            >
+              Try again
+            </button>
+          </div>
+        ) : finished ? (
+          <div className={styles.result}>
+            <p className={styles.resultTitle}>
+              <span aria-hidden="true">{status === "won" ? "♥" : "✦"}</span>
+              {status === "won" ? WIN_LINES[game.guesses.length - 1] : "So close."}
+            </p>
+            <p className={styles.resultText}>
+              {status === "won" ? (
+                <>
+                  Solved in <strong>{game.guesses.length}</strong>/{MAX_GUESSES}
+                </>
+              ) : (
+                <>
+                  Today&rsquo;s word was <strong className={styles.answer}>{answer}</strong>
+                </>
+              )}
+            </p>
+            <p className={styles.next}>
+              Next word in <Countdown />
+            </p>
+          </div>
+        ) : (
+          <div ref={keyboardRef} className={styles.keyboard} role="group" aria-label="Keyboard" data-enter>
             {KEY_ROWS.map((keys, row) => (
               <div className={styles.keyRow} key={keys}>
                 {row === 2 && (
                   <button
                     type="button"
-                    className={cx(styles.key, styles.keyWide)}
+                    className={cx(styles.key, styles.keyWide, styles.keyEnter)}
+                    data-key="enter"
                     onMouseDown={keepFocus}
                     onClick={() => handleKey("enter")}
                   >
@@ -382,6 +471,7 @@ export default function WordBreakGame({ titleId, descriptionId, onClose }: Props
                       key={key}
                       type="button"
                       className={cx(styles.key, state && styles[state])}
+                      data-key={key}
                       aria-label={state ? `${key.toUpperCase()}, ${STATE_LABEL[state]}` : key.toUpperCase()}
                       onMouseDown={keepFocus}
                       onClick={() => handleKey(key)}
@@ -394,6 +484,7 @@ export default function WordBreakGame({ titleId, descriptionId, onClose }: Props
                   <button
                     type="button"
                     className={cx(styles.key, styles.keyWide)}
+                    data-key="backspace"
                     aria-label="Delete letter"
                     onMouseDown={keepFocus}
                     onClick={() => handleKey("backspace")}
@@ -404,11 +495,25 @@ export default function WordBreakGame({ titleId, descriptionId, onClose }: Props
               </div>
             ))}
           </div>
-          <p className={styles.meta}>
-            Played {stats.played} <span aria-hidden="true">·</span> Streak {streak}
-          </p>
-        </>
-      )}
+        )}
+      </div>
+
+      <footer className={styles.foot} data-enter>
+        <dl className={styles.stats}>
+          <div>
+            <dt>Played</dt>
+            <dd>{stats.played}</dd>
+          </div>
+          <div>
+            <dt>Streak</dt>
+            <dd>{streak}</dd>
+          </div>
+          <div>
+            <dt>Best</dt>
+            <dd>{stats.maxStreak}</dd>
+          </div>
+        </dl>
+      </footer>
 
       <p className={styles.srOnly} aria-live="polite">
         {announcement}

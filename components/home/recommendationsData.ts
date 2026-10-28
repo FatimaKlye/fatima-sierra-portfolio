@@ -1,4 +1,4 @@
-// Recommendations shown on the homepage ("The people I've worked with").
+// Testimonials shown on the homepage ("Kind words").
 //
 // Server-only data: it is read by Recommendations.tsx (a server component),
 // which hands the browser only what may be shown. A quote whose `status` is
@@ -9,10 +9,11 @@
 // - `quote` is their own words, unedited. Set `status: "approved"` only after
 //   they have reviewed the exact wording and agreed to have it published.
 // - `photo` and `linkedin` only with their consent / a verified profile.
-// - Order here is the order on the page; the first entry is featured.
+// - Order here is the order on the page; the first entry is shown first.
 //
-// While no quote is approved, the first entry is shown as a "featured
-// collaborator" spotlight: name, role and project only, no quote.
+// Only approved quotes are shown. With none approved, the section shows just
+// its heading and the "Share a few words" invite; with several, it becomes a
+// carousel.
 //
 // Template (copy into the array and fill in):
 // {
@@ -24,7 +25,7 @@
 //   relationship: "How they know me",               // e.g. "Project teammate"
 //   context: "One sentence on what we worked on.",  // optional, factual
 //   quote: "Their words, unedited.",                // optional until received
-//   highlight: "a phrase from the quote",           // optional, copied verbatim from quote
+//   highlights: ["a phrase from the quote"],        // optional, each copied verbatim from quote
 //   date: "2026-10",                                // optional, YYYY-MM or YYYY-MM-DD
 //   photo: { src: "/assets/recommendations/firstname-lastname.jpg", alt: "Portrait of …" },
 //   linkedin: "https://www.linkedin.com/in/…",      // optional, verified
@@ -42,8 +43,8 @@ export type Recommendation = {
   relationship: string;
   context?: string;
   quote?: string;
-  /** A phrase copied verbatim from `quote`, set in the accent colour. */
-  highlight?: string;
+  /** Phrases copied verbatim from `quote`, subtly emphasised. */
+  highlights?: string[];
   /** YYYY-MM or YYYY-MM-DD. */
   date?: string;
   /** Headshot in /public/assets/recommendations/, shared with their consent. */
@@ -62,10 +63,14 @@ export const RECOMMENDATIONS: Recommendation[] = [
     relationship: "Capstone teammate & project leader",
     context:
       "We built IGNIS SAFE together: a mobile fire-safety learning app and web management system for BFP Dasmariñas City Fire Station.",
-    // Proposed wording, awaiting Andrei's review. Hidden until status is "approved".
+    // Wording approved by Andrei for publication.
     quote:
       "Fatima is one of the best teammates I've had the opportunity to work with. She's dependable, highly organized, and consistently delivers her responsibilities on time. She's also driven, competitive in a positive way, and always strives to produce quality work. Throughout our capstone project, I could count on her dedication, initiative, and commitment to the team's success. She's someone you can genuinely rely on.",
-    highlight: "someone you can genuinely rely on",
-    status: "pending",
+    highlights: [
+      "dependable, highly organized",
+      "consistently delivers her responsibilities on time",
+      "someone you can genuinely rely on",
+    ],
+    status: "approved",
   },
 ];

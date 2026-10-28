@@ -93,7 +93,7 @@ export default async function HeroSection() {
               </em>
             </h1>
             <p className={styles.heroLead} data-hero-reveal="lead">
-              I&apos;m a BSIT student at NU Dasmariñas, turning ideas into practical digital experiences. I helped
+              I&apos;m a BSIT student at NU Dasmariñas, turning ideas into practical digital experiences. I
               develop{" "}
               <Link className={styles.leadLink} href="/projects/ignis-safe-website">
                 IGNIS SAFE
@@ -279,7 +279,7 @@ export default async function HeroSection() {
         </section>
       )}
 
-      <Recommendations number="07 — Recommendations" />
+      <Recommendations number="07 — Kind words" />
 
       <section className={`${editorialStyles.section} ${editorialStyles.contactSection}`} id="contact" aria-labelledby="contact-title" data-nav-label="Contact">
         <div className={`${editorialStyles.container} ${editorialStyles.contactInner}`}>

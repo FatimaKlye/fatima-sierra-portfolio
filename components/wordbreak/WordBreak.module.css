@@ -1,5 +1,7 @@
 /* A Little Word Break — the daily word game, opened from the navbar utility menu.
-   Every colour is a token below; dark values switch on with html[data-theme="dark"] or html.dark. */
+   Every colour is a token below; dark values switch on with html[data-theme="dark"] or html.dark.
+   Wide screens get two columns (a blush card with the title, rules and stats beside the board);
+   below 820px it stacks — keep that breakpoint in step with STACKED in WordBreakGame.tsx. */
 
 .overlay {
   --wb-surface: var(--color-background);
@@ -7,20 +9,32 @@
   --wb-muted: var(--color-text-muted);
   --wb-line: var(--color-border);
   --wb-accent: var(--color-primary);
+  --wb-intro-bg: #fdf0f5;
+  --wb-card-bg: var(--color-card);
+  --wb-empty-bg: rgb(var(--rgb-primary) / 0.025);
   --wb-tile-border: #ead9e1;
   --wb-filled-bg: var(--color-white);
   --wb-filled-border: var(--color-secondary);
+  --wb-filled-lip: rgb(var(--rgb-secondary) / 0.38);
   --wb-key-bg: #f6e6ee;
   --wb-key-hover: #f0d6e2;
   --wb-key-text: var(--color-text-primary);
+  --wb-key-lip: rgb(var(--rgb-shadow) / 0.1);
+  --wb-key-shine: 0.55;
   --wb-correct: var(--color-primary);
   --wb-correct-text: #ffffff;
+  --wb-correct-lip: #82304f;
   --wb-present: #f3d98b;
   --wb-present-text: #5b4614;
+  --wb-present-lip: #dcbc62;
   --wb-absent: #d9d0d5;
   --wb-absent-text: #5b4d55;
+  --wb-absent-lip: #c3b7be;
   --wb-scrim: rgb(var(--rgb-shadow) / 0.42);
-  --wb-shadow: 0 32px 80px -28px rgb(var(--rgb-shadow) / 0.42), 0 2px 6px rgb(var(--rgb-shadow-tint) / 0.06);
+  --wb-shadow:
+    0 40px 90px -32px rgb(var(--rgb-shadow) / 0.45),
+    0 12px 32px -18px rgb(var(--rgb-shadow-tint) / 0.22),
+    0 2px 6px rgb(var(--rgb-shadow-tint) / 0.06);
   --wb-toast-bg: var(--color-text-primary);
   --wb-toast-text: #ffffff;
   --wb-sparkle-a: #e8a0bf;
@@ -34,20 +48,29 @@
   --wb-muted: var(--color-text-muted);
   --wb-line: var(--color-border);
   --wb-accent: var(--color-primary);
+  --wb-intro-bg: #281d23;
+  --wb-card-bg: #1c171a;
+  --wb-empty-bg: rgb(255 255 255 / 0.015);
   --wb-tile-border: #3e2f37;
   --wb-filled-bg: #251a20;
   --wb-filled-border: #a8728c;
+  --wb-filled-lip: rgb(0 0 0 / 0.4);
   --wb-key-bg: #33252c;
   --wb-key-hover: #3f2e37;
   --wb-key-text: #f6e9ef;
+  --wb-key-lip: rgb(0 0 0 / 0.38);
+  --wb-key-shine: 0.04;
   --wb-correct: #b54a7c;
   --wb-correct-text: #ffffff;
+  --wb-correct-lip: #7d2f53;
   --wb-present: #d8b55e;
   --wb-present-text: #2b2108;
+  --wb-present-lip: #a7873a;
   --wb-absent: #463a40;
   --wb-absent-text: #d9cbd2;
+  --wb-absent-lip: #2f262b;
   --wb-scrim: rgba(8, 4, 6, 0.62);
-  --wb-shadow: 0 32px 80px -24px rgba(0, 0, 0, 0.7);
+  --wb-shadow: 0 40px 90px -28px rgba(0, 0, 0, 0.75), 0 2px 6px rgba(0, 0, 0, 0.3);
   --wb-toast-bg: #f6e9ef;
   --wb-toast-text: #1d1519;
 }
@@ -62,19 +85,28 @@
   padding: 16px;
   overflow-y: auto;
   overscroll-behavior: contain;
-  background: var(--wb-scrim);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 45%, rgb(var(--rgb-shadow-tint) / 0.12), transparent 70%),
+    var(--wb-scrim);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .panel {
   position: relative;
-  width: min(100%, 380px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "head" "help" "play" "foot";
+  row-gap: 14px;
+  width: min(100%, 540px);
   margin: auto;
-  padding: 20px 20px 16px;
+  padding: 22px 22px 18px;
   border: 1px solid var(--wb-line);
-  border-radius: 24px;
-  background: var(--wb-surface);
+  border-radius: 28px;
+  background:
+    radial-gradient(90% 50% at 0% 0%, rgb(var(--rgb-primary) / 0.08), transparent 70%),
+    radial-gradient(70% 40% at 100% 100%, rgb(var(--rgb-secondary) / 0.08), transparent 70%),
+    var(--wb-surface);
   box-shadow: var(--wb-shadow);
   color: var(--wb-text);
   font-family: var(--font-poppins), sans-serif;
@@ -84,58 +116,108 @@
   outline: none;
 }
 
+/* The blush card only appears in the two-column layout (see the wide-screen block below). */
+.introCard {
+  display: none;
+}
+
+/* ---------- Header ---------- */
+
 .head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 14px;
+  grid-area: head;
+  padding-right: 48px; /* clear of the close button */
 }
 
 .eyebrow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
   margin: 0;
-  color: var(--wb-accent);
   font-size: 0.62rem;
   font-weight: 600;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
 }
 
+.issue {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--color-soft-blush);
+  color: var(--wb-accent);
+}
+
+.daily {
+  color: var(--wb-muted);
+}
+
 .title {
-  margin: 4px 0 0;
+  margin: 10px 0 0;
   color: var(--wb-text);
-  font-size: 1.12rem;
+  font-size: 1.42rem;
   font-weight: 600;
-  letter-spacing: -0.01em;
-  line-height: 1.25;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+}
+
+/* A soft highlighter swipe under the name of the game. */
+.title span {
+  padding: 0 2px;
+  background: linear-gradient(transparent 60%, rgb(var(--rgb-primary) / 0.16) 60%, rgb(var(--rgb-primary) / 0.16) 92%, transparent 92%);
+  color: var(--wb-accent);
+  white-space: nowrap;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
 }
 
 .subtitle {
-  margin: 2px 0 0;
+  margin: 4px 0 0;
   color: var(--wb-muted);
-  font-size: 0.78rem;
+  font-size: 0.8rem;
 }
 
 .close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 2;
   display: grid;
-  flex-shrink: 0;
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   padding: 0;
   place-items: center;
-  border: 1px solid var(--wb-line);
+  border: 1px solid rgb(var(--rgb-primary) / 0.18);
   border-radius: 50%;
-  background: transparent;
-  color: var(--wb-muted);
+  background: var(--color-soft-blush);
+  box-shadow: 0 6px 14px -8px rgb(var(--rgb-shadow-tint) / 0.45);
+  color: var(--wb-accent);
   cursor: pointer;
-  transition: background-color 200ms ease, border-color 200ms ease, color 200ms ease;
+  transition:
+    background-color 200ms ease,
+    border-color 200ms ease,
+    color 200ms ease,
+    scale 140ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.close svg {
+  transition: rotate 380ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .close:hover,
 .close:focus-visible {
   border-color: var(--wb-accent);
   background: var(--wb-accent);
-  color: var(--wb-surface);
+  color: var(--color-on-primary);
+}
+
+.close:hover svg,
+.close:focus-visible svg {
+  rotate: 90deg;
+}
+
+.close:active {
+  scale: 0.92;
 }
 
 .close:focus-visible {
@@ -143,15 +225,211 @@
   outline-offset: 2px;
 }
 
+/* ---------- How to play ---------- */
+
+.help {
+  display: grid;
+  grid-area: help;
+  align-content: start;
+}
+
+.helpToggle {
+  display: inline-flex;
+  justify-self: start;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px 5px 5px;
+  border: 1px solid rgb(var(--rgb-primary) / 0.22);
+  border-radius: 999px;
+  background: var(--wb-card-bg);
+  color: var(--wb-text);
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background-color 200ms ease,
+    border-color 200ms ease,
+    scale 140ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.helpMark {
+  display: grid;
+  width: 22px;
+  height: 22px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--wb-accent);
+  color: var(--color-on-primary);
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.chevron {
+  color: var(--wb-muted);
+  transition: rotate 380ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.helpToggle[aria-expanded="true"] .chevron {
+  rotate: 180deg;
+}
+
+@media (hover: hover) {
+  .helpToggle:hover {
+    border-color: rgb(var(--rgb-primary) / 0.5);
+    background: var(--color-soft-blush);
+  }
+}
+
+.helpToggle:active {
+  scale: 0.97;
+}
+
+.helpToggle:focus-visible {
+  outline: 3px solid rgb(var(--rgb-primary) / 0.32);
+  outline-offset: 2px;
+}
+
+/* Expands by animating a grid row from 0fr to 1fr — no measuring. Hidden (and silent to
+   screen readers) once folded: visibility flips only after the collapse has played. */
+.helpBody {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    grid-template-rows 440ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 240ms ease,
+    visibility 0s linear 440ms;
+}
+
+.helpBody[data-open] {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+.helpClip {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.helpCard {
+  display: grid;
+  gap: 12px;
+  margin-top: 10px;
+  padding: 14px;
+  border: 1px solid var(--wb-line);
+  border-radius: 18px;
+  background: var(--wb-card-bg);
+  box-shadow: 0 10px 24px -20px rgb(var(--rgb-shadow-tint) / 0.5);
+}
+
+.rules {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: rule;
+}
+
+.rules li {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  gap: 9px;
+  color: var(--wb-muted);
+  font-size: 0.76rem;
+  line-height: 1.45;
+  counter-increment: rule;
+}
+
+.rules li::before {
+  display: grid;
+  height: 18px;
+  margin-top: 1px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--color-soft-blush);
+  color: var(--wb-accent);
+  font-size: 0.6rem;
+  font-weight: 700;
+  content: counter(rule);
+}
+
+.rules strong,
+.caption strong {
+  color: var(--wb-text);
+  font-weight: 600;
+}
+
+.examples {
+  display: grid;
+  gap: 9px;
+  margin: 0;
+  padding: 12px 0 0;
+  border-top: 1px dashed var(--wb-line);
+  list-style: none;
+}
+
+.example {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+}
+
+.sample {
+  display: flex;
+  gap: 4px;
+}
+
+.caption {
+  color: var(--wb-muted);
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+
+/* Each opening replays a short cascade, and the key letter of every sample flips to its colour. */
+.helpBody[data-open] .rules li,
+.helpBody[data-open] .example {
+  animation: rise 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.helpBody[data-open] .rules li:nth-child(2) { animation-delay: 50ms; }
+.helpBody[data-open] .rules li:nth-child(3) { animation-delay: 100ms; }
+.helpBody[data-open] .example { animation-delay: calc(160ms + var(--n) * 50ms); }
+
+.helpBody[data-open] .miniFlip {
+  animation: flip 520ms ease-in-out both;
+  animation-delay: calc(380ms + var(--n) * 200ms);
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+
 /* ---------- Board ---------- */
+
+.play {
+  display: grid;
+  grid-area: play;
+  align-content: center;
+  gap: 16px;
+  min-width: 0;
+}
 
 .stage {
   position: relative;
   display: flex;
   justify-content: center;
-  /* Tiles shrink on short or narrow screens so the whole game always fits without scrolling. */
-  --tile: clamp(36px, min(calc((100vh - 390px) / 6), calc((100vw - 96px) / 5)), 54px);
-  --tile: clamp(36px, min(calc((100dvh - 390px) / 6), calc((100vw - 96px) / 5)), 54px);
+  /* Tiles shrink on short or narrow screens so the whole game fits without scrolling. */
+  --tile: clamp(34px, min(calc((100vh - 470px) / 6), calc((100vw - 100px) / 5)), 56px);
+  --tile: clamp(34px, min(calc((100dvh - 470px) / 6), calc((100vw - 100px) / 5)), 56px);
 }
 
 .board {
@@ -166,7 +444,7 @@
 }
 
 .tile {
-  --tile-bg: transparent;
+  --tile-bg: var(--wb-empty-bg);
   --tile-fg: var(--wb-text);
   --tile-border: var(--wb-tile-border);
 
@@ -175,39 +453,76 @@
   height: var(--tile);
   place-items: center;
   border: 1.5px solid var(--tile-border);
-  border-radius: 12px;
+  border-radius: calc(var(--tile) * 0.26);
   background: var(--tile-bg);
+  box-shadow:
+    0 2px 0 var(--tile-lip, transparent),
+    inset 0 1px 0 rgb(255 255 255 / var(--tile-shine, 0));
   color: var(--tile-fg);
   font-size: calc(var(--tile) * 0.42);
   font-weight: 600;
   line-height: 1;
   text-transform: uppercase;
   user-select: none;
-  transition: border-color 160ms ease;
+  transition: border-color 160ms ease, box-shadow 200ms ease;
+}
+
+/* The empty square the next letter will land in. */
+.caret {
+  --tile-border: rgb(var(--rgb-primary) / 0.45);
+  animation: caret 1.8s ease-in-out infinite;
 }
 
 .filled {
   --tile-bg: var(--wb-filled-bg);
   --tile-border: var(--wb-filled-border);
+  --tile-lip: var(--wb-filled-lip);
 }
 
-/* Shared by tiles and keys (keys read these through var() fallbacks). Declared after .filled so they win. */
+/* "How to play" sample tiles: neutral letters, unless a state class below colours them. */
+.mini {
+  --tile-bg: var(--wb-filled-bg);
+  --tile-fg: var(--wb-text);
+  --tile-border: var(--wb-tile-border);
+
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  border: 1.5px solid var(--tile-border);
+  border-radius: 7px;
+  background: var(--tile-bg);
+  box-shadow: 0 1.5px 0 var(--tile-lip, transparent);
+  color: var(--tile-fg);
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+/* Shared by tiles, samples and keys (keys read these through var() fallbacks). Declared after .filled and .mini so they win. */
 .correct {
   --tile-bg: var(--wb-correct);
   --tile-fg: var(--wb-correct-text);
   --tile-border: var(--wb-correct);
+  --tile-lip: var(--wb-correct-lip);
+  --tile-shine: 0.22;
 }
 
 .present {
   --tile-bg: var(--wb-present);
   --tile-fg: var(--wb-present-text);
   --tile-border: var(--wb-present);
+  --tile-lip: var(--wb-present-lip);
+  --tile-shine: 0.35;
 }
 
 .absent {
   --tile-bg: var(--wb-absent);
   --tile-fg: var(--wb-absent-text);
   --tile-border: var(--wb-absent);
+  --tile-lip: var(--wb-absent-lip);
+  --tile-shine: 0.2;
 }
 
 .typing {
@@ -240,6 +555,7 @@
   49.9% {
     border-color: var(--wb-filled-border);
     background: var(--wb-filled-bg);
+    box-shadow: 0 2px 0 var(--wb-filled-lip);
     color: var(--wb-text);
   }
   0% { transform: rotateX(0deg); }
@@ -258,6 +574,11 @@
   20%, 80% { transform: translateX(3px); }
   30%, 50%, 70% { transform: translateX(-6px); }
   40%, 60% { transform: translateX(6px); }
+}
+
+@keyframes caret {
+  0%, 100% { box-shadow: 0 0 0 0 rgb(var(--rgb-primary) / 0.16); }
+  50% { box-shadow: 0 0 0 4px rgb(var(--rgb-primary) / 0); }
 }
 
 .toastSlot {
@@ -314,55 +635,80 @@
 
 .keyboard {
   display: grid;
-  gap: 6px;
-  margin-top: 16px;
+  gap: 7px;
 }
 
 .keyRow {
   display: flex;
   justify-content: center;
-  gap: 5px;
+  gap: 6px;
 }
 
 .keyRow:nth-child(2) {
   padding-inline: 5%;
 }
 
+/* Soft, pillowy keys: a darker lip along the bottom that presses flat when tapped. */
 .key {
   display: grid;
   flex: 1 1 0;
   min-width: 0;
-  height: 48px;
+  height: 50px;
   padding: 0;
   place-items: center;
   border: 0;
-  border-radius: 10px;
+  border-radius: 12px;
   background: var(--tile-bg, var(--wb-key-bg));
+  box-shadow:
+    inset 0 -2.5px 0 var(--tile-lip, var(--wb-key-lip)),
+    inset 0 1px 0 rgb(255 255 255 / var(--tile-shine, var(--wb-key-shine)));
   color: var(--tile-fg, var(--wb-key-text));
-  font-size: 0.8rem;
+  font: inherit;
+  font-size: 0.82rem;
   font-weight: 600;
   text-transform: uppercase;
   cursor: pointer;
   touch-action: manipulation;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
-  transition: background-color 220ms ease, color 220ms ease, scale 120ms ease;
+  transition:
+    background-color 220ms ease,
+    color 220ms ease,
+    box-shadow 160ms ease,
+    translate 180ms cubic-bezier(0.22, 1, 0.36, 1),
+    scale 120ms ease;
 }
 
 .keyWide {
   flex-grow: 1.55;
   font-size: 0.66rem;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
+}
+
+.keyEnter {
+  --tile-bg: rgb(var(--rgb-primary) / 0.14);
+  --tile-fg: var(--wb-accent);
+  --tile-lip: rgb(var(--rgb-primary) / 0.28);
 }
 
 @media (hover: hover) {
-  .key:hover:not(.correct, .present, .absent) {
+  .key:hover {
+    translate: 0 -1px;
+  }
+
+  .key:hover:not(.correct, .present, .absent, .keyEnter) {
     background: var(--wb-key-hover);
+  }
+
+  .keyEnter:hover {
+    --tile-bg: rgb(var(--rgb-primary) / 0.22);
   }
 }
 
 .key:active {
-  scale: 0.94;
+  translate: 0 1px;
+  box-shadow: inset 0 -1px 0 var(--tile-lip, var(--wb-key-lip));
+  scale: 0.97;
 }
 
 .key:focus-visible {
@@ -370,21 +716,18 @@
   outline-offset: 2px;
 }
 
-.meta {
-  margin: 12px 0 0;
-  color: var(--wb-muted);
-  font-size: 0.68rem;
-  letter-spacing: 0.04em;
-  text-align: center;
-}
-
 /* ---------- Result ---------- */
 
 .result {
   display: grid;
   justify-items: center;
-  gap: 4px;
-  margin-top: 18px;
+  align-content: center;
+  gap: 6px;
+  min-height: 164px; /* about the keyboard's height, so the board doesn't jump when it's swapped in */
+  padding: 16px;
+  border: 1px solid var(--wb-line);
+  border-radius: 20px;
+  background: var(--wb-card-bg);
   text-align: center;
   animation: resultIn 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
@@ -395,16 +738,19 @@
 }
 
 .resultTitle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   margin: 0;
   color: var(--wb-accent);
-  font-size: 1rem;
+  font-size: 1.1rem;
   font-weight: 600;
 }
 
 .resultText {
   margin: 0;
   color: var(--wb-muted);
-  font-size: 0.82rem;
+  font-size: 0.84rem;
 }
 
 .resultText strong {
@@ -416,38 +762,6 @@
   color: var(--wb-accent);
   letter-spacing: 0.14em;
   text-transform: uppercase;
-}
-
-.stats {
-  display: flex;
-  margin: 12px 0 4px;
-}
-
-.stats > div {
-  display: flex;
-  flex-direction: column-reverse;
-  align-items: center;
-  padding: 0 18px;
-}
-
-.stats > div + div {
-  border-left: 1px solid var(--wb-line);
-}
-
-.stats dt {
-  color: var(--wb-muted);
-  font-size: 0.58rem;
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-}
-
-.stats dd {
-  margin: 0;
-  color: var(--wb-text);
-  font-size: 1.2rem;
-  font-weight: 600;
-  line-height: 1.3;
 }
 
 .next {
@@ -471,6 +785,48 @@
   margin-top: 8px;
 }
 
+/* ---------- Stats ---------- */
+
+.foot {
+  grid-area: foot;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+}
+
+/* Stacked layout: one compact line per stat ("Played 4"); the wide layout stacks label under number. */
+.stats > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 6px;
+  padding: 7px 6px;
+  border: 1px solid var(--wb-line);
+  border-radius: 14px;
+  background: var(--wb-card-bg);
+}
+
+.stats dt {
+  color: var(--wb-muted);
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.stats dd {
+  margin: 0;
+  color: var(--wb-text);
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
 .srOnly {
   position: absolute;
   width: 1px;
@@ -483,15 +839,136 @@
   border: 0;
 }
 
-@media (max-width: 480px) {
+/* ---------- Wide screens: two columns ---------- */
+
+@media (min-width: 820px) {
   .panel {
-    padding: 18px 16px 14px;
-    border-radius: 20px;
+    grid-template-columns: 256px minmax(0, 1fr);
+    grid-template-rows: auto 1fr auto;
+    grid-template-areas:
+      "head play"
+      "help play"
+      "foot play";
+    column-gap: 32px;
+    row-gap: 0;
+    width: min(100%, 820px);
+    padding: 16px 28px 16px 16px;
+    border-radius: 32px;
   }
 
-  .key {
-    height: 50px;
+  .introCard {
+    position: relative;
+    display: block;
+    grid-area: 1 / 1 / -1 / 2;
+    overflow: hidden;
+    border: 1px solid var(--wb-line);
+    border-radius: 22px;
+    background:
+      radial-gradient(120% 60% at 100% 100%, rgb(var(--rgb-primary) / 0.12), transparent 65%),
+      var(--wb-intro-bg);
   }
+
+  /* A faint dotted paper texture that fades out under the title. */
+  .introCard::before {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgb(var(--rgb-primary) / 0.16) 1px, transparent 1.3px);
+    background-size: 14px 14px;
+    content: "";
+    -webkit-mask-image: linear-gradient(to bottom, #000, transparent 42%);
+    mask-image: linear-gradient(to bottom, #000, transparent 42%);
+  }
+
+  .spark {
+    position: absolute;
+    color: var(--wb-accent);
+    line-height: 1;
+    opacity: 0.55;
+    animation: twinkle 3.2s ease-in-out infinite;
+  }
+
+  .spark:nth-child(1) { top: 20px; right: 22px; font-size: 12px; }
+  .spark:nth-child(2) { top: 44px; right: 42px; color: var(--wb-sparkle-a); font-size: 9px; animation-delay: -1.1s; }
+  .spark:nth-child(3) { right: 20px; bottom: 96px; color: var(--wb-sparkle-a); font-size: 10px; animation-delay: -2.2s; }
+
+  /* Above the card (which is positioned), inset to sit inside it. */
+  .head,
+  .help,
+  .foot {
+    position: relative;
+    padding-inline: 22px;
+  }
+
+  .head { padding-top: 24px; }
+  .help { padding-top: 18px; }
+  .foot { padding-top: 16px; padding-bottom: 20px; }
+
+  .title { font-size: 1.5rem; }
+
+  .example {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+  }
+
+  .play {
+    gap: 22px;
+    padding: 18px 0 8px;
+  }
+
+  .stage {
+    --tile: clamp(38px, calc((100vh - 340px) / 6), 60px);
+    --tile: clamp(38px, calc((100dvh - 340px) / 6), 60px);
+  }
+
+  .board,
+  .row {
+    gap: 7px;
+  }
+
+  .key { height: 52px; }
+
+  .result { min-height: 170px; }
+
+  .stats > div {
+    flex-direction: column-reverse;
+    align-items: center;
+    gap: 0;
+    padding: 9px 4px 8px;
+  }
+
+  .stats dd { font-size: 1.12rem; }
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.25; scale: 0.8; }
+  50% { opacity: 0.7; scale: 1.1; }
+}
+
+@media (max-width: 480px) {
+  .overlay {
+    padding: 12px;
+  }
+
+  .panel {
+    row-gap: 12px;
+    padding: 18px 16px 14px;
+    border-radius: 24px;
+  }
+
+  .close {
+    top: 14px;
+    right: 14px;
+  }
+
+  .title { font-size: 1.28rem; }
+
+  .helpCard { padding: 12px; }
+
+  .play { gap: 14px; }
+
+  .keyRow { gap: 5px; }
+
+  .key { border-radius: 10px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -499,14 +976,27 @@
   .flip,
   .hop,
   .shake,
+  .caret,
   .toast,
-  .result {
+  .result,
+  .spark,
+  .helpBody[data-open] .rules li,
+  .helpBody[data-open] .example,
+  .helpBody[data-open] .miniFlip {
     animation: none !important;
   }
 
   .tile,
   .key,
-  .close {
+  .close,
+  .close svg,
+  .chevron,
+  .helpToggle,
+  .helpBody {
     transition-duration: 0.01ms !important;
+  }
+
+  .helpBody {
+    transition-delay: 0s !important;
   }
 }
