@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode, SVGProps } from "react";
 import { ArrowRight, ArrowUpRight, Download, Mail } from "lucide-react";
-import { CERTIFICATES, EDUCATION } from "@/components/about/aboutData";
+import { CERTIFICATES } from "@/components/about/aboutData";
 import { CONTACT_EMAIL, RESUME_URL, SOCIAL_LINKS } from "@/components/contact/contactData";
 import { EXPERIENCE_HIGHLIGHTS } from "@/components/experience/experienceData";
 import EditorialMotion from "@/components/motion/EditorialMotion";
@@ -34,6 +34,8 @@ const CONTACT_LINKS = CONTACT_LINK_IDS.flatMap((id) => {
 const GITHUB_LINK = SOCIAL_LINKS.find((link) => link.id === "github");
 const LINKEDIN_LINK = SOCIAL_LINKS.find((link) => link.id === "linkedin");
 const EMAIL_LINK = SOCIAL_LINKS.find((link) => link.id === "email");
+/** Where I live — not the campus location in EDUCATION, which is Dasmariñas. */
+const BASED_IN = "Cavite City";
 
 /** One headline word inside a clipping mask, so HeroMotion can slide it up into place. */
 function TitleWord({ children, className }: { children: ReactNode; className?: string }) {
@@ -64,7 +66,6 @@ function Sparkle({ className, ...rest }: SVGProps<SVGSVGElement>) {
  * is a short preview that links to the dedicated page with the complete content.
  */
 export default async function HeroSection() {
-  const college = EDUCATION[0];
   const githubUsername = GITHUB_LINK?.handle.replace(/^@/, "") ?? "";
   const githubContributions = githubUsername ? await getGithubContributions(githubUsername) : null;
 
@@ -73,66 +74,68 @@ export default async function HeroSection() {
       <section className={styles.hero} id="home" aria-labelledby="home-hero-title" data-nav-label="Intro" data-nav-intro>
         <HeroMotion className={styles.heroInner}>
           <div className={styles.heroCopy}>
-            <h1 id="home-hero-title" className={styles.heroTitle}>
-              <span className={styles.titleLine}>
-                <TitleWord>I</TitleWord> <TitleWord>create</TitleWord>
-              </span>{" "}
-              <em>
+            <div className={styles.heroIntro}>
+              <h1 id="home-hero-title" className={styles.heroTitle}>
                 <span className={styles.titleLine}>
-                  <TitleWord>web</TitleWord> <TitleWord className={styles.amp}>&amp;</TitleWord>{" "}
-                  <TitleWord>mobile</TitleWord>
+                  <TitleWord>I</TitleWord> <TitleWord>create</TitleWord>
                 </span>{" "}
-                <span className={styles.titleLine}>
-                  <span className={styles.underlined}>
-                    <TitleWord>apps.</TitleWord>
-                    <svg className={styles.squiggle} viewBox="0 0 200 20" aria-hidden="true" focusable="false" data-hero-reveal="draw">
-                      <path d="M4 13C30 5 52 17 82 11S140 4 166 10 190 13 196 9" pathLength={1} />
-                    </svg>
+                <em>
+                  <span className={styles.titleLine}>
+                    <TitleWord>web</TitleWord> <TitleWord className={styles.amp}>&amp;</TitleWord>{" "}
+                    <TitleWord>mobile</TitleWord>
+                  </span>{" "}
+                  <span className={styles.titleLine}>
+                    <span className={styles.underlined}>
+                      <TitleWord>apps.</TitleWord>
+                      <svg className={styles.squiggle} viewBox="0 0 200 20" aria-hidden="true" focusable="false" data-hero-reveal="draw">
+                        <path d="M4 13C30 5 52 17 82 11S140 4 166 10 190 13 196 9" pathLength={1} />
+                      </svg>
+                    </span>
                   </span>
-                </span>
-              </em>
-            </h1>
-            <p className={styles.heroLead} data-hero-reveal="lead">
-              I&apos;m a BSIT student at NU Dasmariñas, turning ideas into practical digital experiences. I
-              develop{" "}
-              <Link className={styles.leadLink} href="/projects/ignis-safe-website">
-                IGNIS SAFE
-              </Link>
-              , a fire safety learning and management platform for BFP Dasmariñas.
-            </p>
+                </em>
+              </h1>
+              <p className={styles.heroLead} data-hero-reveal="lead">
+                I&apos;m a BSIT student at NU Dasmariñas, turning ideas into practical digital experiences. I
+                develop{" "}
+                <Link className={styles.leadLink} href="/projects/ignis-safe-website">
+                  IGNIS SAFE
+                </Link>
+                , a fire safety learning and management platform for BFP Dasmariñas.
+              </p>
 
-            <div className={styles.actions}>
-              <Link className="ui-btn ui-btn--primary" href="#projects" data-hero-reveal="action" data-magnetic="0.25">
-                View Projects <ArrowRight size={16} aria-hidden="true" className={styles.iconForward} />
-              </Link>
-              <a className="ui-btn ui-btn--secondary" href={RESUME_URL} download data-hero-reveal="action" data-magnetic="0.25">
-                Download Resume <Download size={16} aria-hidden="true" className={styles.iconDown} />
-              </a>
+              <div className={styles.actions}>
+                <Link className="ui-btn ui-btn--primary" href="#projects" data-hero-reveal="action" data-magnetic="0.25">
+                  View Projects <ArrowRight size={16} aria-hidden="true" className={styles.iconForward} />
+                </Link>
+                <a className="ui-btn ui-btn--secondary" href={RESUME_URL} download data-hero-reveal="action" data-magnetic="0.25">
+                  Download Resume <Download size={16} aria-hidden="true" className={styles.iconDown} />
+                </a>
+              </div>
+
+              <ul className={styles.quickLinks} aria-label="Profiles and contact">
+                {GITHUB_LINK && (
+                  <li data-hero-reveal="link">
+                    <a href={GITHUB_LINK.href} target="_blank" rel="noreferrer" aria-label="GitHub profile (opens in a new tab)" data-magnetic>
+                      GitHub <ArrowUpRight size={14} aria-hidden="true" className={styles.iconUpRight} />
+                    </a>
+                  </li>
+                )}
+                {LINKEDIN_LINK && (
+                  <li data-hero-reveal="link">
+                    <a href={LINKEDIN_LINK.href} target="_blank" rel="noreferrer" aria-label="LinkedIn profile (opens in a new tab)" data-magnetic>
+                      LinkedIn <ArrowUpRight size={14} aria-hidden="true" className={styles.iconUpRight} />
+                    </a>
+                  </li>
+                )}
+                {EMAIL_LINK && (
+                  <li data-hero-reveal="link">
+                    <a href={EMAIL_LINK.href} target="_blank" rel="noreferrer" aria-label={`Email ${CONTACT_EMAIL} (opens Gmail in a new tab)`} data-magnetic>
+                      <Mail size={14} aria-hidden="true" /> Email
+                    </a>
+                  </li>
+                )}
+              </ul>
             </div>
-
-            <ul className={styles.quickLinks} aria-label="Profiles and contact">
-              {GITHUB_LINK && (
-                <li data-hero-reveal="link">
-                  <a href={GITHUB_LINK.href} target="_blank" rel="noreferrer" aria-label="GitHub profile (opens in a new tab)" data-magnetic>
-                    GitHub <ArrowUpRight size={14} aria-hidden="true" className={styles.iconUpRight} />
-                  </a>
-                </li>
-              )}
-              {LINKEDIN_LINK && (
-                <li data-hero-reveal="link">
-                  <a href={LINKEDIN_LINK.href} target="_blank" rel="noreferrer" aria-label="LinkedIn profile (opens in a new tab)" data-magnetic>
-                    LinkedIn <ArrowUpRight size={14} aria-hidden="true" className={styles.iconUpRight} />
-                  </a>
-                </li>
-              )}
-              {EMAIL_LINK && (
-                <li data-hero-reveal="link">
-                  <a href={EMAIL_LINK.href} target="_blank" rel="noreferrer" aria-label={`Email ${CONTACT_EMAIL} (opens Gmail in a new tab)`} data-magnetic>
-                    <Mail size={14} aria-hidden="true" /> Email
-                  </a>
-                </li>
-              )}
-            </ul>
 
             <div className={styles.stack} data-hero-reveal="stack">
               <p className={styles.stackLabel}>Core stack</p>
@@ -197,7 +200,7 @@ export default async function HeroSection() {
               </div>
               <div>
                 <dt>Based in</dt>
-                <dd>{college.location}</dd>
+                <dd>{BASED_IN}</dd>
               </div>
             </dl>
           </div>
