@@ -2,22 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useEffect, useRef, useSyncExternalStore } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { CONTACT_EMAIL, SOCIAL_LINKS } from "@/components/contact/contactData";
 import styles from "./SiteFooter.module.css";
-
-type FooterNavLink = { href: string; label: string; activeOn?: string[] };
-
-const FOOTER_NAV_LINKS: FooterNavLink[] = [
-  { href: "/about", label: "About Me" },
-  { href: "/projects", label: "Projects" },
-  { href: "/skills", label: "Skills" },
-  { href: "/experience", label: "Experience", activeOn: ["/certifications"] },
-  { href: "/contact", label: "Contact" },
-];
 
 type FooterSocial = { id: string; label: string; href: string; external: boolean };
 
@@ -43,13 +32,8 @@ const HEADLINE = [
 const subscribeNever = () => () => {};
 const getYear = () => new Date().getFullYear();
 
-function isActive(link: FooterNavLink, pathname: string): boolean {
-  return [link.href, ...(link.activeOn ?? [])].some((route) => pathname === route || pathname.startsWith(`${route}/`));
-}
-
 export default function SiteFooter() {
   const rootRef = useRef<HTMLElement>(null);
-  const pathname = usePathname();
   const year = useSyncExternalStore(subscribeNever, getYear, getYear);
 
   useEffect(() => {
@@ -150,7 +134,9 @@ export default function SiteFooter() {
         <div className={styles.eyebrowRow}>
           <p className={styles.eyebrow} data-ft-rise>
             <span className={styles.pulse} aria-hidden="true" />
-            Open to internships &amp; junior developer roles
+            <span>Software Development Intern</span>
+            <span className={styles.eyebrowSep} aria-hidden="true">·</span>
+            <span className={styles.eyebrowOrg}>PrimusTech Solutions</span>
           </p>
           <span className={styles.rule} data-ft-line aria-hidden="true" />
         </div>
@@ -173,8 +159,8 @@ export default function SiteFooter() {
 
           <div className={styles.invite}>
             <p className={styles.inviteText} data-ft-rise>
-              Have a project, a role, or an idea worth building? I&apos;d love to hear about it — let&apos;s create
-              something purposeful together.
+              <strong>Currently building &amp; learning at PrimusTech Solutions.</strong> Always happy to talk code,
+              design, or an idea worth building.
             </p>
             <Link className={styles.inviteLink} href="/contact" data-ft-rise>
               <span className={styles.underline}>Start a conversation</span>
@@ -209,26 +195,6 @@ export default function SiteFooter() {
             </li>
           ))}
         </ul>
-
-        <nav className={styles.nav} aria-label="Footer navigation" data-ft-rise>
-          <span className={styles.navLabel} aria-hidden="true">Explore</span>
-          <ul>
-            {FOOTER_NAV_LINKS.map((link, index) => (
-              <li key={link.href}>
-                <Link
-                  className={styles.underline}
-                  href={link.href}
-                  aria-current={isActive(link, pathname) ? "page" : undefined}
-                >
-                  {link.label}
-                  <sup aria-hidden="true">0{index + 1}</sup>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
-
-        <span className={styles.rule} data-ft-line aria-hidden="true" />
 
         <div className={styles.bottom}>
           <Link className={styles.signature} href="/" aria-label="Fatima Klye Sierra home">

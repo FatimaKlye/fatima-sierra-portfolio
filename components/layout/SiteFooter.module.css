@@ -1,4 +1,4 @@
-/* Editorial closing panel: one oversized statement, a social rail, a quiet index and a signature line. */
+/* Editorial closing panel: a current-role eyebrow, one oversized statement, a social rail and a signature line. */
 .footer {
   --ft-pink: var(--color-primary);
   --ft-burgundy: #6f2242;
@@ -60,8 +60,11 @@
   gap: 20px;
 }
 
-.eyebrow,
-.navLabel {
+.eyebrow {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 10px;
   margin: 0;
   color: var(--ft-pink);
   font-size: 10px;
@@ -71,11 +74,12 @@
   text-transform: uppercase;
 }
 
-.eyebrow {
-  display: inline-flex;
-  flex-shrink: 0;
-  align-items: center;
-  gap: 10px;
+.eyebrowSep {
+  color: var(--color-text-muted);
+}
+
+.eyebrowOrg {
+  color: var(--ft-burgundy);
 }
 
 .pulse {
@@ -187,6 +191,17 @@
   color: var(--color-text-muted);
   font-size: 0.92rem;
   line-height: 1.75;
+}
+
+/* The current-role statement leads; the friendly follow-up stays muted beneath it. */
+.inviteText strong {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--color-text-primary);
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.45;
 }
 
 .inviteLink {
@@ -341,69 +356,15 @@ a:focus-visible .arrowDiagonal > span:last-child { transform: translate(0, 0); }
   margin-left: auto;
 }
 
-/* ---------- Index navigation ---------- */
-
-.nav {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 12px 28px;
-  padding: 26px 0;
-}
-
-.navLabel {
-  color: var(--color-text-muted);
-}
-
-.nav ul {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px 18px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.nav li {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-}
-
-.nav li + li::before {
-  content: "·";
-  color: var(--color-secondary);
-}
-
-.nav a {
-  color: var(--color-text-muted);
-  font-size: 0.88rem;
-  font-weight: 500;
-  transition: color 250ms ease, background-size 450ms var(--ft-ease);
-}
-
-.nav a:hover,
-.nav a:focus-visible,
-.nav a[aria-current="page"] {
-  color: var(--ft-pink);
-}
-
-.nav sup {
-  margin-left: 3px;
-  color: var(--ft-pink);
-  font-size: 8px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-}
-
 /* ---------- Signature line ---------- */
 
+/* The social rail's bottom border doubles as this row's divider. */
 .bottom {
   display: grid;
   grid-template-columns: auto 1fr auto auto;
   align-items: center;
   gap: 18px 32px;
-  padding: 22px 0 28px;
+  padding: 28px 0;
 }
 
 .signature {
@@ -584,14 +545,15 @@ a:focus-visible .arrowDiagonal > span:last-child { transform: translate(0, 0); }
 }
 
 @media (max-width: 640px) {
-  .eyebrow { flex-shrink: 1; line-height: 1.7; }
+  .eyebrow { flex-shrink: 1; flex-wrap: wrap; row-gap: 2px; line-height: 1.7; }
+  .eyebrowSep { display: none; }
+  /* Company drops to its own line, aligned under the role (7px pulse + 10px gap). */
+  .eyebrowOrg { flex-basis: 100%; padding-left: 17px; }
   .eyebrowRow .rule { display: none; }
   .credits { flex-direction: column; }
   .credits > [aria-hidden] { display: none; }
   .invite { justify-self: start; }
   .social { padding: 20px 14px; }
-  .nav { gap: 12px; }
-  .navLabel { flex-basis: 100%; }
 
   .bottom {
     grid-template-columns: 1fr auto;
@@ -616,7 +578,6 @@ a:focus-visible .arrowDiagonal > span:last-child { transform: translate(0, 0); }
   .arrowTrack > span,
   .social::before,
   .socialLabel,
-  .nav a,
   .signatureLogo,
   .swash path,
   .backToTop,
