@@ -45,12 +45,14 @@ const REVEAL_ATTR = "data-theme-reveal";
 const REVEAL_MS = 520;
 const REVEAL_EASING = "cubic-bezier(0.55, 0, 0.15, 1)";
 /* Budgets for slow devices. Any view transition makes the browser restyle the whole page as it
-   starts and again as it ends — on top of the flip itself. A device that can't do that quickly
-   gets the instant switch, from then on for the rest of the visit. The update callback runs right
-   after the first of those restyles, so a late one is the earliest, cheapest sign. */
+   starts and again as it ends — on top of the flip itself. The update callback runs right after
+   the first of those restyles, so a late one is the earliest, cheapest sign. One late reveal is
+   usually a busy moment (the page still loading or decoding images), not a slow device, so only
+   consecutive misses switch to the instant flip, and only until the next page load. (Remembering
+   a single miss in sessionStorage kept the heart off in that tab for good, reloads included.) */
 const SLOW_CAPTURE_MS = 110;
 const SLOW_START_MS = 250; // click to the heart's first frame
-const INSTANT_KEY = "fs-theme-instant";
+const SLOW_STRIKES = 2;
 
 type ViewTransitionLike = { ready: Promise<void>; finished: Promise<void>; skipTransition: () => void };
 type ViewTransitionDocument = Document & { startViewTransition?: (update: () => void) => ViewTransitionLike };
@@ -60,26 +62,16 @@ let running: ViewTransitionLike | null = null;
 let target: Theme = "light";
 let generation = 0;
 let releaseTimer = 0;
-let instantOnly: boolean | null = null;
+let slowStrikes = 0;
 
 function preferInstant() {
-  if (instantOnly === null) {
-    try {
-      instantOnly = window.sessionStorage.getItem(INSTANT_KEY) === "1";
-    } catch {
-      instantOnly = false;
-    }
-  }
-  return instantOnly;
+  return slowStrikes >= SLOW_STRIKES;
 }
 
-function rememberSlow() {
-  instantOnly = true;
-  try {
-    window.sessionStorage.setItem(INSTANT_KEY, "1");
-  } catch {
-    // Remembered for this page only.
-  }
+/** Counts a late reveal; true once the device has missed often enough to get the instant flip. */
+function strike() {
+  slowStrikes++;
+  return preferInstant();
 }
 
 /** Flips the theme with transitions held off, so colours land in the same frame as the flip. */
@@ -254,24 +246,27 @@ export function setTheme(theme: Theme) {
   target = theme;
   const root = document.documentElement;
   const started = performance.now();
+  let late = false;
   const transition = doc.startViewTransition(() => {
-    const slow = performance.now() - started > SLOW_CAPTURE_MS;
-    if (!slow) root.setAttribute(REVEAL_ATTR, "");
+    late = performance.now() - started > SLOW_CAPTURE_MS;
+    const bail = late && strike();
+    if (!bail) root.setAttribute(REVEAL_ATTR, "");
     commit(target);
-    if (slow) {
-      // Bail before the new page is captured: that would cost yet another full restyle.
-      rememberSlow();
-      transition.skipTransition();
-    }
+    // Bail before the new page is captured: that would cost yet another full restyle.
+    if (bail) transition.skipTransition();
   });
   running = transition;
   transition.ready
     .then(() => {
-      if (performance.now() - started > SLOW_START_MS) {
-        rememberSlow();
-        transition.skipTransition();
-        return;
+      // A late capture has already been counted; otherwise a late first frame counts instead.
+      if (!late && performance.now() - started > SLOW_START_MS) {
+        late = true;
+        if (strike()) {
+          transition.skipTransition();
+          return;
+        }
       }
+      if (!late) slowStrikes = 0;
       // Lifting the hold as the heart lands folds its restyle into the teardown's.
       const scheduled = generation;
       revealHeart().finished.then(() => release(scheduled), () => {});
