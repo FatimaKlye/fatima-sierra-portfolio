@@ -1,0 +1,411 @@
+/* Utility menu — a quiet "···" beside Resume, and the small floating card it opens.
+   Every colour is a global token, so light and dark both come for free. */
+
+.wrap {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+/* ---------- Trigger ---------- */
+
+.trigger {
+  position: relative;
+  display: inline-grid;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  place-items: center;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: background-color 220ms ease, color 220ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.dots {
+  display: flex;
+  align-items: center;
+  gap: 3.5px;
+  transition: gap 260ms cubic-bezier(0.22, 1, 0.36, 1), scale 160ms ease;
+}
+
+.dots span {
+  width: 3.5px;
+  height: 3.5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+@media (hover: hover) {
+  .trigger:hover {
+    background: var(--color-soft-blush);
+    color: var(--color-primary);
+  }
+
+  .trigger:hover .dots { gap: 4.5px; }
+}
+
+.trigger[data-open] {
+  background: var(--color-soft-blush);
+  color: var(--color-primary);
+}
+
+.trigger:focus-visible {
+  outline: 3px solid rgb(var(--rgb-primary) / 0.32);
+  outline-offset: 2px;
+}
+
+.trigger:active .dots { scale: 0.9; }
+
+/* Music is on: a small rose dot with a slow breath. */
+.liveDot {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 7px;
+  height: 7px;
+  border: 1.5px solid var(--color-background);
+  border-radius: 50%;
+  background: var(--color-primary);
+  scale: 0;
+  transition: scale 280ms cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+
+.liveDot[data-live] {
+  scale: 1;
+  animation: breathe 2.4s ease-in-out infinite;
+}
+
+/* ---------- Card ---------- */
+
+.panel {
+  position: absolute;
+  /* The 40px trigger sits centred in the 72px bar: this floats the card 8px below the header. */
+  top: calc(100% + 24px);
+  right: 0;
+  z-index: 60;
+  width: 280px;
+  padding: 6px;
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  background: var(--color-card);
+  box-shadow:
+    0 24px 48px -22px rgb(var(--rgb-shadow) / 0.3),
+    0 2px 8px rgb(var(--rgb-shadow-tint) / 0.06);
+  opacity: 0;
+  visibility: hidden;
+  transform-origin: top right;
+}
+
+.row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border-radius: 11px;
+  transition: background-color 180ms ease;
+}
+
+@media (hover: hover) {
+  .row:hover { background: rgb(var(--rgb-primary) / 0.06); }
+}
+
+.row:focus-within { background: rgb(var(--rgb-primary) / 0.06); }
+
+.item {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+  min-height: 54px;
+  grid-template-columns: 32px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 11px;
+  background: transparent;
+  color: var(--color-text-primary);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.item:focus-visible,
+.play:focus-visible {
+  outline: 2px solid rgb(var(--rgb-primary) / 0.45);
+  outline-offset: -2px;
+}
+
+.icon {
+  position: relative;
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-background);
+  color: var(--color-primary);
+  transition: background-color 200ms ease, border-color 200ms ease;
+}
+
+@media (hover: hover) {
+  .row:hover .icon {
+    border-color: rgb(var(--rgb-primary) / 0.4);
+    background: var(--color-soft-blush);
+  }
+}
+
+.text {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.label {
+  font-size: 0.84rem;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+.meta {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-text-muted);
+  font-size: 0.72rem;
+  line-height: 1.3;
+}
+
+.metaText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Arrow that leans in on hover: these rows open something. */
+.go {
+  color: var(--color-text-muted);
+  opacity: 0.4;
+  transition:
+    opacity 200ms ease,
+    color 200ms ease,
+    translate 260ms cubic-bezier(0.22, 1, 0.36, 1);
+  translate: -2px 2px;
+}
+
+@media (hover: hover) {
+  .row:hover .go {
+    color: var(--color-primary);
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+.divider {
+  height: 1px;
+  margin: 4px 10px;
+  background: var(--color-border);
+}
+
+/* ---------- Mini Wordle ---------- */
+
+.letter {
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+/* ---------- Music ---------- */
+
+.wave {
+  grid-auto-flow: column;
+  gap: 2px;
+  align-content: center;
+  justify-content: center;
+}
+
+.wave span {
+  width: 2px;
+  height: 13px;
+  border-radius: 2px;
+  background: currentColor;
+  scale: 1 0.3;
+  transition: scale 400ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.wave[data-state="playing"] span { animation: wave 0.9s ease-in-out infinite alternate; }
+.wave[data-state="playing"] span:nth-child(2) { animation-duration: 0.62s; animation-delay: -0.2s; }
+.wave[data-state="playing"] span:nth-child(3) { animation-duration: 0.78s; animation-delay: -0.45s; }
+.wave[data-state="playing"] span:nth-child(4) { animation-duration: 0.55s; animation-delay: -0.1s; }
+
+.wave[data-state="loading"] span { animation: wave 0.5s ease-in-out infinite alternate; }
+.wave[data-state="loading"] span:nth-child(2) { animation-delay: 0.1s; }
+.wave[data-state="loading"] span:nth-child(3) { animation-delay: 0.2s; }
+.wave[data-state="loading"] span:nth-child(4) { animation-delay: 0.3s; }
+
+.wave[data-state="error"] { color: var(--color-text-muted); }
+
+.statusDot {
+  flex-shrink: 0;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgb(var(--rgb-primary) / 0.28);
+  transition: background-color 200ms ease;
+}
+
+.statusDot[data-live] {
+  background: var(--color-primary);
+  animation: breathe 2.4s ease-in-out infinite;
+}
+
+/* Quick play/pause, so the music is still one tap from the bar. */
+.play {
+  display: grid;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  margin-right: 10px;
+  padding: 0;
+  place-items: center;
+  border: 1px solid rgb(var(--rgb-primary) / 0.35);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--color-primary);
+  cursor: pointer;
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    scale 140ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (hover: hover) {
+  .play:hover {
+    border-color: var(--color-primary);
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+  }
+}
+
+.play:active { scale: 0.92; }
+
+/* ---------- Appearance ---------- */
+
+/* Both glyphs share the tile; CSS picks one from <html data-theme>, so there is no flash. */
+.moon,
+.sun {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  transition:
+    opacity 300ms ease,
+    rotate 520ms cubic-bezier(0.22, 1, 0.36, 1),
+    scale 520ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.sun {
+  opacity: 0;
+  rotate: -90deg;
+  scale: 0.4;
+}
+
+:global(html[data-theme="dark"]) .moon {
+  opacity: 0;
+  rotate: 90deg;
+  scale: 0.4;
+}
+
+:global(html[data-theme="dark"]) .sun {
+  opacity: 1;
+  rotate: 0deg;
+  scale: 1;
+}
+
+.switch {
+  position: relative;
+  width: 30px;
+  height: 18px;
+  border-radius: 999px;
+  background: rgb(var(--rgb-primary) / 0.18);
+  transition: background-color 260ms ease;
+}
+
+.switch span {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--color-white);
+  box-shadow: 0 1px 3px rgb(var(--rgb-shadow) / 0.25);
+  transition: translate 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+:global(html[data-theme="dark"]) .switch { background: var(--color-primary); }
+:global(html[data-theme="dark"]) .switch span { translate: 12px 0; }
+
+/* ---------- Motion ---------- */
+
+@keyframes wave {
+  from { scale: 1 0.3; }
+  to { scale: 1 1; }
+}
+
+@keyframes breathe {
+  0%, 100% { box-shadow: 0 0 0 0 rgb(var(--rgb-primary) / 0.4); }
+  50% { box-shadow: 0 0 0 4px rgb(var(--rgb-primary) / 0); }
+}
+
+/* Phones: the card hangs from the header's right edge (.actions), so it never runs off-screen. */
+@media (max-width: 900px) {
+  .wrap { position: static; }
+
+  /* A full 44px touch target, matching the menu toggle beside it. */
+  .trigger {
+    width: 44px;
+    height: 44px;
+  }
+
+  .panel {
+    top: calc(100% + 22px);
+    width: min(300px, calc(100vw - 32px));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trigger,
+  .dots,
+  .liveDot,
+  .row,
+  .icon,
+  .go,
+  .play,
+  .moon,
+  .sun,
+  .switch,
+  .switch span,
+  .wave span {
+    transition: none;
+  }
+
+  .liveDot[data-live],
+  .statusDot[data-live],
+  .wave span {
+    animation: none !important;
+  }
+
+  .wave[data-state="playing"] span:nth-child(1) { scale: 1 0.55; }
+  .wave[data-state="playing"] span:nth-child(2) { scale: 1 0.95; }
+  .wave[data-state="playing"] span:nth-child(3) { scale: 1 0.7; }
+  .wave[data-state="playing"] span:nth-child(4) { scale: 1 0.45; }
+}

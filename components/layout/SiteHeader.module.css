@@ -100,13 +100,15 @@
   transform: scaleX(1);
 }
 
-/* Right-hand cluster: the word-game tile, theme switch, Resume, and (on mobile) the menu toggle. */
+/* Right-hand cluster: the "···" utility menu, Resume, and (on mobile) the menu toggle.
+   Positioned so the utility card can hang from its right edge on phones. */
 .actions {
+  position: relative;
   display: flex;
   grid-column: 3;
   align-items: center;
   justify-self: end;
-  gap: 12px;
+  gap: 10px;
 }
 
 .menuToggle {
@@ -274,10 +276,8 @@
   .actions { gap: 6px; }
 }
 
-/* Smallest phones: logo plus four 40px controls still fit on one line. */
 @media (max-width: 360px) {
   .container { width: calc(100% - 32px); }
-  .actions { gap: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {

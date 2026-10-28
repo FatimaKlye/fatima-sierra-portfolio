@@ -1,14 +1,12 @@
-/* A Little Word Break — the navbar "W" tile and its daily word game.
+/* A Little Word Break — the daily word game, opened from the navbar utility menu.
    Every colour is a token below; dark values switch on with html[data-theme="dark"] or html.dark. */
 
-.trigger,
 .overlay {
   --wb-surface: var(--color-background);
   --wb-text: var(--color-text-primary);
   --wb-muted: var(--color-text-muted);
   --wb-line: var(--color-border);
   --wb-accent: var(--color-primary);
-  --wb-trigger-bg: var(--color-white);
   --wb-tile-border: #ead9e1;
   --wb-filled-bg: var(--color-white);
   --wb-filled-border: var(--color-secondary);
@@ -29,16 +27,13 @@
   --wb-sparkle-b: #f3bcd3;
 }
 
-:global(html[data-theme="dark"]) .trigger,
 :global(html[data-theme="dark"]) .overlay,
-:global(html.dark) .trigger,
 :global(html.dark) .overlay {
   --wb-surface: var(--color-card);
   --wb-text: var(--color-text-primary);
   --wb-muted: var(--color-text-muted);
   --wb-line: var(--color-border);
   --wb-accent: var(--color-primary);
-  --wb-trigger-bg: var(--color-card);
   --wb-tile-border: #3e2f37;
   --wb-filled-bg: #251a20;
   --wb-filled-border: #a8728c;
@@ -55,80 +50,6 @@
   --wb-shadow: 0 32px 80px -24px rgba(0, 0, 0, 0.7);
   --wb-toast-bg: #f6e9ef;
   --wb-toast-text: #1d1519;
-}
-
-/* ---------- Navbar trigger: a tiny letter tile that flips pink on hover ---------- */
-
-.trigger {
-  display: inline-grid;
-  flex-shrink: 0;
-  width: 40px;
-  height: 40px;
-  padding: 0;
-  place-items: center;
-  border: 0;
-  border-radius: 12px;
-  background: transparent;
-  cursor: pointer;
-  perspective: 240px;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.triggerFace {
-  display: grid;
-  width: 30px;
-  height: 30px;
-  place-items: center;
-  border: 1.5px solid var(--wb-line);
-  border-radius: 9px;
-  background: var(--wb-trigger-bg);
-  color: var(--wb-accent);
-  font-family: var(--font-poppins), sans-serif;
-  font-size: 0.86rem;
-  font-weight: 600;
-  line-height: 1;
-  transition:
-    background-color 200ms ease,
-    border-color 200ms ease,
-    color 200ms ease,
-    box-shadow 300ms ease,
-    scale 140ms ease;
-}
-
-@media (hover: hover) {
-  .trigger:hover .triggerFace {
-    border-color: var(--wb-accent);
-    background: var(--wb-accent);
-    color: var(--wb-surface);
-    box-shadow: 0 10px 20px -10px rgb(var(--rgb-shadow-tint) / 0.65);
-    animation: triggerFlip 460ms ease-in-out;
-  }
-}
-
-.trigger:focus-visible {
-  outline: 3px solid rgb(var(--rgb-primary) / 0.32);
-  outline-offset: 2px;
-}
-
-.trigger:focus-visible .triggerFace {
-  border-color: var(--wb-accent);
-}
-
-.trigger:active .triggerFace {
-  scale: 0.92;
-}
-
-/* The same half-turn reveal as the game's tiles: colour swaps while the tile is edge-on. */
-@keyframes triggerFlip {
-  0%,
-  49.9% {
-    border-color: var(--wb-line);
-    background: var(--wb-trigger-bg);
-    color: var(--wb-accent);
-  }
-  0% { transform: rotateX(0deg); }
-  50% { transform: rotateX(90deg); }
-  100% { transform: rotateX(0deg); }
 }
 
 /* ---------- Dialog ---------- */
@@ -562,14 +483,6 @@
   border: 0;
 }
 
-/* Touch layouts: a full 44px hit area (matching the menu toggle) around the same small tile. */
-@media (max-width: 900px) {
-  .trigger {
-    width: 44px;
-    height: 44px;
-  }
-}
-
 @media (max-width: 480px) {
   .panel {
     padding: 18px 16px 14px;
@@ -582,7 +495,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .trigger:hover .triggerFace,
   .typing,
   .flip,
   .hop,
@@ -592,7 +504,6 @@
     animation: none !important;
   }
 
-  .triggerFace,
   .tile,
   .key,
   .close {

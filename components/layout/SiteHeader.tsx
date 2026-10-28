@@ -5,10 +5,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
 import type { MouseEvent } from "react";
-import WordBreak from "@/components/wordbreak/WordBreak";
-import MusicToggle from "./MusicToggle";
 import ResumeModal from "./ResumeModal";
-import ThemeToggle from "./ThemeToggle";
+import UtilityMenu from "./UtilityMenu";
 import styles from "./SiteHeader.module.css";
 
 type NavItem = {
@@ -137,9 +135,7 @@ export default function SiteHeader() {
           </nav>
 
           <div className={styles.actions}>
-            <WordBreak />
-            <MusicToggle />
-            <ThemeToggle />
+            <UtilityMenu />
 
             <div className={styles.resumeCta}>
               <button type="button" className="ui-btn ui-btn--primary ui-btn--sm" onClick={() => setResumeOpen(true)}>

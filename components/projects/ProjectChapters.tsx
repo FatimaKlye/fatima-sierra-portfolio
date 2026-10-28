@@ -171,30 +171,13 @@ function MediaLink({ project, className, children }: { project: ShowcaseProject;
 
 type LayoutProps = { project: ShowcaseProject; titleId: string };
 
-/* A wide, cinematic screen that unclips as it scrolls in. */
+/* Copy beside a wide browser screen that unclips as it scrolls in, a second page layered on its corner. */
 function Cinema({ project, titleId }: LayoutProps) {
   const [main, second] = project.screens;
   return (
-    <>
-      <div className={styles.container}>
+    <div className={`${styles.container} ${styles.cinemaGrid}`}>
+      <div className={styles.cinemaCopy}>
         <Head project={project} titleId={titleId} />
-      </div>
-      <div className={styles.cinemaMedia}>
-        <MediaLink project={project} className={styles.cinemaFrame}>
-          <span className={styles.clip} data-clip>
-            <Shot media={main} sizes="(max-width: 900px) 100vw, 1320px" />
-          </span>
-        </MediaLink>
-        {second && (
-          <figure className={styles.cinemaSecond}>
-            <span data-parallax="12">
-              <Shot media={second} sizes="(max-width: 900px) 56vw, 420px" />
-            </span>
-            {second.label && <figcaption>{second.label}</figcaption>}
-          </figure>
-        )}
-      </div>
-      <div className={`${styles.container} ${styles.cinemaBody}`}>
         <Body project={project}>
           {project.slug === "ignis-safe-website" && (
             <a className={styles.next} href="#ignis-safe-mobile">
@@ -204,7 +187,22 @@ function Cinema({ project, titleId }: LayoutProps) {
           )}
         </Body>
       </div>
-    </>
+      <div className={styles.cinemaMedia}>
+        <MediaLink project={project} className={styles.cinemaFrame}>
+          <span className={styles.clip} data-clip>
+            <Shot media={main} sizes="(max-width: 900px) 100vw, 640px" />
+          </span>
+        </MediaLink>
+        {second && (
+          <figure className={styles.cinemaSecond}>
+            <span data-parallax="8">
+              <Shot media={second} sizes="(max-width: 900px) 50vw, 320px" />
+            </span>
+            {second.label && <figcaption>{second.label}</figcaption>}
+          </figure>
+        )}
+      </div>
+    </div>
   );
 }
 
