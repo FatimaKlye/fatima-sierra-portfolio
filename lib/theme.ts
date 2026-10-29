@@ -44,35 +44,21 @@ const SWITCHING_ATTR = "data-theme-switching";
 const REVEAL_ATTR = "data-theme-reveal";
 const REVEAL_MS = 520;
 const REVEAL_EASING = "cubic-bezier(0.55, 0, 0.15, 1)";
-/* Budgets for slow devices. Any view transition makes the browser restyle the whole page as it
-   starts and again as it ends — on top of the flip itself. The update callback runs right after
-   the first of those restyles, so a late one is the earliest, cheapest sign. One late reveal is
-   usually a busy moment (the page still loading or decoding images), not a slow device, so only
-   consecutive misses switch to the instant flip, and only until the next page load. (Remembering
-   a single miss in sessionStorage kept the heart off in that tab for good, reloads included.) */
-const SLOW_CAPTURE_MS = 110;
-const SLOW_START_MS = 250; // click to the heart's first frame
-const SLOW_STRIKES = 2;
+/* No slow-device fallback: a late capture used to count as a strike, and two strikes switched the
+   heart off until the next page load. On slower laptops that tripped within the first few toggles,
+   so the heart played once or twice and then never again. Every supported switch now gets one. */
 
 type ViewTransitionLike = { ready: Promise<void>; finished: Promise<void>; skipTransition: () => void };
 type ViewTransitionDocument = Document & { startViewTransition?: (update: () => void) => ViewTransitionLike };
+type ViewTransitionCapable = ViewTransitionDocument & Required<Pick<ViewTransitionDocument, "startViewTransition">>;
 
 let running: ViewTransitionLike | null = null;
+/** Whether `running` has passed its update callback (old page captured, theme committed). */
+let captured = false;
 /** The latest theme asked for; a transition's deferred update applies this, never a stale choice. */
 let target: Theme = "light";
 let generation = 0;
 let releaseTimer = 0;
-let slowStrikes = 0;
-
-function preferInstant() {
-  return slowStrikes >= SLOW_STRIKES;
-}
-
-/** Counts a late reveal; true once the device has missed often enough to get the instant flip. */
-function strike() {
-  slowStrikes++;
-  return preferInstant();
-}
 
 /** Flips the theme with transitions held off, so colours land in the same frame as the flip. */
 function commit(theme: Theme) {
@@ -213,60 +199,21 @@ function revealHeart(): Animation {
   );
 }
 
-/**
- * Switches theme in place — no reload, scroll or React state beyond the two theme readers. Where
- * view transitions exist, the new theme opens inside a heart from the centre of the screen;
- * reduced motion, older browsers and slow devices get an instant switch instead.
- */
-export function setTheme(theme: Theme) {
-  try {
-    window.localStorage.setItem(STORAGE_KEY, theme);
-  } catch {
-    // Private mode or blocked storage: the switch still applies for this visit.
-  }
-
-  // A second press mid-reveal finishes the first one at once rather than stacking another.
-  if (running) {
-    running.skipTransition();
-    switchInstantly(theme);
-    return;
-  }
-  if (theme === getTheme()) return;
-
-  const doc = document as ViewTransitionDocument;
-  if (
-    typeof doc.startViewTransition !== "function" ||
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
-    preferInstant()
-  ) {
-    switchInstantly(theme);
-    return;
-  }
-
-  target = theme;
+/** Opens one heart onto `target`. Its teardown resets everything, or starts the next heart. */
+function startReveal(doc: ViewTransitionCapable) {
   const root = document.documentElement;
-  const started = performance.now();
-  let late = false;
+  // Set before the transition starts, so every reveal's pseudos are styled from their first frame.
+  root.setAttribute(REVEAL_ATTR, "");
+  captured = false;
   const transition = doc.startViewTransition(() => {
-    late = performance.now() - started > SLOW_CAPTURE_MS;
-    const bail = late && strike();
-    if (!bail) root.setAttribute(REVEAL_ATTR, "");
-    commit(target);
-    // Bail before the new page is captured: that would cost yet another full restyle.
-    if (bail) transition.skipTransition();
+    captured = true;
+    // Presses before the capture cancelled each other out: nothing to reveal.
+    if (target === getTheme()) transition.skipTransition();
+    else commit(target);
   });
   running = transition;
   transition.ready
     .then(() => {
-      // A late capture has already been counted; otherwise a late first frame counts instead.
-      if (!late && performance.now() - started > SLOW_START_MS) {
-        late = true;
-        if (strike()) {
-          transition.skipTransition();
-          return;
-        }
-      }
-      if (!late) slowStrikes = 0;
       // Lifting the hold as the heart lands folds its restyle into the teardown's.
       const scheduled = generation;
       revealHeart().finished.then(() => release(scheduled), () => {});
@@ -275,10 +222,45 @@ export function setTheme(theme: Theme) {
   transition.finished
     .catch(() => {})
     .finally(() => {
+      if (running !== transition) return;
+      running = null;
+      // A press during this reveal asked for the other theme: open a fresh heart for it.
+      if (target !== getTheme()) {
+        startReveal(doc);
+        return;
+      }
       root.removeAttribute(REVEAL_ATTR);
-      if (running === transition) running = null;
       releaseSoon();
     });
+}
+
+/**
+ * Switches theme in place — no reload, scroll or React state beyond the two theme readers. Where
+ * view transitions exist, the new theme opens inside a heart from the centre of the screen, every
+ * time; reduced motion and older browsers get an instant switch instead.
+ */
+export function setTheme(theme: Theme) {
+  try {
+    window.localStorage.setItem(STORAGE_KEY, theme);
+  } catch {
+    // Private mode or blocked storage: the switch still applies for this visit.
+  }
+
+  target = theme;
+  if (running) {
+    // Before the capture, the pending reveal will simply commit the new `target`. Mid-reveal, cut
+    // the current heart short; its teardown opens a new one toward `target`.
+    if (captured) running.skipTransition();
+    return;
+  }
+  if (theme === getTheme()) return;
+
+  const doc = document as ViewTransitionDocument;
+  if (typeof doc.startViewTransition !== "function" || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    switchInstantly(theme);
+    return;
+  }
+  startReveal(doc as ViewTransitionCapable);
 }
 
 /**
