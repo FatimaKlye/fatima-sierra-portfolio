@@ -3,6 +3,7 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { observeReveals } from "./reveal";
 
 /**
  * Drives scroll animations from data attributes so page sections stay
@@ -11,6 +12,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
  *  data-word            title words, masked slide-up when the opening enters view
  *  data-reveal          fades/rises once when scrolled into view
  *  data-stagger         children of this element reveal one after another
+ *    (these three are one-shot entrances, run by ./reveal with no GSAP at all)
  *  data-draw            SVG path that draws itself while scrolling
  *  data-spin="n"        rotates n degrees across its scroll (medals)
  *  data-parallax="n"    gentle vertical drift of ±n% while scrolling (wide screens)
@@ -20,8 +22,8 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
  *                       as the reading reaches them
  *  data-magnetic        leans gently toward the pointer while hovered (fine pointers only)
  *
- * Nothing is hidden by CSS: GSAP sets the start states after hydration, so
- * reduced-motion visitors and no-JS renders simply see everything.
+ * Nothing is hidden until hydration: GSAP and ./reveal set the start states
+ * from script, so reduced-motion visitors and no-JS renders simply see everything.
  */
 export default function EditorialMotion({ children, className }: { children: ReactNode; className?: string }) {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -33,56 +35,10 @@ export default function EditorialMotion({ children, className }: { children: Rea
     gsap.registerPlugin(ScrollTrigger);
 
     const all = <T extends Element = HTMLElement>(selector: string) => Array.from(root.querySelectorAll<T>(selector));
+    const stopReveals = observeReveals(root);
     const mm = gsap.matchMedia();
 
     mm.add("(prefers-reduced-motion: no-preference)", () => {
-      const words = all("[data-word]");
-      if (words.length) {
-        gsap.fromTo(
-          words,
-          { yPercent: 118 },
-          {
-            yPercent: 0,
-            duration: 1.15,
-            ease: "power4.out",
-            stagger: 0.08,
-            clearProps: "transform",
-            scrollTrigger: { trigger: words[0], start: "top 92%", once: true },
-          }
-        );
-      }
-
-      all("[data-reveal]").forEach((element) => {
-        gsap.fromTo(
-          element,
-          { y: 40, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.95,
-            ease: "power3.out",
-            clearProps: "transform",
-            scrollTrigger: { trigger: element, start: "top 96%", once: true },
-          }
-        );
-      });
-
-      all("[data-stagger]").forEach((group) => {
-        gsap.fromTo(
-          Array.from(group.children),
-          { y: 30, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.8,
-            ease: "power3.out",
-            stagger: 0.08,
-            clearProps: "transform",
-            scrollTrigger: { trigger: group, start: "top 94%", once: true },
-          }
-        );
-      });
-
       all<SVGPathElement>("[data-draw]").forEach((path) => {
         const length = path.getTotalLength();
         gsap.fromTo(
@@ -208,6 +164,7 @@ export default function EditorialMotion({ children, className }: { children: Rea
     return () => {
       cancelAnimationFrame(frame);
       window.removeEventListener("load", refresh);
+      stopReveals();
       mm.revert();
     };
   }, []);
