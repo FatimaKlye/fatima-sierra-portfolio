@@ -24,12 +24,15 @@
   border: 0;
 }
 
-/* Clipped line for word-by-word slide-ups. */
+/* Clipped line for word-by-word slide-ups. Descenders drop ~0.28em below the baseline,
+   further than these tight line boxes reach, so the mask grows on every side and an equal
+   negative margin pulls it back: whole glyphs, unchanged layout. Words start 135% down
+   (heroWordIn, ProjectsMotion) so they stay hidden below the taller mask. */
 .mask {
   display: inline-block;
   overflow: hidden;
-  padding-bottom: 0.1em;
-  margin-bottom: -0.1em;
+  padding: 0.06em 0.04em 0.22em;
+  margin: -0.06em -0.04em -0.22em;
   vertical-align: top;
 }
 
@@ -56,7 +59,7 @@
 }
 
 @keyframes heroWordIn {
-  from { transform: translateY(115%); }
+  from { transform: translateY(135%); }
   to { transform: none; }
 }
 

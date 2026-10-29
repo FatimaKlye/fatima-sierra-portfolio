@@ -146,7 +146,7 @@ export default function TableAndRecord() {
             const words = section.querySelectorAll("[data-tr-word]");
             gsap.fromTo(
               words,
-              { yPercent: 115 },
+              { yPercent: 135 },
               {
                 yPercent: 0,
                 duration: 1.1,

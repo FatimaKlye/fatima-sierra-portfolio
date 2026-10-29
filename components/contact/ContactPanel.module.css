@@ -95,12 +95,15 @@
   line-height: 0.95;
 }
 
-/* Each word slides up from behind its own mask; the padding keeps the "y" descender inside it. */
+/* Each word slides up from behind its own mask. The "y" drops ~0.28em below the baseline and
+   the tight tracking pushes glyph edges past the word box, so the mask grows on every side and
+   an equal negative margin pulls it back: whole glyphs, unchanged layout. Words start at
+   yPercent 135 (ContactMotion) so they stay hidden below the taller mask. */
 .wordMask {
   display: inline-block;
   overflow: hidden;
-  padding-bottom: 0.1em;
-  margin-bottom: -0.1em;
+  padding: 0.06em 0.04em 0.22em;
+  margin: -0.06em -0.04em -0.22em;
   vertical-align: top;
 }
 

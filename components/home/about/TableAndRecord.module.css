@@ -73,12 +73,15 @@
   padding-left: clamp(0px, 9vw, 8.5rem);
 }
 
-/* Each word sits in a mask; padding keeps descenders from being clipped. */
+/* Each word sits in a mask. Descenders ("bring", "leadership") drop ~0.28em below the
+   baseline, further than this tight line box reaches, so the mask grows on every side and an
+   equal negative margin pulls it back: whole glyphs, unchanged layout. Words start at
+   yPercent 135 (TableAndRecord.tsx) so they stay hidden below the taller mask. */
 .mask {
   display: inline-block;
   overflow: clip;
-  padding-bottom: 0.1em;
-  margin-bottom: -0.1em;
+  padding: 0.06em 0.04em 0.22em;
+  margin: -0.06em -0.04em -0.22em;
   vertical-align: top;
 }
 

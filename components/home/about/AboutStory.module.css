@@ -93,13 +93,15 @@
   padding-left: 0.9em;
 }
 
-/* Each word slides up inside its own mask; the extra bottom room keeps the
-   descenders of "cooking" and "coding" from being clipped. */
+/* Each word slides up inside its own mask. The "g" in "cooking" and "coding" drops ~0.28em
+   below the baseline, further than this tight line box reaches, so the mask grows on every
+   side and an equal negative margin pulls it back: whole glyphs, unchanged layout. Words
+   start 135% down (globals.css) so they stay hidden below the taller mask. */
 .mask {
   display: inline-block;
   overflow: hidden;
-  padding-bottom: 0.1em;
-  margin-bottom: -0.1em;
+  padding: 0.06em 0.04em 0.22em;
+  margin: -0.06em -0.04em -0.22em;
   vertical-align: bottom;
 }
 

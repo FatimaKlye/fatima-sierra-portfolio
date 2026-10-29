@@ -167,7 +167,7 @@ html[data-entrance-intro] body::after {
   }
 
   [data-reveals] [data-word]:not([data-revealed]) {
-    transform: translate3d(0, 118%, 0);
+    transform: translate3d(0, 135%, 0);
   }
 
   [data-reveals] [data-reveal][data-revealed="run"] {

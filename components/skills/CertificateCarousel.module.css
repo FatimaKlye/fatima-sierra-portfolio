@@ -157,9 +157,12 @@
   text-transform: uppercase;
 }
 
+/* The clamp needs overflow hidden, and Poppins' "(" "/" ")" rise above the first line box, so
+   top padding (taken back off the margin) keeps their tops from being shaved. */
 .title {
   display: -webkit-box;
-  margin: 6px 0 0;
+  margin: calc(6px - 0.1em) 0 0;
+  padding-top: 0.1em;
   overflow: hidden;
   color: var(--color-text-primary);
   font-size: clamp(1rem, 1.45vw, 1.2rem);

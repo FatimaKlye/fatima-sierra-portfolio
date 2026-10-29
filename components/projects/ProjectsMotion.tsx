@@ -47,7 +47,7 @@ export default function ProjectsMotion({ children }: { children: ReactNode }) {
       lines.forEach((line) => {
         gsap.fromTo(
           all("[data-word]", line),
-          { yPercent: 115 },
+          { yPercent: 135 },
           {
             yPercent: 0,
             duration: 1.05,

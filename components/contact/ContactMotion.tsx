@@ -51,7 +51,7 @@ export default function ContactMotion({ children, className }: { children: React
         ["meta", 10],
       ];
 
-      gsap.set(words, { yPercent: 115 });
+      gsap.set(words, { yPercent: 135 });
       gsap.set(sparkle, { autoAlpha: 0, scale: 0.2, rotation: -140 });
       gsap.set(group("glyph"), { autoAlpha: 0, scale: 0.92 });
       risers.forEach(([name, y]) => gsap.set(group(name), { autoAlpha: 0, y }));
