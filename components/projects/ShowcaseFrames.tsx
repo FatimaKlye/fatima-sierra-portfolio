@@ -30,6 +30,8 @@ export function Shot({ media, sizes, priority, decorative, className }: FramePro
         fill
         sizes={sizes}
         priority={priority}
+        // The first stage screen is the page's largest paint: fetch it ahead of the header logos.
+        fetchPriority={priority ? "high" : undefined}
         draggable={false}
         data-zoom
       />

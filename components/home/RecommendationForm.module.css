@@ -1,8 +1,9 @@
 /* Recommendation submission dialog: same overlay as the certificate viewer,
-   hairline fields like the contact form, compact enough for one screen. */
+   fully outlined, softly tinted fields (no one-sided rules), compact enough for one screen. */
 
 .overlay {
   --form-error: #b3261e;
+  --rgb-form-error: 179 38 30;
   position: fixed;
   inset: 0;
   z-index: 80;
@@ -17,6 +18,7 @@
 
 :global(html[data-theme="dark"]) .overlay {
   --form-error: #f2a7a0;
+  --rgb-form-error: 242 167 160;
 }
 
 .dialog {
@@ -28,17 +30,6 @@
   border-radius: 12px;
   background: var(--color-background);
   box-shadow: var(--shadow-soft);
-}
-
-/* Pink-to-burgundy rule along the top edge. */
-.dialog::before {
-  position: absolute;
-  top: 0;
-  right: 0;
-  left: 0;
-  height: 3px;
-  background: linear-gradient(90deg, var(--color-primary), #6e2445);
-  content: "";
 }
 
 .close {
@@ -74,8 +65,7 @@
 }
 
 .header {
-  padding: 30px 72px 22px 28px;
-  border-bottom: 1px solid var(--color-border);
+  padding: 30px 72px 0 28px;
 }
 
 .eyebrow {
@@ -120,6 +110,9 @@
 
 .form {
   position: relative;
+  display: grid;
+  gap: 18px;
+  padding: 24px 28px 0;
 }
 
 .honeypot {
@@ -142,27 +135,14 @@
 .pair {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.pair > .field:first-child {
-  border-right: 1px solid var(--color-border);
+  gap: 18px;
 }
 
 .field {
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding: 16px 28px 14px;
-  border-bottom: 1px solid var(--color-border);
-  transition:
-    background-color 200ms ease,
-    box-shadow 200ms ease;
-}
-
-.field:focus-within {
-  background: rgb(var(--rgb-blush) / 0.4);
-  box-shadow: inset 0 -2px 0 var(--color-primary);
+  gap: 8px;
 }
 
 .label {
@@ -188,15 +168,38 @@
 .input {
   display: block;
   width: 100%;
-  padding: 0;
-  border: 0;
-  border-radius: 0;
+  padding: 11px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
   outline: none;
-  background: transparent;
+  background: var(--color-card);
   color: var(--color-text-primary);
   font-family: var(--font-poppins), sans-serif;
   font-size: 1rem;
   line-height: 1.5;
+  transition:
+    border-color 200ms ease,
+    background-color 200ms ease,
+    box-shadow 200ms ease;
+}
+
+.input:hover:not(:disabled) {
+  border-color: rgb(var(--rgb-primary) / 0.45);
+}
+
+.input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgb(var(--rgb-primary) / 0.16);
+}
+
+/* Error: complete outline plus a soft tint; the message sits right below. */
+.field[data-invalid="true"] .input {
+  border-color: var(--form-error);
+  background: rgb(var(--rgb-form-error) / 0.06);
+}
+
+.field[data-invalid="true"] .input:focus {
+  box-shadow: 0 0 0 3px rgb(var(--rgb-form-error) / 0.2);
 }
 
 .input::placeholder {
@@ -243,8 +246,10 @@
   grid-template-columns: auto 1fr;
   gap: 4px 12px;
   align-items: start;
-  padding: 16px 28px;
-  border-bottom: 1px solid var(--color-border);
+  padding: 14px 16px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: rgb(var(--rgb-blush) / 0.35);
   color: var(--color-text-primary);
   font-size: 0.85rem;
   line-height: 1.55;
@@ -271,6 +276,11 @@
   outline-offset: 2px;
 }
 
+.consent[data-invalid="true"] {
+  border-color: var(--form-error);
+  background: rgb(var(--rgb-form-error) / 0.06);
+}
+
 .consent[data-invalid="true"] .checkbox {
   outline: 1px solid var(--form-error);
   outline-offset: 2px;
@@ -282,7 +292,7 @@
   align-items: center;
   justify-content: flex-end;
   gap: 14px 20px;
-  padding: 18px 28px 24px;
+  padding: 4px 0 24px;
 }
 
 .formError {
@@ -332,22 +342,15 @@
   }
 
   .header {
-    padding: 26px 64px 18px 20px;
+    padding: 26px 64px 0 20px;
+  }
+
+  .form {
+    padding: 20px 20px 0;
   }
 
   .pair {
     grid-template-columns: 1fr;
-  }
-
-  .pair > .field:first-child {
-    border-right: 0;
-  }
-
-  .field,
-  .consent,
-  .footer {
-    padding-right: 20px;
-    padding-left: 20px;
   }
 
   .footer :global(.ui-btn) {

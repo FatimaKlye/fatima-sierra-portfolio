@@ -11,6 +11,9 @@ const subscribeNoop = () => () => undefined;
 const TITLE = ["Selected", "work,"];
 const TITLE_ACCENT = ["case", "by", "case."];
 
+/** Position in the CSS-driven opening's stagger (see .root [data-hero-*] in the stylesheet). */
+const stagger = (index: number) => ({ "--i": index }) as CSSProperties;
+
 /** Layered real screens for one project; data-depth drives the cursor parallax in ProjectsMotion. */
 function StageComposition({ project, priority }: { project: ShowcaseProject; priority: boolean }) {
   const [first, second, third] = project.screens;
@@ -119,7 +122,7 @@ export default function ProjectsHero() {
     >
       <div className={styles.heroInner}>
         <div className={styles.heroCopy}>
-          <nav className={styles.crumbs} aria-label="Breadcrumb" data-hero-in>
+          <nav className={styles.crumbs} aria-label="Breadcrumb" data-hero-in style={stagger(0)}>
             <ol>
               <li>
                 <Link href="/">Home</Link>
@@ -129,10 +132,12 @@ export default function ProjectsHero() {
           </nav>
 
           <h1 className={styles.heroTitle} aria-label="Selected work, case by case.">
-            {TITLE.map((word) => (
+            {TITLE.map((word, index) => (
               <Fragment key={word}>
                 <span className={styles.mask} aria-hidden="true">
-                  <span data-hero-word>{word}</span>
+                  <span data-hero-word style={stagger(index)}>
+                    {word}
+                  </span>
                 </span>{" "}
               </Fragment>
             ))}
@@ -140,7 +145,9 @@ export default function ProjectsHero() {
               {TITLE_ACCENT.map((word, index) => (
                 <Fragment key={word}>
                   <span className={styles.mask} aria-hidden="true">
-                    <span data-hero-word>{word}</span>
+                    <span data-hero-word style={stagger(TITLE.length + index)}>
+                      {word}
+                    </span>
                   </span>
                   {index < TITLE_ACCENT.length - 1 ? " " : null}
                 </Fragment>
@@ -148,7 +155,7 @@ export default function ProjectsHero() {
             </em>
           </h1>
 
-          <p className={styles.heroIntro} data-hero-in>
+          <p className={styles.heroIntro} data-hero-in style={stagger(1)}>
             A fire station, a campus office, a beauty-shop prototype and a rental business — each one started with a
             practical need. Preview a project, then open its case study.
           </p>
@@ -199,6 +206,7 @@ export default function ProjectsHero() {
         <div
           className={styles.heroIndex}
           data-hero-in
+          style={stagger(2)}
           onPointerEnter={() => setPaused(true)}
           onPointerLeave={() => setPaused(false)}
         >
@@ -261,7 +269,7 @@ export default function ProjectsHero() {
         </div>
       </div>
 
-      <dl className={styles.stats} data-hero-in>
+      <dl className={styles.stats} data-hero-in style={stagger(3)}>
         {PROJECT_STATS.map((stat) => (
           <div key={stat.label}>
             <dt>{stat.label}</dt>

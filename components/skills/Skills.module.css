@@ -1276,8 +1276,10 @@
 .supportTools li {
   display: grid;
   gap: 4px;
-  padding-left: 14px;
-  border-left: 2px solid var(--color-secondary);
+  padding: 12px 14px;
+  border: 1px solid rgb(var(--rgb-primary) / 0.1);
+  border-radius: 10px;
+  background: rgb(var(--rgb-primary) / 0.04);
 }
 
 .supportTools strong {

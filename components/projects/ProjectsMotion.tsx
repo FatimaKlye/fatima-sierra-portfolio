@@ -10,8 +10,7 @@ import styles from "./ProjectsPage.module.css";
  * Every animation on /projects, driven from data attributes so the chapters stay
  * server markup:
  *
- *  data-hero-word / data-hero-in / data-hero-stage   opening sequence on load
- *  data-word              masked words that slide up when their line enters view
+ *  data-word             masked words that slide up when their line enters view
  *  data-reveal            fades/rises once when scrolled into view
  *  data-stagger           children reveal one after another
  *  data-clip[="side"]     media that unclips while scrolling; its [data-zoom] image settles from a zoom
@@ -23,8 +22,9 @@ import styles from "./ProjectsPage.module.css";
  *  data-cursor="label"    small label that follows the cursor over media (fine pointers)
  *  data-open-case         links that open their case study behind a curtain
  *
- * The opening is hidden by CSS only while data-motion="pending"; reduced-motion
- * visitors get data-motion="off" and everything simply visible and still.
+ * The hero opening (data-hero-word / data-hero-in / data-hero-stage) is pure CSS, so it
+ * plays from the first paint and never waits on this script. Reduced-motion visitors get
+ * everything simply visible and still.
  */
 export default function ProjectsMotion({ children }: { children: ReactNode }) {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -40,31 +40,7 @@ export default function ProjectsMotion({ children }: { children: ReactNode }) {
       Array.from(scope.querySelectorAll<T>(selector));
     const mm = gsap.matchMedia();
 
-    mm.add("(prefers-reduced-motion: reduce)", () => {
-      root.dataset.motion = "off";
-    });
-
     mm.add("(prefers-reduced-motion: no-preference)", () => {
-      /* Opening ------------------------------------------------------------ */
-      const heroWords = all("[data-hero-word]");
-      const heroIn = all("[data-hero-in]");
-      const stage = all("[data-hero-stage]");
-
-      gsap
-        .timeline({
-          defaults: { ease: "power4.out" },
-          onComplete: () => gsap.set([...heroWords, ...heroIn, ...stage], { clearProps: "transform,opacity,clipPath" }),
-        })
-        .fromTo(heroWords, { yPercent: 115 }, { yPercent: 0, duration: 1.1, stagger: 0.07 }, 0.05)
-        .fromTo(heroIn, { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: 0.9, stagger: 0.08, ease: "power3.out" }, 0.25)
-        .fromTo(
-          stage,
-          { clipPath: "inset(10% 6% 10% 6% round 28px)", opacity: 0 },
-          { clipPath: "inset(0% 0% 0% 0% round 0px)", opacity: 1, duration: 1.4, ease: "expo.out" },
-          0.15
-        );
-      root.dataset.motion = "on";
-
       /* Scroll reveals ------------------------------------------------------ */
       // Words animate per line (heading or quote), so each title plays as one gesture.
       const lines = new Set(all("[data-word]").map((word) => word.closest("h2, p") ?? word));
@@ -300,7 +276,7 @@ export default function ProjectsMotion({ children }: { children: ReactNode }) {
   }, [router]);
 
   return (
-    <div ref={rootRef} className={styles.root} data-motion="pending">
+    <div ref={rootRef} className={styles.root}>
       {children}
     </div>
   );
@@ -328,7 +304,13 @@ function openBehindCurtain(origin: HTMLElement, pathname: string, navigate: () =
   });
   document.body.appendChild(curtain);
 
-  const lift = () =>
+  // The curtain must never outstay its welcome: whatever happens to the navigation (slow
+  // network, an error, the visitor pressing Back), it lifts.
+  let lifted = false;
+  const lift = () => {
+    if (lifted) return;
+    lifted = true;
+    window.removeEventListener("popstate", lift);
     gsap.to(curtain, {
       clipPath: "inset(0px 0px 100% 0px round 0px)",
       duration: 0.75,
@@ -336,6 +318,8 @@ function openBehindCurtain(origin: HTMLElement, pathname: string, navigate: () =
       delay: 0.12,
       onComplete: () => curtain.remove(),
     });
+  };
+  window.addEventListener("popstate", lift);
 
   gsap.fromTo(
     curtain,
@@ -345,11 +329,18 @@ function openBehindCurtain(origin: HTMLElement, pathname: string, navigate: () =
       duration: 0.6,
       ease: "power3.inOut",
       onComplete: () => {
-        navigate();
+        try {
+          navigate();
+        } catch {
+          lift();
+          return;
+        }
         const started = performance.now();
-        // Lift once the new route has committed its URL, or give up after a few seconds.
+        // Lift once the new route has committed its URL; a slow route shows its old page again
+        // after 2.5s rather than leaving the screen a blank sheet of colour.
         const wait = () => {
-          if (window.location.pathname === pathname || performance.now() - started > 4000) {
+          if (lifted) return;
+          if (window.location.pathname === pathname || performance.now() - started > 2500) {
             requestAnimationFrame(lift);
           } else {
             requestAnimationFrame(wait);

@@ -37,22 +37,45 @@
   display: inline-block;
 }
 
-/* The opening is hidden only until ProjectsMotion takes over; a CSS failsafe reveals it
-   anyway if scripts never run. Reduced-motion visitors never see it hidden. */
+/* The opening plays from CSS alone: it starts with the first paint instead of waiting for
+   hydration, and no late or failed script can leave the hero hidden. Transform and opacity
+   only, so it runs on the compositor while the page hydrates underneath. --i (set inline)
+   staggers each group. Reduced-motion visitors simply see the finished layout. */
 @media (prefers-reduced-motion: no-preference) {
-  .root[data-motion="pending"] [data-hero-word] {
-    transform: translateY(115%);
-    animation: heroFailsafe 500ms ease 2.5s forwards;
+  .root [data-hero-word] {
+    animation: heroWordIn 1.1s cubic-bezier(0.165, 0.84, 0.44, 1) calc(50ms + var(--i, 0) * 70ms) both;
   }
 
-  .root[data-motion="pending"] [data-hero-in],
-  .root[data-motion="pending"] [data-hero-stage] {
-    opacity: 0;
-    animation: heroFailsafe 500ms ease 2.5s forwards;
+  .root [data-hero-in] {
+    animation: heroRiseIn 0.9s cubic-bezier(0.215, 0.61, 0.355, 1) calc(250ms + var(--i, 0) * 80ms) both;
+  }
+
+  .root [data-hero-stage] {
+    animation: heroStageIn 1.3s cubic-bezier(0.19, 1, 0.22, 1) 150ms both;
   }
 }
 
-@keyframes heroFailsafe {
+@keyframes heroWordIn {
+  from { transform: translateY(115%); }
+  to { transform: none; }
+}
+
+@keyframes heroRiseIn {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes heroStageIn {
+  from {
+    opacity: 0;
+    transform: translateY(28px) scale(0.97);
+  }
   to {
     opacity: 1;
     transform: none;
@@ -736,8 +759,9 @@
 
 .part {
   margin: 0;
-  padding-left: 16px;
-  border-left: 2px solid var(--color-primary);
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: rgb(var(--rgb-primary) / 0.05);
   color: var(--color-text-muted);
   font-size: 0.86rem;
   line-height: 1.65;

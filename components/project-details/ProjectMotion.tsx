@@ -9,17 +9,15 @@ import styles from "./ProjectDetails.module.css";
  * Drives every GSAP animation on a case-study page from data attributes, so the
  * section components stay plain server markup:
  *
- *  data-word            hero title words, masked slide-up on load
- *  data-intro           hero elements, staggered fade/rise on load
- *  data-intro-visual    hero visual, rise + settle on load
- *  data-reveal          fades/rises once when scrolled into view
+ *  data-reveal         fades/rises once when scrolled into view
  *  data-stagger         children of this element reveal one after another
  *  data-line            scrubbed progress line (drives the --p custom property)
  *  data-parallax="n"    gentle vertical drift of ±n% while scrolling (wide screens)
  *
- * Content is hidden by CSS only while data-motion="pending" (before this effect
- * runs). Reduced-motion visitors and failures fall back to data-motion="off",
- * where everything is simply visible.
+ * The hero opening (data-word / data-intro / data-intro-visual) is pure CSS and never
+ * waits on this effect. Scroll reveals are hidden by CSS only while data-motion="pending"
+ * (with a CSS failsafe); reduced-motion visitors and failures fall back to
+ * data-motion="off", where everything is simply visible.
  */
 export default function ProjectMotion({ children }: { children: ReactNode }) {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -41,31 +39,6 @@ export default function ProjectMotion({ children }: { children: ReactNode }) {
 
     mm.add("(prefers-reduced-motion: no-preference)", () => {
       try {
-        const words = all("[data-word]");
-        const intro = all("[data-intro]");
-        const visual = all("[data-intro-visual]");
-
-        gsap
-          .timeline({
-            defaults: { ease: "power4.out" },
-            onComplete: () => {
-              gsap.set([...words, ...intro, ...visual], { clearProps: "transform,opacity" });
-            },
-          })
-          .fromTo(words, { yPercent: 115 }, { yPercent: 0, duration: 1.1, stagger: 0.07 }, 0.05)
-          .fromTo(
-            intro,
-            { y: 28, opacity: 0 },
-            { y: 0, opacity: 1, duration: 0.9, stagger: 0.08, ease: "power3.out" },
-            0.2
-          )
-          .fromTo(
-            visual,
-            { y: 70, opacity: 0, scale: 0.965 },
-            { y: 0, opacity: 1, scale: 1, duration: 1.3, ease: "power3.out" },
-            0.3
-          );
-
         all("[data-reveal]").forEach((element) => {
           gsap.fromTo(
             element,

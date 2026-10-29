@@ -25,6 +25,9 @@ const NAV_ITEMS: NavItem[] = [
   { label: "Contact", href: "/contact" },
 ];
 
+/** Vercel's background (ISR) regeneration of the homepage renders it as "/index"; both mean Home. */
+const normalizePath = (pathname: string) => (pathname === "/index" ? "/" : pathname);
+
 function isActive(item: NavItem, pathname: string): boolean {
   if (item.href === "/") return pathname === "/";
   return [item.href, ...(item.activeOn ?? [])].some(
@@ -36,10 +39,18 @@ export default function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [resumeOpen, setResumeOpen] = useState(false);
   const menuId = useId();
-  const pathname = usePathname();
+  const pathname = normalizePath(usePathname());
   const toggleRef = useRef<HTMLButtonElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const isHome = pathname === "/";
+
+  // The item just clicked takes the highlight at once, while its route is still loading, so a
+  // click never leaves the old page and the new one lit together. Cleared when any route commits
+  // (adjusted during render, not in an effect).
+  const [pending, setPending] = useState<{ from: string; to: string } | null>(null);
+  if (pending && pending.from !== pathname) setPending(null);
+  const navigating = pending !== null;
+  const activePath = pending?.to ?? pathname;
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -73,10 +84,13 @@ export default function SiteHeader() {
 
   const handleNavClick = (event: MouseEvent<HTMLAnchorElement>, item: NavItem) => {
     closeMenu();
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
 
     // Re-selecting Home on the homepage glides back to the top instead of reloading.
-    if (!(item.href === "/" && isHome)) return;
-    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    if (!(item.href === "/" && isHome)) {
+      if (item.href !== pathname) setPending({ from: pathname, to: item.href });
+      return;
+    }
 
     event.preventDefault();
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -84,11 +98,13 @@ export default function SiteHeader() {
     if (window.location.hash) window.history.replaceState(null, "", "/");
   };
 
-  const getAriaCurrent = (item: NavItem): "page" | undefined => (isActive(item, pathname) ? "page" : undefined);
+  const getAriaCurrent = (item: NavItem): "page" | undefined => (isActive(item, activePath) ? "page" : undefined);
 
   return (
     <>
       <header className={styles.header} data-site-header>
+        {/* Immediate feedback while the next route loads; hidden again the moment it commits. */}
+        <span className={styles.progress} data-active={navigating || undefined} aria-hidden="true" />
         <div className={styles.container}>
           <Link
             className={styles.brand}

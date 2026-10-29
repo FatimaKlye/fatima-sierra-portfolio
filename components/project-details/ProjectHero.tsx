@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { Fragment, type CSSProperties } from "react";
 import Link from "next/link";
 import type { ProjectDetail } from "@/data/projectDetailsData";
 import MediaFrame from "./MediaFrame";
@@ -14,7 +14,10 @@ type ProjectHeroProps = {
 
 const pad = (value: number) => String(value).padStart(2, "0");
 
-/** Each word sits in a clipped mask so GSAP can slide it up on load. */
+/** Position in the CSS-driven opening's stagger (see .page [data-word] / [data-intro]). */
+const stagger = (position: number) => ({ "--i": position }) as CSSProperties;
+
+/** Each word sits in a clipped mask so the opening can slide it up on load. */
 function SplitTitle({ text }: { text: string }) {
   const words = text.split(" ");
 
@@ -23,7 +26,7 @@ function SplitTitle({ text }: { text: string }) {
       {words.map((word, wordIndex) => (
         <Fragment key={`${word}-${wordIndex}`}>
           <span className={styles.word}>
-            <span className={styles.wordInner} data-word>
+            <span className={styles.wordInner} data-word style={stagger(wordIndex)}>
               {word}
             </span>
           </span>
@@ -53,7 +56,7 @@ export default function ProjectHero({ project, index, total }: ProjectHeroProps)
       )}
 
       <div className={styles.container}>
-        <nav className={styles.crumbs} aria-label="Project navigation" data-intro>
+        <nav className={styles.crumbs} aria-label="Project navigation" data-intro style={stagger(0)}>
           <Link href="/projects" className={`ui-btn ui-btn--secondary ui-btn--sm ${styles.backLink}`}>
             Back to Projects
           </Link>
@@ -64,26 +67,26 @@ export default function ProjectHero({ project, index, total }: ProjectHeroProps)
         </nav>
 
         <div className={styles.heroTop}>
-          <p className={styles.heroCategory} data-intro>
+          <p className={styles.heroCategory} data-intro style={stagger(1)}>
             {project.category}
           </p>
           <h1 id="project-title" className={styles.title}>
             <SplitTitle text={project.title} />
           </h1>
           {project.fullName ? (
-            <p className={styles.heroFullName} data-intro>
+            <p className={styles.heroFullName} data-intro style={stagger(2)}>
               <span className={styles.heroFullNameLabel}>Full project name</span>
               {project.fullName}
             </p>
           ) : (
-            <p className={styles.tagline} data-intro>
+            <p className={styles.tagline} data-intro style={stagger(2)}>
               {project.tagline}
             </p>
           )}
         </div>
 
         <div className={styles.heroBody}>
-          <div className={styles.heroAside} data-intro>
+          <div className={styles.heroAside} data-intro style={stagger(3)}>
             <dl className={styles.glance}>
               <div className={styles.glanceRow}>
                 <dt>What it does</dt>

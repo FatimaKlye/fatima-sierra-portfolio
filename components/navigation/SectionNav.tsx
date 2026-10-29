@@ -196,10 +196,14 @@ export default function SectionNav() {
         lockYRef.current = null;
       }
 
+      // Every layout read happens here, before any style is written below, so a scroll frame
+      // never forces the browser to recalculate layout mid-handler.
       const offset = headerOffset();
       const line = offset + (viewport - offset) * ACTIVATION_RATIO;
       const tops = elements.map((element) => element.getBoundingClientRect().top);
       const atBottom = max > 0 && scrollY >= max - 2;
+      const footerTop = document.querySelector("body > footer")?.getBoundingClientRect().top ?? Infinity;
+      const railBottom = isDesktopRef.current ? (capsuleRef.current?.getBoundingClientRect().bottom ?? viewport / 2) : 0;
 
       let index = 0;
       tops.forEach((top, i) => {
@@ -218,13 +222,12 @@ export default function SectionNav() {
         activeRef.current = index;
         setActive(index);
       }
-      if (sectionFillRef.current) gsap.set(sectionFillRef.current, { scaleY: sectionProgress });
-      if (ringRef.current) gsap.set(ringRef.current, { strokeDashoffset: RING_LENGTH * (1 - pageProgress) });
+      // Plain style writes: gsap.set would read computed styles back on every scroll frame.
+      if (sectionFillRef.current) sectionFillRef.current.style.transform = `scaleY(${sectionProgress})`;
+      if (ringRef.current) ringRef.current.style.strokeDashoffset = String(RING_LENGTH * (1 - pageProgress));
 
       // Step aside for the footer instead of sitting on top of it.
-      const footerTop = document.querySelector("body > footer")?.getBoundingClientRect().top ?? Infinity;
       if (isDesktopRef.current) {
-        const railBottom = capsuleRef.current?.getBoundingClientRect().bottom ?? viewport / 2;
         setObscured(footerTop < railBottom + 24);
       } else {
         setObscured(footerTop < viewport - 8);
