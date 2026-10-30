@@ -3,6 +3,7 @@ import Link from "next/link";
 import { HERO_CONTENT } from "@/components/about/aboutData";
 import EditorialMotion from "@/components/motion/EditorialMotion";
 import AboutOpening from "./AboutOpening";
+import CommunityMembership from "./CommunityMembership";
 import RecipeToCode from "./RecipeToCode";
 import TableAndRecord from "./TableAndRecord";
 import {
@@ -264,6 +265,9 @@ export default function AboutStory() {
 
         {/* What I bring to the table + Honours, Leadership & Education ---- */}
         <TableAndRecord />
+
+        {/* Beyond the code: FGWB PH membership card ------------------------- */}
+        <CommunityMembership />
 
         {/* Finale: approach + what's next ----------------------------------- */}
         <div className={styles.finale} id="whats-next" data-nav-label="What’s next">
