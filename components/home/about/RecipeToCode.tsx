@@ -12,6 +12,22 @@ const RESTING = 50;
 
 const valueText = (value: number) => `${value}% code, ${100 - value}% recipe`;
 
+/** Static recipe + code list, shown if the interactive comparison fails (see WidgetBoundary). */
+export function RecipeToCodeFallback() {
+  return (
+    <ol className={`${styles.recipeList} ${styles.recipeFallback}`}>
+      {RECIPE_STEPS.map((step) => (
+        <li className={styles.recipeText} key={step.kitchen}>
+          <strong className={styles.recipeStep}>{step.kitchen}</strong>
+          <span className={styles.recipeLine}>
+            {step.kitchenLine} In code: {step.dev}
+          </span>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
 /**
  * "Recipe → code" comparison. Each row stacks a kitchen step and its code
  * counterpart in the same grid cell, so both always share a height; the code

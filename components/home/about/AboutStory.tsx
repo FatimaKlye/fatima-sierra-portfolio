@@ -1,10 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { HERO_CONTENT } from "@/components/about/aboutData";
+import WidgetBoundary from "@/components/layout/WidgetBoundary";
 import EditorialMotion from "@/components/motion/EditorialMotion";
 import AboutOpening from "./AboutOpening";
-import CommunityMembership from "./CommunityMembership";
-import RecipeToCode from "./RecipeToCode";
+import CommunityMembership, { CommunityMembershipFallback } from "./CommunityMembership";
+import RecipeToCode, { RecipeToCodeFallback } from "./RecipeToCode";
 import TableAndRecord from "./TableAndRecord";
 import {
   COLLEGE,
@@ -63,7 +64,9 @@ export default function AboutStory() {
             </p>
           </div>
           <div data-reveal>
-            <RecipeToCode />
+            <WidgetBoundary name="RecipeToCode" fallback={<RecipeToCodeFallback />}>
+              <RecipeToCode />
+            </WidgetBoundary>
           </div>
         </div>
 
@@ -267,7 +270,9 @@ export default function AboutStory() {
         <TableAndRecord />
 
         {/* Beyond the code: FGWB PH membership card ------------------------- */}
-        <CommunityMembership />
+        <WidgetBoundary name="CommunityMembership" fallback={<CommunityMembershipFallback />}>
+          <CommunityMembership />
+        </WidgetBoundary>
 
         {/* Finale: approach + what's next ----------------------------------- */}
         <div className={styles.finale} id="whats-next" data-nav-label="What’s next">

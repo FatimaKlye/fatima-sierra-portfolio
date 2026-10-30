@@ -20,6 +20,33 @@ const LOAD_TIMEOUT = 15000;
 
 type Status = "idle" | "loading" | "loaded" | "failed";
 
+/**
+ * The section without the live card, shown if the widget itself fails (see WidgetBoundary).
+ * No data-reveal here: it can mount after the page's reveals are armed and would stay hidden.
+ */
+export function CommunityMembershipFallback() {
+  return (
+    <section className={styles.community} id="community" aria-labelledby="community-title" data-nav-label="Community">
+      <div className={styles.container}>
+        <div className={styles.copy}>
+          <p className={styles.eyebrow}>Beyond the code</p>
+          <h2 id="community-title" className={styles.title}>
+            Building alongside <em>women who build.</em>
+          </h2>
+          <p className={styles.body}>
+            A member of For Girls Who Build PH (card no. FGWB-19535). The membership card couldn&apos;t be shown here,
+            but it&apos;s one click away.
+          </p>
+          <a className={`ui-btn ui-btn--secondary ui-btn--sm ${styles.cta}`} href={CARD_URL} target="_blank" rel="noopener noreferrer">
+            View Membership <span aria-hidden="true">↗</span>
+            <span className={styles.srOnly}> (opens in a new tab)</span>
+          </a>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function CommunityMembership() {
   const frameRef = useRef<HTMLDivElement>(null);
   const [status, setStatus] = useState<Status>("idle");
