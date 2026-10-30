@@ -21,6 +21,15 @@ import {
 import styles from "./TableAndRecord.module.css";
 
 /**
+ * Entrances play forward once and never reverse. Not `once: true`: a `once` trigger kills itself
+ * the moment it finds it's already past its start (a refresh restores the scroll mid-page), and
+ * doing that while ScrollTrigger is still refreshing the triggers created alongside it shrinks
+ * its internal list mid-loop — "Cannot read properties of undefined (reading 'end')", which took
+ * the whole About page down.
+ */
+const PLAY_ONCE = "play none none none";
+
+/**
  * "What I bring to the table" + "Honours, Leadership & Education".
  *
  * The two sections share one piece of state: which kind of record is highlighted.
@@ -153,7 +162,7 @@ export default function TableAndRecord() {
                 ease: "power4.out",
                 stagger: 0.07,
                 clearProps: "transform",
-                scrollTrigger: { trigger: words[0], start: "top 88%", once: true },
+                scrollTrigger: { trigger: words[0], start: "top 88%", toggleActions: PLAY_ONCE },
               }
             );
             gsap.fromTo(
@@ -167,14 +176,14 @@ export default function TableAndRecord() {
                 stagger: 0.1,
                 delay: 0.25,
                 clearProps: "transform,opacity",
-                scrollTrigger: { trigger: words[0], start: "top 88%", once: true },
+                scrollTrigger: { trigger: words[0], start: "top 88%", toggleActions: PLAY_ONCE },
               }
             );
           });
 
           // Courses: divider draws, number rises, then the skills follow.
           table.querySelectorAll<HTMLElement>("[data-tr-course]").forEach((course) => {
-            const timeline = gsap.timeline({ scrollTrigger: { trigger: course, start: "top 86%", once: true } });
+            const timeline = gsap.timeline({ scrollTrigger: { trigger: course, start: "top 86%", toggleActions: PLAY_ONCE } });
             timeline
               .fromTo(course.querySelector("[data-tr-line]"), { scaleX: 0 }, { scaleX: 1, duration: 1.1, ease: "power3.inOut", clearProps: "transform" })
               .fromTo(course.querySelector("[data-tr-no]"), { yPercent: 105 }, { yPercent: 0, duration: 0.9, ease: "power4.out", clearProps: "transform" }, 0.15)
@@ -206,7 +215,7 @@ export default function TableAndRecord() {
             }
           );
           record.querySelectorAll<HTMLElement>("[data-tr-year-row]").forEach((row) => {
-            const timeline = gsap.timeline({ scrollTrigger: { trigger: row, start: "top 88%", once: true } });
+            const timeline = gsap.timeline({ scrollTrigger: { trigger: row, start: "top 88%", toggleActions: PLAY_ONCE } });
             timeline
               .fromTo(row.querySelector("[data-tr-year]"), { yPercent: 105 }, { yPercent: 0, duration: 0.9, ease: "power4.out", clearProps: "transform" })
               .fromTo(
@@ -226,7 +235,7 @@ export default function TableAndRecord() {
               ease: "power3.out",
               stagger: 0.05,
               clearProps: "transform,opacity",
-              scrollTrigger: { trigger: record.querySelector("[data-tr-filters]"), start: "top 92%", once: true },
+              scrollTrigger: { trigger: record.querySelector("[data-tr-filters]"), start: "top 92%", toggleActions: PLAY_ONCE },
             }
           );
         }
