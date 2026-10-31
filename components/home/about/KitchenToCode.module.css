@@ -669,4 +669,11 @@
     width: auto;
     margin-top: 22px;
   }
+
+  /* A full thumb-sized target for each side of the switch. */
+  .option {
+    min-height: 44px;
+    padding: 10px 20px;
+    font-size: 13px;
+  }
 }

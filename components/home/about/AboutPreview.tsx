@@ -14,7 +14,9 @@ const Arrow = () => (
 /**
  * Homepage About Me feature: the shared headline and Fatima's story in her own
  * words beside the kitchen → code composition, the section's interactive centrepiece.
- * Links to the full /about story.
+ * Links to the full /about story. Source order is the phone reading order —
+ * headline, story, the kitchen → code stage, then the Then / Now ledger and CTA —
+ * and the desktop grid lifts the stage into its own column.
  */
 export default function AboutPreview({ eyebrow }: { eyebrow: string }) {
   return (
@@ -25,18 +27,20 @@ export default function AboutPreview({ eyebrow }: { eyebrow: string }) {
           <AboutTitle as="h2" styles={styles} />
         </header>
 
-        <div className={styles.stageArea}>
-          <KitchenToCode />
-        </div>
-
-        <div className={styles.story} data-stagger>
-          <p className={styles.storyText}>
+        <div className={styles.story}>
+          <p className={styles.storyText} data-reveal>
             {PREVIEW_STORY.opening}
             {PREVIEW_STORY.kitchen}
             {PREVIEW_STORY.body}
             <em>{PREVIEW_STORY.highlight}</em>.
           </p>
+        </div>
 
+        <div className={styles.stageArea}>
+          <KitchenToCode />
+        </div>
+
+        <div className={styles.outro} data-stagger>
           <dl className={styles.ledger}>
             <div data-side="kitchen">
               <dt>Then</dt>

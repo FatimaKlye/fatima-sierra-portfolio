@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ChefHat, CodeXml } from "lucide-react";
 import { PROJECTS } from "@/components/projects/projectsData";
 import { KITCHEN_PHOTO, MEDALS } from "./aboutStoryData";
@@ -40,6 +39,8 @@ const SCENE_LABEL = {
 
 const REDUCED_MOTION = "(prefers-reduced-motion: reduce)";
 const FINE_POINTER = "(hover: hover) and (pointer: fine)";
+const NARROW = "(max-width: 640px)";
+const ENTRANCE_FAILSAFE = 4000;
 
 function Tokens({ tokens }: { tokens: Token[] }) {
   return tokens.map(([text, tone], index) => (
@@ -72,8 +73,9 @@ export default function KitchenToCode() {
     const journal = journalRef.current;
     if (!stage || !journal) return;
 
-    gsap.registerPlugin(ScrollTrigger);
     const reduceMotion = window.matchMedia(REDUCED_MOTION).matches;
+    let entranceObserver: IntersectionObserver | undefined;
+    let entranceFailsafe = 0;
 
     const ctx = gsap.context(() => {
       const q = gsap.utils.selector(stage);
@@ -104,16 +106,41 @@ export default function KitchenToCode() {
         gsap.to(journal, { "--peek": `${distance}px`, duration: 0.6, ease: "power3.out", overwrite: "auto", ...vars });
 
       // Entrance: the journal unmasks from the bottom, then the plate and note settle beside it.
-      gsap
-        .timeline({
-          scrollTrigger: { trigger: stage, start: "top 80%", once: true },
-          onComplete: () => {
-            if (!codedRef.current) peek(36, { delay: 0.3, yoyo: true, repeat: 1, repeatDelay: 0.5, ease: "power2.inOut" });
+      // Only armed while the stage is still below the fold, so a stage that is already on screen
+      // (anchor jump, restored scroll, slow hydration) is never hidden again, and started by an
+      // IntersectionObserver rather than a ScrollTrigger: content must never wait on a recorded
+      // trigger position (stale after late layout shifts, iOS toolbar resizes) to appear. The
+      // switch is never hidden at all.
+      if (stage.getBoundingClientRect().top > window.innerHeight && typeof IntersectionObserver !== "undefined") {
+        const entrance = gsap
+          .timeline({
+            paused: true,
+            onComplete: () => {
+              if (!codedRef.current) peek(36, { delay: 0.3, yoyo: true, repeat: 1, repeatDelay: 0.5, ease: "power2.inOut" });
+            },
+          })
+          .fromTo(journal, { clipPath: "inset(100% 0% 0% 0% round 14px)" }, { clipPath: "inset(0% 0% 0% 0% round 14px)", duration: 1.2, ease: "expo.out", clearProps: "clipPath" })
+          .fromTo(q("[data-float]"), { y: 48, opacity: 0 }, { y: 0, opacity: 1, duration: 1.1, ease: "expo.out", stagger: 0.12, clearProps: "opacity" }, 0.25)
+          // Phones see the whole stage at once: a quicker entrance keeps it from reading as empty.
+          .timeScale(window.matchMedia(NARROW).matches ? 1.5 : 1);
+
+        let answered = false;
+        entranceObserver = new IntersectionObserver(
+          ([entry]) => {
+            answered = true;
+            // Above the viewport counts too: a fast flick can carry the stage past in one frame.
+            if (!entry.isIntersecting && entry.boundingClientRect.top >= 0) return;
+            entranceObserver?.disconnect();
+            entrance.play();
           },
-        })
-        .fromTo(journal, { clipPath: "inset(100% 0% 0% 0% round 14px)" }, { clipPath: "inset(0% 0% 0% 0% round 14px)", duration: 1.2, ease: "expo.out", clearProps: "clipPath" })
-        .fromTo(q("[data-float]"), { y: 48, opacity: 0 }, { y: 0, opacity: 1, duration: 1.1, ease: "expo.out", stagger: 0.12, clearProps: "opacity" }, 0.25)
-        .fromTo(q("[data-foot]"), { y: 16, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: "power3.out", clearProps: "all" }, 0.55);
+          { rootMargin: "0px 0px -12% 0px" }
+        );
+        entranceObserver.observe(stage);
+        // If the observer never reports, show the composition rather than leave it masked.
+        entranceFailsafe = window.setTimeout(() => {
+          if (!answered) entrance.progress(1);
+        }, ENTRANCE_FAILSAFE);
+      }
 
       if (!window.matchMedia(FINE_POINTER).matches) return;
 
@@ -156,6 +183,8 @@ export default function KitchenToCode() {
     }, stage);
 
     return () => {
+      entranceObserver?.disconnect();
+      window.clearTimeout(entranceFailsafe);
       ctx.revert();
       timelineRef.current = null;
     };

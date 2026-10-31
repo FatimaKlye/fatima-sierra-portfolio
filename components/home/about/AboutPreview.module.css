@@ -1,6 +1,7 @@
 /* Homepage "From cooking to coding." feature. The headline and Fatima's story
    hold the left column; the right is an editorial kitchen composition
-   (KitchenToCode) that turns into a developer's workspace. The /about page keeps its own skin in
+   (KitchenToCode) that turns into a developer's workspace. Phones stack it all
+   in source order. The /about page keeps its own skin in
    AboutStory.module.css. */
 
 .section {
@@ -23,11 +24,13 @@
 .layout {
   display: grid;
   grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-  grid-template-rows: auto 1fr;
+  grid-template-rows: auto 1fr auto;
   grid-template-areas:
     "head  stage"
-    "story stage";
-  gap: clamp(28px, 3.4vw, 48px) clamp(40px, 5vw, 80px);
+    "story stage"
+    "outro stage";
+  /* Vertical rhythm comes from each block's margin-top, so it can differ per breakpoint. */
+  gap: 0 clamp(40px, 5vw, 80px);
   width: min(calc(100% - 64px), var(--page-max-width));
   margin: 0 auto;
 }
@@ -126,6 +129,14 @@
   grid-area: story;
   align-self: end;
   max-width: 44ch;
+  margin-top: clamp(28px, 3.4vw, 48px);
+}
+
+/* Then / Now ledger and the CTA, which close the story column. */
+.outro {
+  grid-area: outro;
+  max-width: 44ch;
+  margin-top: clamp(24px, 2.6vw, 32px);
 }
 
 .storyText {
@@ -147,7 +158,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 24px;
-  margin: clamp(24px, 2.6vw, 32px) 0 0;
+  margin: 0;
 }
 
 .ledger > div {
@@ -257,24 +268,33 @@
 
 /* Responsive ---------------------------------------------------------------------- */
 
-/* Tablet and below: headline, then the desk, then the story. */
+/* Tablet and below: one column in reading order — headline, story, the desk, then
+   the ledger and CTA. Every row is sized by its content; nothing is held to the viewport. */
 @media (max-width: 1000px) {
   .layout {
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto;
     grid-template-areas:
       "head"
+      "story"
       "stage"
-      "story";
-  }
-
-  .stageArea {
-    width: min(100%, 760px);
+      "outro";
   }
 
   .story {
     align-self: start;
     max-width: 62ch;
+    margin-top: 28px;
+  }
+
+  .stageArea {
+    width: min(100%, 760px);
+    margin-top: 48px;
+  }
+
+  .outro {
+    max-width: 62ch;
+    margin-top: 40px;
   }
 }
 
@@ -286,10 +306,28 @@
 
 @media (max-width: 640px) {
   .section {
+    --title-size: clamp(2.2rem, 10.4vw, 2.6rem);
+
     padding: 64px 0 56px;
   }
 
-  .layout {
-    row-gap: 32px;
+  .story {
+    margin-top: 20px;
+  }
+
+  .storyText {
+    line-height: 1.75;
+  }
+
+  .stageArea {
+    margin-top: 36px;
+  }
+
+  .outro {
+    margin-top: 36px;
+  }
+
+  .ledger {
+    gap: 18px;
   }
 }
