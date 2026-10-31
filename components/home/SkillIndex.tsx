@@ -13,8 +13,8 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { observeReveals } from "@/components/motion/reveal";
 import TechIcon from "@/components/skills/TechIcon";
 import type { SkillEntry } from "@/components/skills/skillsData";
 import styles from "./SkillIndex.module.css";
@@ -243,7 +243,6 @@ export default function SkillIndex({ groups }: SkillIndexProps) {
     const root = rootRef.current;
     if (!root) return;
 
-    gsap.registerPlugin(ScrollTrigger);
     const reducedQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     const syncReduced = () => {
       reducedRef.current = reducedQuery.matches;
@@ -254,25 +253,10 @@ export default function SkillIndex({ groups }: SkillIndexProps) {
     const all = (selector: string) => Array.from(root.querySelectorAll<HTMLElement>(selector));
     const mm = gsap.matchMedia();
 
-    // Plays once: dividers draw, then labels and tools rise in. Start states are
-    // set after hydration, so no-JS and reduced-motion visitors see everything.
-    mm.add("(prefers-reduced-motion: no-preference)", () => {
-      const timeline = gsap.timeline({ scrollTrigger: { trigger: root, start: "top 85%", once: true } });
-      timeline
-        .fromTo(all("[data-divider]"), { "--draw": 0 }, { "--draw": 1, duration: 1.1, ease: "power3.inOut", stagger: 0.08 }, 0)
-        .fromTo(
-          all("[data-label]"),
-          { y: 16, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.8, ease: "power3.out", stagger: 0.08, clearProps: "transform,opacity" },
-          0.1
-        )
-        .fromTo(
-          all("[data-item]"),
-          { y: 14, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.6, ease: "power3.out", stagger: 0.025, clearProps: "transform,opacity" },
-          0.2
-        );
-    });
+    // Rows rise in (and their dividers draw) as the index enters view. This runs on the shared
+    // IntersectionObserver reveals rather than a ScrollTrigger: content must never wait on a
+    // recorded trigger position (stale after late layout shifts, iOS toolbar resizes) to appear.
+    const stopReveals = observeReveals(root);
 
     // Magnetic pull toward the pointer — a few pixels at most.
     mm.add("(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)", () => {
@@ -311,6 +295,7 @@ export default function SkillIndex({ groups }: SkillIndexProps) {
 
     return () => {
       reducedQuery.removeEventListener("change", syncReduced);
+      stopReveals();
       mm.revert();
     };
   }, []);
@@ -445,17 +430,16 @@ export default function SkillIndex({ groups }: SkillIndexProps) {
         if (event.key === "Escape" && anchorRef.current) hide();
       }}
     >
-      <dl className={styles.groups} data-divider>
+      <dl className={styles.groups} data-stagger>
         {groups.map((group, groupIndex) => (
           <div
             className={styles.row}
             key={group.id}
             data-row
-            data-divider
             onPointerEnter={onRowEnter}
             onPointerLeave={onRowLeave}
           >
-            <dt className={styles.label} data-label>
+            <dt className={styles.label}>
               <span className={styles.labelIndex} aria-hidden="true">{pad(groupIndex + 1)}</span>
               <span className={styles.labelText}>{group.label}</span>
             </dt>
@@ -474,7 +458,7 @@ export default function SkillIndex({ groups }: SkillIndexProps) {
                   );
 
                   return (
-                    <li key={item.name} data-item>
+                    <li key={item.name}>
                       {count > 0 ? (
                         <Link
                           className={styles.tech}

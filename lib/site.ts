@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 export const SITE_URL = "https://fatimasierra.vercel.app";
 export const SITE_NAME = "Fatima Sierra — Portfolio";
 export const SITE_DESCRIPTION =
-  "Portfolio of Fatima Sierra, a web and mobile developer creating purposeful, reliable, and user-centered digital solutions for public safety, education, sustainability, and connected communities.";
+  "Portfolio of Fatima Sierra, a BSIT student and web and mobile developer open to software development internships, creating purposeful, reliable, and user-centered digital solutions for public safety, education, sustainability, and connected communities.";
 
 type PageMetadataInput = {
   path: string;

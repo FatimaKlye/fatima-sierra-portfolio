@@ -1,5 +1,6 @@
 /* Homepage skill index — one border-separated row per area. GSAP drives the
-   custom properties below (fill, rule, divider draw); CSS only paints them. */
+   hover custom properties below (fill, rule); CSS only paints them. The entrance
+   is the shared scroll reveal (globals.css), plus the divider draw below. */
 
 .root {
   position: relative;
@@ -7,8 +8,6 @@
 }
 
 .groups {
-  --draw: 1;
-
   position: relative;
   margin: 0;
 }
@@ -22,12 +21,9 @@
   left: 0;
   height: 1px;
   background: var(--color-border);
-  transform: scaleX(var(--draw));
-  transform-origin: left;
 }
 
 .row {
-  --draw: 1;
   --fill: 0;
   --fill-origin: top;
   --line: 0%;
@@ -67,8 +63,18 @@
     linear-gradient(var(--color-primary), var(--color-primary)) var(--line-origin) center / var(--line) 100% no-repeat,
     var(--color-border);
   pointer-events: none;
-  transform: scaleX(var(--draw));
   transform-origin: left;
+}
+
+/* Each row's divider draws in as the row rises (reveal state set by ../motion/reveal). */
+@media (prefers-reduced-motion: no-preference) {
+  [data-reveals] .row:not([data-revealed])::after {
+    transform: scaleX(0);
+  }
+
+  [data-reveals] .row[data-revealed="run"]::after {
+    transition: transform 1100ms cubic-bezier(0.645, 0.045, 0.355, 1) var(--reveal-delay, 0ms);
+  }
 }
 
 .label {
@@ -358,6 +364,18 @@ a.tech[data-current] .techName {
   .row {
     grid-template-columns: 1fr;
     gap: 12px;
+  }
+}
+
+/* Touch: 44px hit areas, with row spacing to match so neighbours never overlap. */
+@media (pointer: coarse) {
+  .list {
+    row-gap: 22px;
+  }
+
+  .tech {
+    margin: -11px -8px;
+    padding: 11px 8px;
   }
 }
 

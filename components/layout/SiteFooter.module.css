@@ -74,14 +74,6 @@
   text-transform: uppercase;
 }
 
-.eyebrowSep {
-  color: var(--color-text-muted);
-}
-
-.eyebrowOrg {
-  color: var(--ft-burgundy);
-}
-
 .pulse {
   position: relative;
   width: 7px;
@@ -546,9 +538,6 @@ a:focus-visible .arrowDiagonal > span:last-child { transform: translate(0, 0); }
 
 @media (max-width: 640px) {
   .eyebrow { flex-shrink: 1; flex-wrap: wrap; row-gap: 2px; line-height: 1.7; }
-  .eyebrowSep { display: none; }
-  /* Company drops to its own line, aligned under the role (7px pulse + 10px gap). */
-  .eyebrowOrg { flex-basis: 100%; padding-left: 17px; }
   .eyebrowRow .rule { display: none; }
   .credits { flex-direction: column; }
   .credits > [aria-hidden] { display: none; }

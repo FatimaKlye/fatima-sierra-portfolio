@@ -294,7 +294,8 @@ export default async function HeroSection() {
           </div>
           <div className={editorialStyles.contactActions}>
             <p className={editorialStyles.contactLead}>
-              I&apos;m open to internships and junior roles, and happy to walk through any project on this site.
+              I&apos;m open to software development internships where I can contribute to real projects, strengthen my
+              development skills, and learn from experienced developers.
             </p>
             {EMAIL_LINK && (
               <a className={editorialStyles.contactEmail} href={EMAIL_LINK.href} target="_blank" rel="noreferrer">

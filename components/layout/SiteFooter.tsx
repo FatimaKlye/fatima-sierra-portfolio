@@ -134,9 +134,7 @@ export default function SiteFooter() {
         <div className={styles.eyebrowRow}>
           <p className={styles.eyebrow} data-ft-rise>
             <span className={styles.pulse} aria-hidden="true" />
-            <span>Software Development Intern</span>
-            <span className={styles.eyebrowSep} aria-hidden="true">·</span>
-            <span className={styles.eyebrowOrg}>PrimusTech Solutions</span>
+            <span>Open to Software Development Internships</span>
           </p>
           <span className={styles.rule} data-ft-line aria-hidden="true" />
         </div>
@@ -159,8 +157,7 @@ export default function SiteFooter() {
 
           <div className={styles.invite}>
             <p className={styles.inviteText} data-ft-rise>
-              <strong>Currently building &amp; learning at PrimusTech Solutions.</strong> Always happy to talk code,
-              design, or an idea worth building.
+              <strong>Have a project, an opportunity, or just want to connect?</strong> I&apos;d love to hear from you.
             </p>
             <Link className={styles.inviteLink} href="/contact" data-ft-rise>
               <span className={styles.underline}>Start a conversation</span>
