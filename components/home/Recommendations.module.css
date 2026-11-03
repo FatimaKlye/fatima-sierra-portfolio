@@ -108,20 +108,83 @@
 .figure {
   width: 100%;
   margin: clamp(20px, 2.4vw, 28px) 0 0;
+  touch-action: pan-y;
 }
 
 .quote {
-  margin: 0;
-}
-
-.quote p {
   margin: 0;
   color: var(--color-text-primary);
   font-size: clamp(1.12rem, 0.86rem + 1.05vw, 1.62rem);
   font-weight: 400;
   letter-spacing: -0.012em;
   line-height: 1.62;
+}
+
+.quote p {
+  margin: 0;
   text-wrap: pretty;
+}
+
+.quote p + p {
+  margin-top: 0.85em;
+}
+
+/* A long quote opens clamped to roughly a short one's height, fading out at
+   the bottom; the fade point is animatable so expanding dissolves it. */
+@property --rec-fade {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 100%;
+}
+
+.body {
+  --rec-fade: 100%;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(#000 var(--rec-fade), transparent calc(var(--rec-fade) + 48%));
+  mask-image: linear-gradient(#000 var(--rec-fade), transparent calc(var(--rec-fade) + 48%));
+  transition: --rec-fade 600ms ease;
+}
+
+.clamped {
+  --rec-fade: 52%;
+  max-height: 13em;
+  max-height: 8lh;
+}
+
+.readMore {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 18px;
+  padding: 8px 4px;
+  border: 0;
+  background: linear-gradient(currentColor, currentColor) 50% calc(100% - 4px) / 0% 1px no-repeat;
+  color: var(--color-primary);
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: background-size 400ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.readMore svg {
+  transition: transform 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.readMore:hover,
+.readMore:focus-visible {
+  background-size: calc(100% - 8px) 1px;
+}
+
+.readMore[aria-expanded="true"] svg {
+  transform: rotate(180deg);
+}
+
+.readMore:focus-visible {
+  border-radius: 6px;
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 .highlight {
@@ -256,6 +319,25 @@
 .linkedin:hover svg,
 .linkedin:focus-visible svg {
   transform: translate(2px, -2px);
+}
+
+.note {
+  margin-top: -6px;
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+  font-style: italic;
+  line-height: 1.5;
+}
+
+/* Only rendered by `next dev` for wording that is not yet approved. */
+.pending {
+  padding: 4px 12px;
+  border: 1px dashed rgb(var(--rgb-primary) / 0.55);
+  border-radius: 999px;
+  color: var(--color-primary);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
 }
 
 /* Controls (only with more than one approved testimonial) ----------------- */
@@ -461,7 +543,10 @@
   .navButton,
   .navButton svg,
   .linkedin,
-  .linkedin svg {
+  .linkedin svg,
+  .body,
+  .readMore,
+  .readMore svg {
     transition-duration: 1ms;
   }
 }

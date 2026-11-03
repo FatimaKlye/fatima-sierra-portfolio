@@ -1,11 +1,22 @@
 "use client";
 
-import { Fragment, useCallback, useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent } from "react";
+import {
+  Fragment,
+  useCallback,
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type TouchEvent,
+} from "react";
+import { flushSync } from "react-dom";
 import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitText } from "gsap/SplitText";
-import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, ArrowUpRight, ChevronDown } from "lucide-react";
 import RecommendationForm from "./RecommendationForm";
 import styles from "./Recommendations.module.css";
 
@@ -17,11 +28,15 @@ export type Testimonial = {
   role: string;
   /** Project, team or organisation, shown as "IGNIS SAFE | SIQUILE DYNAMICS". */
   affiliation: string[];
-  quote: string;
-  /** Phrases that appear verbatim in `quote`, subtly emphasised. */
+  paragraphs: string[];
+  /** Phrases that appear verbatim in the quote, subtly emphasised. */
   highlights: string[];
+  /** Set when the quote is an English translation, e.g. "Filipino and English". */
+  translatedFrom?: string;
   photo?: { src: string; alt: string };
   linkedin?: string;
+  /** Local-development preview of wording not yet approved. */
+  pending?: boolean;
 };
 
 type Part = { text: string; accent: boolean };
@@ -42,6 +57,85 @@ function emphasize(text: string, phrases: string[]): Part[] {
   }
   if (at < text.length) parts.push({ text: text.slice(at), accent: false });
   return parts;
+}
+
+/** Quotes longer than this (in characters, over several paragraphs) open collapsed. */
+const LONG_QUOTE = 520;
+
+/**
+ * The quotation itself. A long one opens clamped to about the height of a short
+ * one, so every testimonial gets the same footprint; the full text stays in the
+ * DOM (and with screen readers) and "Read full recommendation" reveals it.
+ */
+function QuoteBody({ testimonial }: { testimonial: Testimonial }) {
+  const bodyRef = useRef<HTMLDivElement>(null);
+  const toggleRef = useRef<HTMLButtonElement>(null);
+  const bodyId = useId();
+  const [expanded, setExpanded] = useState(false);
+  const { paragraphs, highlights } = testimonial;
+  const collapsible = paragraphs.length > 1 && paragraphs.join(" ").length > LONG_QUOTE;
+  const clamped = collapsible && !expanded;
+
+  const toggle = () => {
+    const body = bodyRef.current;
+    if (!body) return;
+    const from = body.offsetHeight;
+    flushSync(() => setExpanded((open) => !open));
+    if (!allowsMotion()) return;
+    const to = body.offsetHeight;
+    gsap.fromTo(
+      body,
+      { maxHeight: from },
+      {
+        maxHeight: to,
+        duration: 0.75,
+        ease: "power3.inOut",
+        clearProps: "maxHeight",
+        onComplete: () => {
+          // After collapsing, keep the toggle in view if the page was scrolled past it.
+          const button = toggleRef.current;
+          if (button && button.getBoundingClientRect().top < 0) button.scrollIntoView({ block: "center", behavior: "smooth" });
+        },
+      }
+    );
+  };
+
+  return (
+    <>
+      <blockquote className={styles.quote}>
+        <div id={bodyId} ref={bodyRef} className={`${styles.body} ${clamped ? styles.clamped : ""}`}>
+          {paragraphs.map((paragraph, p) => (
+            <p data-rec-quote key={p}>
+              {emphasize(paragraph, highlights).map((part, i) =>
+                part.accent ? (
+                  <mark className={styles.highlight} key={i}>
+                    {part.text}
+                  </mark>
+                ) : (
+                  <Fragment key={i}>{part.text}</Fragment>
+                )
+              )}
+            </p>
+          ))}
+        </div>
+      </blockquote>
+
+      {collapsible && (
+        <button
+          ref={toggleRef}
+          type="button"
+          className={styles.readMore}
+          onClick={toggle}
+          aria-expanded={expanded}
+          aria-controls={bodyId}
+          data-rec-rise
+        >
+          {expanded ? "Show less" : "Read full recommendation"}
+          <ChevronDown size={16} strokeWidth={2.2} aria-hidden="true" />
+        </button>
+      )}
+    </>
+  );
 }
 
 /** Decorative opening quote; its outline draws in, then fills. */
@@ -131,6 +225,8 @@ export default function RecommendationsShowcase({ number, testimonials }: { numb
   const [formOpen, setFormOpen] = useState(false);
   const busy = useRef(false);
   const turned = useRef(false);
+  const direction = useRef<1 | -1>(1);
+  const touchStart = useRef<{ x: number; y: number } | null>(null);
 
   const total = testimonials.length;
   const current = testimonials[index];
@@ -220,6 +316,10 @@ export default function RecommendationsShowcase({ number, testimonials }: { numb
             ),
       });
 
+      // The author's name rolls up letter by letter inside its own mask.
+      const name = SplitText.create(q("[data-rec-name]"), { type: "words,chars", mask: "words" });
+      const start = turn ? 0.35 : 0.9;
+
       gsap
         .timeline({
           scrollTrigger: trigger(),
@@ -231,10 +331,13 @@ export default function RecommendationsShowcase({ number, testimonials }: { numb
           q("[data-rec-rise]"),
           { y: 16, autoAlpha: 0 },
           { y: 0, autoAlpha: 1, duration: 0.8, ease: "power3.out", stagger: 0.08, clearProps: "transform,opacity,visibility" },
-          turn ? 0.35 : 0.9
-        );
+          start
+        )
+        .from(name.chars, { yPercent: 110, duration: 0.7, ease: "power3.out", stagger: 0.018 }, start + 0.12);
 
       if (turn) {
+        // Drift in from the side the reader is heading toward.
+        gsap.fromTo(figure, { x: 28 * direction.current }, { x: 0, duration: 0.9, ease: "power3.out", clearProps: "transform" });
         gsap.fromTo(
           markRef.current,
           { scale: 0.82, rotation: -10 },
@@ -260,14 +363,31 @@ export default function RecommendationsShowcase({ number, testimonials }: { numb
         return;
       }
       busy.current = true;
-      gsap.to(figure, { autoAlpha: 0, y: -14, duration: 0.4, ease: "power2.in", onComplete: () => setIndex(next) });
+      direction.current = dir;
+      gsap.to(figure, { autoAlpha: 0, x: -28 * dir, duration: 0.4, ease: "power2.in", onComplete: () => setIndex(next) });
     },
     [index, total]
   );
 
-  const onControlsKey = (event: KeyboardEvent<HTMLDivElement>) => {
+  // Arrow keys work anywhere inside the slider (arrows, read-more toggle).
+  const onStageKey = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key === "ArrowRight") go(1);
     else if (event.key === "ArrowLeft") go(-1);
+  };
+
+  // Horizontal swipes turn the page; vertical drags are left to page scrolling.
+  const onTouchStart = (event: TouchEvent<HTMLDivElement>) => {
+    const touch = event.touches[0];
+    touchStart.current = { x: touch.clientX, y: touch.clientY };
+  };
+  const onTouchEnd = (event: TouchEvent<HTMLDivElement>) => {
+    const from = touchStart.current;
+    touchStart.current = null;
+    if (!from) return;
+    const touch = event.changedTouches[0];
+    const dx = touch.clientX - from.x;
+    const dy = touch.clientY - from.y;
+    if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.4) go(dx < 0 ? 1 : -1);
   };
 
   return (
@@ -289,33 +409,38 @@ export default function RecommendationsShowcase({ number, testimonials }: { numb
         </header>
 
         {current && (
-          <div className={styles.stage}>
+          <div
+            className={styles.stage}
+            {...(hasControls && {
+              role: "region",
+              "aria-roledescription": "carousel",
+              "aria-label": "Testimonials",
+              onKeyDown: onStageKey,
+              onTouchStart,
+              onTouchEnd,
+            })}
+          >
             {/* Outside the keyed figure so it stays put across page turns. */}
             <span ref={markRef} className={styles.mark} aria-hidden="true">
               <QuoteMark />
             </span>
 
-            <figure ref={figureRef} key={current.id} className={styles.figure}>
-              <blockquote className={styles.quote}>
-                <p data-rec-quote>
-                  {emphasize(current.quote, current.highlights).map((part, i) =>
-                    part.accent ? (
-                      <mark className={styles.highlight} key={i}>
-                        {part.text}
-                      </mark>
-                    ) : (
-                      <Fragment key={i}>{part.text}</Fragment>
-                    )
-                  )}
-                </p>
-              </blockquote>
+            <figure
+              ref={figureRef}
+              key={current.id}
+              className={styles.figure}
+              {...(hasControls && { "aria-roledescription": "slide", "aria-label": `${index + 1} of ${total}` })}
+            >
+              <QuoteBody testimonial={current} />
 
               <figcaption className={styles.author}>
                 <span className={styles.rule} data-rec-rise aria-hidden="true" />
                 <span className={styles.person} data-rec-rise>
                   <Avatar testimonial={current} />
                   <span className={styles.details}>
-                    <strong className={styles.name}>{current.name}</strong>
+                    <strong className={styles.name} data-rec-name>
+                      {current.name}
+                    </strong>
                     <span className={styles.role}>{current.role}</span>
                     {current.affiliation.length > 0 && (
                       <span className={styles.affiliation}>
@@ -340,11 +465,21 @@ export default function RecommendationsShowcase({ number, testimonials }: { numb
                     <span className={styles.srOnly}> profile of {current.name} (opens in a new tab)</span>
                   </a>
                 )}
+                {current.translatedFrom && (
+                  <span className={styles.note} data-rec-rise>
+                    Translated from {current.translatedFrom}
+                  </span>
+                )}
+                {current.pending && (
+                  <span className={styles.pending} data-rec-rise>
+                    Dev preview · awaiting approval, hidden in production
+                  </span>
+                )}
               </figcaption>
             </figure>
 
             {hasControls && (
-              <div className={styles.controls} role="group" aria-label="Browse testimonials" onKeyDown={onControlsKey}>
+              <div className={styles.controls} role="group" aria-label="Browse testimonials">
                 <button type="button" className={styles.navButton} onClick={() => go(-1)} aria-label="Previous testimonial">
                   <ArrowLeft size={18} aria-hidden="true" />
                 </button>

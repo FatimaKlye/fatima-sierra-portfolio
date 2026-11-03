@@ -11,7 +11,9 @@
 // - `photo` and `linkedin` only with their consent / a verified profile.
 // - Order here is the order on the page; the first entry is shown first.
 //
-// Only approved quotes are shown. With none approved, the section shows just
+// Only approved quotes are shown. During `next dev`, pending ones are also
+// previewed (labelled as such) so the layout can be checked; production builds
+// never include them. With none approved, the section shows just
 // its heading and the "Share a few words" invite; with several, it becomes a
 // carousel.
 //
@@ -24,7 +26,8 @@
 //   team: "Team name",                              // optional
 //   relationship: "How they know me",               // e.g. "Project teammate"
 //   context: "One sentence on what we worked on.",  // optional, factual
-//   quote: "Their words, unedited.",                // optional until received
+//   quote: "Their words, unedited.",                // optional until received; "\n\n" between paragraphs
+//   translation: { from: "Filipino", original: "…" }, // only if `quote` is a translation
 //   highlights: ["a phrase from the quote"],        // optional, each copied verbatim from quote
 //   date: "2026-10",                                // optional, YYYY-MM or YYYY-MM-DD
 //   photo: { src: "/assets/recommendations/firstname-lastname.jpg", alt: "Portrait of …" },
@@ -42,7 +45,10 @@ export type Recommendation = {
   team?: string;
   relationship: string;
   context?: string;
+  /** Paragraphs are separated by a blank line ("\n\n"). */
   quote?: string;
+  /** Set when `quote` is a translation. `original` stays on the server. */
+  translation?: { from: string; original?: string };
   /** Phrases copied verbatim from `quote`, subtly emphasised. */
   highlights?: string[];
   /** YYYY-MM or YYYY-MM-DD. */
@@ -72,5 +78,30 @@ export const RECOMMENDATIONS: Recommendation[] = [
       "someone you can genuinely rely on",
     ],
     status: "approved",
+  },
+  {
+    id: "sarah-macandile",
+    name: "Sarah Macandile",
+    role: "Capstone Team Member & Documenter",
+    organization: "IGNIS SAFE",
+    team: "SIQUILE DYNAMICS",
+    relationship: "Capstone groupmate",
+    // English translation of her original mixed English and Filipino message.
+    // Switch to "approved" only once Sarah has signed off on this exact wording.
+    quote:
+      "Working with you was honestly a great experience! One thing I really appreciate about you is how you naturally take the lead and make sure everyone in the group feels included.\n\n" +
+      "You're the kind of person who starts conversations and encourages everyone to share their ideas and suggestions. I really admire that because you don't just focus on your own ideas — you genuinely listen to and consider what others have to say.\n\n" +
+      "You're also very understanding and caring toward the team, which makes working with you much easier and more comfortable. I also love how creative you are and how you see things from different perspectives, especially when we're making decisions together.\n\n" +
+      "I'm really glad I got to be your groupmate. Thank you for all your effort and patience! I know you'll do great in whatever you choose to do next. Good luck always!",
+    translation: {
+      from: "Filipino and English",
+      // original: "…",  // her message as submitted; kept on record, never rendered
+    },
+    highlights: [
+      "naturally take the lead and make sure everyone in the group feels included",
+      "you genuinely listen to and consider what others have to say",
+      "how creative you are",
+    ],
+    status: "pending",
   },
 ];
