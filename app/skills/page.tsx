@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { ArrowRight } from "lucide-react";
-import { CERTIFICATES, LEARNING_EXPOSURE, PROFESSIONAL_SKILLS } from "@/components/about/aboutData";
 import EditorialMotion from "@/components/motion/EditorialMotion";
-import CertificateCarousel from "@/components/skills/CertificateCarousel";
+import BeyondTheCode from "@/components/skills/beyond/BeyondTheCode";
 import PracticeIndex from "@/components/skills/PracticeIndex";
 import SkillsHero from "@/components/skills/SkillsHero";
 import SkillsPointer from "@/components/skills/SkillsPointer";
@@ -18,12 +15,6 @@ export const metadata: Metadata = pageMetadata({
   description:
     "The languages, frameworks, tools and practices Fatima Klye M. Sierra uses to build responsive web and mobile applications — Next.js, React, TypeScript, Flutter, Supabase and more.",
 });
-
-// Featured certifications lead the rail; the rest follow in their existing order.
-const CAROUSEL_CERTIFICATES = [
-  ...CERTIFICATES.filter((certificate) => certificate.featured),
-  ...CERTIFICATES.filter((certificate) => !certificate.featured),
-];
 
 export default function SkillsPage() {
   return (
@@ -67,48 +58,22 @@ export default function SkillsPage() {
           </div>
         </section>
 
-        <section className={`${styles.section} ${styles.surface}`} id="still-learning" aria-labelledby="growing-title" data-nav-label="Still learning">
+        <section className={`${styles.section} ${styles.surface}`} id="beyond-the-code" aria-labelledby="beyond-title" data-nav-label="Beyond the code">
           <div className={styles.container}>
             <header className={styles.splitHead}>
               <div>
-                <p className={styles.kicker} data-reveal>03 — Still learning</p>
-                <h2 id="growing-title" className={styles.title} data-reveal>
-                  Always adding <em>to the recipe.</em>
+                <p className={styles.kicker} data-reveal>03 — Beyond the code</p>
+                <h2 id="beyond-title" className={styles.title} data-reveal>
+                  What I&apos;ve learned <em>beyond the code.</em>
                 </h2>
               </div>
               <p className={styles.headNote} data-reveal>
-                Concepts I&apos;ve explored through workshops, webinars and training — each one backed by a
-                certificate. Drag, swipe or use the arrows to browse; select one to see it up close.
+                The certificates that record my structured learning, the topics they introduced me to — marked
+                honestly as exposure or practice — and how I work with the people around me.
               </p>
             </header>
 
-            <CertificateCarousel certificates={CAROUSEL_CERTIFICATES} />
-
-            <div className={styles.viewAll} data-reveal>
-              <Link className="ui-btn ui-btn--secondary" href="/certifications" data-magnetic>
-                View All Certifications
-                <ArrowRight size={16} strokeWidth={1.75} aria-hidden="true" />
-              </Link>
-            </div>
-
-            <div className={styles.growingLists}>
-              <div>
-                <h3 className={styles.listLabel}>Technical exposure</h3>
-                <ul className={styles.pills} data-stagger>
-                  {LEARNING_EXPOSURE.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <h3 className={styles.listLabel}>Professional skills</h3>
-                <ul className={styles.pills} data-stagger>
-                  {PROFESSIONAL_SKILLS.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
-              </div>
-            </div>
+            <BeyondTheCode />
           </div>
         </section>
 

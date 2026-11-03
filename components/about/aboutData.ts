@@ -498,6 +498,7 @@ export const CERTIFICATES: CertificateRecord[] = [
     title: "Beyond Spreadsheets: Visualizing Data's Story Through Analytics",
     type: "Certificate of Completion",
     issuer: "NU Dasmariñas Computer Society",
+    date: "May 7, 2025", // as printed on the certificate itself
     category: "completion",
     fileUrl: "/assets/certificates/completion/beyond-spreadsheets-may7.pdf",
     fileType: "pdf",
