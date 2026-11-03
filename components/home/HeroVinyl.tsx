@@ -12,7 +12,7 @@ const SPIN_DOWN = 0.8; // a touch longer than the fade-out, like a platter coast
 const reducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 /**
- * The hero's circular "open to internships" badge, pressed into a miniature record that opens the site's
+ * The hero's circular "intern at PrimusTech" badge, pressed into a miniature record that opens the site's
  * jukebox. It reads as decoration until hovered; a click opens the player, the disc spins up and
  * coasts down with the music, and a small pill under it says what's playing. Playback itself lives
  * in lib/music, so it carries on across pages and stays in step with the navbar toggle.
@@ -119,7 +119,7 @@ export default function HeroVinyl() {
             </defs>
             <text>
               <textPath href="#hero-badge-path" textLength="282" lengthAdjust="spacing">
-                WEB &amp; MOBILE DEVELOPER · OPEN TO INTERNSHIPS ·
+                SOFTWARE DEV INTERN · PRIMUSTECH SOLUTIONS ·
               </textPath>
             </text>
           </svg>
