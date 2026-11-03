@@ -473,6 +473,8 @@
   color: var(--color-text-muted);
   font-size: 0.92rem;
   line-height: 1.6;
+  text-align: start; /* a short caption in a narrow column: justifying it opens gaps */
+  hyphens: manual;
 }
 
 .footNote strong {

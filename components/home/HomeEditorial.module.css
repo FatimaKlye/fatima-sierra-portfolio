@@ -132,7 +132,9 @@
   font-weight: 600;
   letter-spacing: 0.08em;
   line-height: 1.5;
+  text-align: start; /* metadata, not body copy: never justified */
   text-transform: uppercase;
+  hyphens: manual;
 }
 
 .timelineType {

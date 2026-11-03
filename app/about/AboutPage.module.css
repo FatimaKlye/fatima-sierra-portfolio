@@ -20,6 +20,11 @@
   text-align: center;
 }
 
+/* Follows the header: centred on desktop, left-aligned on small screens. */
+.sectionHeader p {
+  text-align: inherit;
+}
+
 .sectionEyebrow {
   margin: 0 0 10px;
   color: var(--color-primary);

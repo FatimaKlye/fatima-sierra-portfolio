@@ -26,6 +26,12 @@
   text-align: center;
 }
 
+/* The eyebrow and slide counter keep the centred axis; the quote itself is justified globally. */
+.header p,
+.count {
+  text-align: inherit;
+}
+
 .srOnly {
   position: absolute;
   width: 1px;

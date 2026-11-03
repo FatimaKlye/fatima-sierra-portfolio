@@ -287,6 +287,8 @@
   font-weight: 600;
   letter-spacing: 0.06em;
   line-height: 1.6;
+  text-align: start; /* metadata, not body copy: never justified */
+  hyphens: manual;
 }
 
 .rowTitle {

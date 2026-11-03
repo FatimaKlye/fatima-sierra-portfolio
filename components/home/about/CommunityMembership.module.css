@@ -182,6 +182,10 @@
   transition: opacity 400ms var(--cm-ease);
 }
 
+.fallback p {
+  text-align: inherit;
+}
+
 .frame[data-status="loaded"] .placeholder {
   opacity: 0;
 }

@@ -744,6 +744,8 @@
   font-size: clamp(1rem, 1.4vw, 1.15rem);
   font-weight: 500;
   letter-spacing: -0.01em;
+  text-align: start; /* a tagline, not body copy: never justified */
+  hyphens: manual;
 }
 
 .body {
@@ -1310,6 +1312,8 @@
   font-weight: 600;
   letter-spacing: -0.055em;
   line-height: 0.98;
+  text-align: start; /* display type: never justified */
+  hyphens: manual;
 }
 
 .spreadQuote .mask:nth-last-child(-n + 2) > span {

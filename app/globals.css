@@ -128,6 +128,29 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+/* Editorial body copy: paragraphs and plain-text list items (bullets like responsibilities, not
+   list items that wrap cards or timeline rows) are justified, like a printed page. The :where()
+   selector has zero specificity, so any component that sets its own alignment (centred eyebrows,
+   right-aligned dates) still wins. A one-line paragraph looks the same as before, because the last
+   line of a justified block stays at the start edge. Hyphenation (from <html lang="en">) keeps word
+   gaps even; the limits stop it from splitting off short pieces like "a-" or "-ly". */
+:where(main, footer) :where(p, li:not(:has(> :not(a, strong, em, b, i, mark, abbr, code, br)))) {
+  text-align: justify;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+  hyphenate-limit-chars: 7 3 3;
+}
+
+/* A narrow phone fits too few words on a line to justify without visible gaps, so text stays
+   ragged-right there. */
+@media (max-width: 599px) {
+  :where(main, footer) :where(p, li:not(:has(> :not(a, strong, em, b, i, mark, abbr, code, br)))) {
+    text-align: start;
+    -webkit-hyphens: manual;
+    hyphens: manual;
+  }
+}
+
 body:has([data-home-page]) {
   padding-top: 0;
 }

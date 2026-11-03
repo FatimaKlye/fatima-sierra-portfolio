@@ -665,6 +665,8 @@
   color: var(--color-text-muted);
   font-size: 0.8rem;
   line-height: 1.55;
+  text-align: start; /* metadata, not body copy: never justified */
+  hyphens: manual;
 }
 
 .chapterBody {
@@ -744,6 +746,8 @@
   font-size: 0.95rem;
   font-weight: 600;
   line-height: 1.3;
+  text-align: start; /* a short label, not body copy: never justified */
+  hyphens: manual;
 }
 
 .medalNote {
@@ -831,6 +835,8 @@
   font-weight: 500;
   letter-spacing: -0.035em;
   line-height: 1.2;
+  text-align: start; /* display type: justifying a few words per line opens wide gaps */
+  hyphens: manual;
 }
 
 .pullQuote em {
@@ -884,6 +890,8 @@
   font-weight: 600;
   letter-spacing: -0.02em;
   line-height: 1.3;
+  text-align: start; /* a title, not body copy: never justified */
+  hyphens: manual;
 }
 
 .ticketSub {
@@ -1072,6 +1080,11 @@
   background-color: var(--color-brand-fill);
   color: var(--color-white);
   text-align: center;
+}
+
+/* An editorial closing: its eyebrow and lead stay centred under the title. */
+.finale p {
+  text-align: inherit;
 }
 
 .finale::before {
