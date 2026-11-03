@@ -122,7 +122,7 @@ export async function POST(request: Request) {
   }
 }
 
-/** A ready-to-paste entry for recommendationsData.ts, left "pending" until the writer approves it. */
+/** A ready-to-paste entry for recommendationsData.ts, unpublished until the writer approves it. */
 function buildDataSnippet(s: RecommendationFields) {
   const id = s.name
     .toLowerCase()
@@ -139,7 +139,7 @@ function buildDataSnippet(s: RecommendationFields) {
     `  relationship: ${JSON.stringify(s.relationship)},`,
     `  quote: ${JSON.stringify(s.message)},`,
     ...(s.linkedin ? [`  linkedin: ${JSON.stringify(s.linkedin)},`] : []),
-    `  status: "pending",`,
+    `  published: false,`,
     "},",
   ].join("\n");
 }
@@ -159,7 +159,7 @@ function buildText(s: RecommendationFields, submittedAt: string) {
     s.message,
     "",
     "To publish: confirm the final wording with them, add this to components/home/recommendationsData.ts,",
-    'then set status to "approved":',
+    "then set published to true:",
     "",
     buildDataSnippet(s),
     "",
@@ -224,7 +224,7 @@ function buildHtml(s: RecommendationFields, submittedAt: string) {
             </tr>
             <tr>
               <td style="padding:20px 32px 8px;">
-                <p style="margin:0 0 8px; font-size:12px; color:#6e5964;">To publish: confirm the final wording with them, add this to <code>components/home/recommendationsData.ts</code>, then set <code>status: "approved"</code>.</p>
+                <p style="margin:0 0 8px; font-size:12px; color:#6e5964;">To publish: confirm the final wording with them, add this to <code>components/home/recommendationsData.ts</code>, then set <code>published: true</code>.</p>
                 <pre style="margin:0; padding:14px; background:#2a1c24; color:#f6dde7; border-radius:10px; font-size:12px; line-height:1.5; white-space:pre-wrap;">${escapeHtml(buildDataSnippet(s))}</pre>
               </td>
             </tr>

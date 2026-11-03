@@ -2,20 +2,20 @@
 //
 // Server-only data: it is read by Recommendations.tsx (a server component),
 // which hands the browser only what may be shown. A quote whose `status` is
-// still "pending" never leaves the server, so draft wording is never published.
+// not `published` never leaves the server, so draft wording is never shown.
 //
 // Rules:
 // - Only add real collaborators, with details you have verified.
-// - `quote` is their own words, unedited. Set `status: "approved"` only after
+// - `quote` is their own words, unedited. Set `published: true` only after
 //   they have reviewed the exact wording and agreed to have it published.
 // - `photo` and `linkedin` only with their consent / a verified profile.
 // - Order here is the order on the page; the first entry is shown first.
 //
-// Only approved quotes are shown. During `next dev`, pending ones are also
-// previewed (labelled as such) so the layout can be checked; production builds
-// never include them. With none approved, the section shows just
-// its heading and the "Share a few words" invite; with several, it becomes a
-// carousel.
+// Only published quotes are shown, the same way in `next dev`, production
+// builds and on Vercel. With none published, the section shows just its
+// heading and the "Share a few words" invite; with several, it becomes a
+// carousel. Quotes longer than about Andrei's open as a whole-sentence excerpt
+// with a "Read full recommendation" dialog.
 //
 // Template (copy into the array and fill in):
 // {
@@ -32,10 +32,8 @@
 //   date: "2026-10",                                // optional, YYYY-MM or YYYY-MM-DD
 //   photo: { src: "/assets/recommendations/firstname-lastname.jpg", alt: "Portrait of …" },
 //   linkedin: "https://www.linkedin.com/in/…",      // optional, verified
-//   status: "pending",                              // "approved" once they sign off
+//   published: false,                               // true once they sign off
 // },
-
-export type RecommendationStatus = "pending" | "approved";
 
 export type Recommendation = {
   id: string;
@@ -56,7 +54,8 @@ export type Recommendation = {
   /** Headshot in /public/assets/recommendations/, shared with their consent. */
   photo?: { src: string; alt: string };
   linkedin?: string;
-  status: RecommendationStatus;
+  /** Shown on the site. Set to true only once the writer has approved the exact wording. */
+  published: boolean;
 };
 
 export const RECOMMENDATIONS: Recommendation[] = [
@@ -77,7 +76,7 @@ export const RECOMMENDATIONS: Recommendation[] = [
       "consistently delivers her responsibilities on time",
       "someone you can genuinely rely on",
     ],
-    status: "approved",
+    published: true,
   },
   {
     id: "sarah-macandile",
@@ -86,8 +85,8 @@ export const RECOMMENDATIONS: Recommendation[] = [
     organization: "IGNIS SAFE",
     team: "SIQUILE DYNAMICS",
     relationship: "Capstone groupmate",
-    // English translation of her original mixed English and Filipino message.
-    // Switch to "approved" only once Sarah has signed off on this exact wording.
+    // English translation of her original mixed English and Filipino message,
+    // approved by Sarah for publication.
     quote:
       "Working with you was honestly a great experience! One thing I really appreciate about you is how you naturally take the lead and make sure everyone in the group feels included.\n\n" +
       "You're the kind of person who starts conversations and encourages everyone to share their ideas and suggestions. I really admire that because you don't just focus on your own ideas — you genuinely listen to and consider what others have to say.\n\n" +
@@ -102,6 +101,6 @@ export const RECOMMENDATIONS: Recommendation[] = [
       "you genuinely listen to and consider what others have to say",
       "how creative you are",
     ],
-    status: "pending",
+    published: true,
   },
 ];

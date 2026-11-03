@@ -8,38 +8,64 @@ const initialsOf = (name: string) => {
 
 type WithQuote = Recommendation & { quote: string };
 
-/** `next dev` previews pending quotes so the layout can be reviewed; builds never do. */
-const PREVIEW_PENDING = process.env.NODE_ENV === "development";
+const isPublished = (entry: Recommendation): entry is WithQuote => entry.published && Boolean(entry.quote);
 
-const isPublishable = (entry: Recommendation): entry is WithQuote =>
-  Boolean(entry.quote) && (entry.status === "approved" || PREVIEW_PENDING);
+/** Quotes up to this length (characters) show in full on their card. */
+const LONG_QUOTE = 600;
+/** A longer quote's excerpt stays within this, so its card (plus the "Read full" button) matches a short one. */
+const EXCERPT_CHARS = 330;
 
-/** Only publishable entries reach this point. The untranslated original is never sent. */
+/**
+ * The opening whole sentences of a long quote, keeping its paragraph breaks, so
+ * every card has a similar footprint and nothing is cut mid-sentence. Returns
+ * undefined when the quote is short enough to show in full.
+ */
+function excerptOf(paragraphs: string[]): string[] | undefined {
+  if (paragraphs.join(" ").length <= LONG_QUOTE) return undefined;
+  const excerpt: string[] = [];
+  let length = 0;
+  for (const paragraph of paragraphs) {
+    const sentences = paragraph.split(/(?<=[.!?])\s+(?=[A-Z"“‘'])/);
+    const kept: string[] = [];
+    for (const sentence of sentences) {
+      if (length + sentence.length > EXCERPT_CHARS && length > 0) {
+        if (kept.length) excerpt.push(kept.join(" "));
+        return excerpt;
+      }
+      kept.push(sentence);
+      length += sentence.length + 1;
+    }
+    excerpt.push(kept.join(" "));
+  }
+  return undefined;
+}
+
+/** Only published entries reach this point. The untranslated original is never sent. */
 function toTestimonial(entry: WithQuote): Testimonial {
+  const paragraphs = entry.quote
+    .split(/\n\s*\n/)
+    .map((paragraph) => paragraph.trim())
+    .filter(Boolean);
   return {
     id: entry.id,
     name: entry.name,
     initials: initialsOf(entry.name),
     role: entry.role,
     affiliation: [entry.organization, entry.team].filter((part): part is string => Boolean(part)),
-    paragraphs: entry.quote
-      .split(/\n\s*\n/)
-      .map((paragraph) => paragraph.trim())
-      .filter(Boolean),
+    paragraphs,
+    excerpt: excerptOf(paragraphs),
     highlights: (entry.highlights ?? []).filter((phrase) => phrase && entry.quote.includes(phrase)),
     translatedFrom: entry.translation?.from,
     photo: entry.photo,
     linkedin: entry.linkedin,
-    pending: entry.status !== "approved",
   };
 }
 
 /**
- * Homepage testimonials ("Kind words"). Only recommendations whose wording the
- * writer has approved cross to the browser; pending ones never leave the server
- * outside local development.
+ * Homepage testimonials ("Kind words"). Only recommendations marked `published`
+ * cross to the browser, identically in development, production and on Vercel.
  */
 export default function Recommendations({ number }: { number: string }) {
-  const testimonials = RECOMMENDATIONS.filter(isPublishable).map(toTestimonial);
+  const testimonials = RECOMMENDATIONS.filter(isPublished).map(toTestimonial);
   return <RecommendationsShowcase number={number} testimonials={testimonials} />;
 }
