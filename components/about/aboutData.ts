@@ -266,12 +266,6 @@ export const TECHNOLOGY_GROUPS: TechnologyGroup[] = [
         icon: `${DEVICON_BASE}/dart/dart-original.svg`,
         usage: "The language I write Flutter apps in. I use it for app logic, state and connecting IGNIS SAFE Mobile to Supabase.",
       },
-      {
-        name: "Java",
-        mark: "JV",
-        icon: `${DEVICON_BASE}/java/java-original.svg`,
-        usage: "I use Java for object-oriented programming, structuring application logic with classes and reusable code.",
-      },
     ],
   },
   {
@@ -288,7 +282,7 @@ export const TECHNOLOGY_GROUPS: TechnologyGroup[] = [
         name: "PostgreSQL",
         mark: "PG",
         icon: `${DEVICON_BASE}/postgresql/postgresql-original.svg`,
-        usage: "The database behind my Supabase work. I use it to design tables and relationships and manage structured app data.",
+        usage: "The database behind my Supabase work. I write SQL migrations for tables, triggers and access rules — 17 of the 23 in the IGNIS SAFE app repository.",
       },
     ],
   },

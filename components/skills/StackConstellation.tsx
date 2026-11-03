@@ -1,14 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import TechIcon from "./TechIcon";
-import type { SkillEntry } from "./skillsData";
+import type { SkillEntry, SkillProjectPreview as Project } from "./skillsData";
 import styles from "./Skills.module.css";
 
 type Side = { id: string; label: string; items: SkillEntry[] };
-type Project = { slug: string; title: string; category: string; image: string };
 type Hover = { kind: "tech"; name: string } | { kind: "project"; slug: string } | null;
 type Wire = { key: string; d: string; tech: string; slug: string };
 
@@ -198,10 +198,17 @@ export default function StackConstellation({ sides, projects, initial }: StackCo
                 onPointerEnter={() => setHover({ kind: "project", slug: project.slug })}
                 onFocus={() => setHover({ kind: "project", slug: project.slug })}
                 onBlur={() => setHover(null)}
-                data-peek-src={project.image}
               >
                 <span className={styles.hubIndex} aria-hidden="true">
                   {pad(index + 1)}
+                </span>
+                <span
+                  className={`${styles.hubThumb}${project.media.frame === "phone" ? ` ${styles.hubThumbPhone}` : ""}${
+                    project.media.frame === "plain" ? ` ${styles.hubThumbCropped}` : ""
+                  }`}
+                  aria-hidden="true"
+                >
+                  <Image src={project.media.src} alt="" fill sizes="80px" quality={70} draggable={false} />
                 </span>
                 <span className={styles.hubText}>
                   <span className={styles.hubTitle}>{project.title}</span>
@@ -244,7 +251,6 @@ export default function StackConstellation({ sides, projects, initial }: StackCo
                       className={styles.usedLink}
                       href={`/projects/${project.slug}`}
                       data-magnetic
-                      data-peek-src={projects.find((entry) => entry.slug === project.slug)?.image}
                     >
                       {project.title}
                       <ArrowUpRight size={14} strokeWidth={1.75} aria-hidden="true" />

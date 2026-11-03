@@ -352,6 +352,11 @@ const IGNIS_ORGANIZATION = `${NU} · Capstone with BFP Dasmariñas`;
 /** Organizational, not development: shown apart from the roles and contributions. */
 const IGNIS_TEAM_ROLE = "Assistant Secretary of the capstone team";
 
+/*
+ * Stack "Languages" rows come from GitHub's language breakdown of each repository, and
+ * "PostgreSQL" from the SQL migrations each Supabase repository contains (November 2026).
+ * Beautiverse has no repository to check, so it lists only what its own docs state.
+ */
 export const PROJECT_DETAILS: ProjectDetail[] = [
   {
     slug: "ignis-safe-website",
@@ -440,7 +445,8 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
     ],
     stack: [
       { label: "Frontend", items: ["React 19", "Vite", "React Router", "GSAP"] },
-      { label: "Backend & database", items: ["Supabase"] },
+      { label: "Backend & database", items: ["Supabase", "PostgreSQL"] },
+      { label: "Languages", items: ["JavaScript", "CSS", "HTML"] },
       { label: "Attendance checks", items: ["face-api", "MediaPipe", "React Webcam", "QR codes"] },
       { label: "Charts & exports", items: ["Chart.js", "jsPDF"] },
       { label: "Quality tools", items: ["ESLint", "Lighthouse"] },
@@ -545,7 +551,7 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
     ],
     stack: [
       { label: "Mobile app", items: ["Flutter", "Dart", "Provider"] },
-      { label: "Backend & database", items: ["Supabase"] },
+      { label: "Backend & database", items: ["Supabase", "PostgreSQL"] },
       { label: "Authentication", items: ["Google Sign-In"] },
       { label: "3D simulations (team)", items: ["Unity"] },
       { label: "Media", items: ["model_viewer_plus", "video_player"] },
@@ -644,6 +650,7 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
       { label: "Backend & API", items: ["Node.js", "Express"] },
       { label: "Database", items: ["MongoDB", "Mongoose"] },
       { label: "Auth & integrations", items: ["JWT", "Google Calendar API", "Nodemailer", "QR codes"] },
+      { label: "Languages", items: ["JavaScript", "CSS", "HTML"] },
     ],
     links: {
       repoUrl: "https://github.com/seandrodejo/itso-id-tracker1",
@@ -809,8 +816,9 @@ export const PROJECT_DETAILS: ProjectDetail[] = [
       },
     ],
     stack: [
-      { label: "Framework", items: ["Next.js 16", "React 19", "TypeScript"] },
-      { label: "Backend & database", items: ["Supabase"] },
+      { label: "Framework", items: ["Next.js 16", "React 19"] },
+      { label: "Languages", items: ["TypeScript", "CSS"] },
+      { label: "Backend & database", items: ["Supabase", "PostgreSQL"] },
       { label: "Forms & validation", items: ["React Hook Form", "Zod"] },
       { label: "Documents & signing", items: ["pdf-lib", "react-signature-canvas"] },
       { label: "Motion", items: ["GSAP"] },

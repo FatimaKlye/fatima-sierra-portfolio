@@ -3,7 +3,7 @@
 
 import { CORE_KNOWLEDGE, TECHNOLOGY_GROUPS, type TechnologyItem } from "@/components/about/aboutData";
 import { PROJECTS } from "@/components/projects/projectsData";
-import { PROJECT_DETAILS } from "@/data/projectDetailsData";
+import { PROJECT_DETAILS, type ProjectMedia } from "@/data/projectDetailsData";
 
 export type SkillProject = { slug: string; title: string };
 
@@ -62,13 +62,31 @@ const unionProjects = (skills: SkillEntry[]) =>
     (project) => ({ slug: project.slug, title: project.title })
   );
 
-/** Every project, in portfolio order, with the preview image used by the hover peek. */
+const detailOf = (slug: string) => PROJECT_DETAILS.find((entry) => entry.slug === slug);
+
+/** The case study's own hero screenshot, so every preview is the real interface. */
+const heroOf = (slug: string): ProjectMedia => {
+  const project = PROJECTS.find((entry) => entry.slug === slug);
+  return (
+    detailOf(slug)?.hero ?? {
+      src: project?.image ?? "",
+      alt: project?.imageAlt ?? "",
+      width: 960,
+      height: 720,
+      frame: "plain",
+    }
+  );
+};
+
+/** Every project, in portfolio order, with its real hero screenshot. */
 export const SKILL_PROJECTS = PROJECTS.map((project) => ({
   slug: project.slug,
   title: project.title,
-  category: project.category,
-  image: project.image,
+  category: detailOf(project.slug)?.category ?? project.category,
+  media: heroOf(project.slug),
 }));
+
+export type SkillProjectPreview = (typeof SKILL_PROJECTS)[number];
 
 /** The constellation: interface tools on one side, mobile and data on the other, projects between. */
 export const STACK_SIDES = [
@@ -164,6 +182,108 @@ const PRACTICE_CONFIG: PracticeConfig[] = [
   },
 ];
 
+/* ---------- Evidence shown beside each build area ---------- */
+
+export type BrowserShot = {
+  slug: string;
+  title: string;
+  media: ProjectMedia;
+  /** Address shown in the browser bar — the live domain when there is one. */
+  address?: string;
+  liveUrl?: string;
+};
+
+export type DataClient = { slug: string; title: string; tool?: SkillEntry; does: string };
+
+export type DataSystem = {
+  id: string;
+  title: string;
+  clients: DataClient[];
+  hub: { title: string; detail: string; tool?: SkillEntry };
+  note?: string;
+};
+
+export type PracticeShowcase =
+  | { kind: "browser"; shots: BrowserShot[] }
+  | { kind: "phones"; slug: string; title: string; front: ProjectMedia; back: ProjectMedia[]; repoUrl?: string }
+  | { kind: "diagram"; systems: DataSystem[] };
+
+const hostOf = (url?: string) => (url ? new URL(url).host : undefined);
+
+const browserShot = (slug: string): BrowserShot => {
+  const detail = detailOf(slug);
+  const media = heroOf(slug);
+  return {
+    slug,
+    title: detail?.title ?? slug,
+    media,
+    address: media.url ?? hostOf(detail?.links.liveUrl),
+    liveUrl: detail?.links.liveUrl,
+  };
+};
+
+const tool = (name: string) => ALL_SKILLS.find((entry) => entry.name === name);
+
+/*
+ * The data diagram only draws what the case studies already state: the IGNIS SAFE
+ * ecosystem section (both surfaces on one Supabase project), the mobile repo's own
+ * SQL migrations, and the Maddy & Cassy integration contribution. No table names,
+ * keys or records.
+ */
+const DATA_SYSTEMS: DataSystem[] = [
+  {
+    id: "ignis",
+    title: "IGNIS SAFE",
+    clients: [
+      {
+        slug: "ignis-safe-website",
+        title: "IGNIS SAFE Website",
+        tool: tool("React"),
+        does: "Manages learning materials and assessment questions; reads learner progress",
+      },
+      {
+        slug: "ignis-safe-mobile",
+        title: "IGNIS SAFE Mobile",
+        tool: tool("Flutter"),
+        does: "Signs learners in; saves module progress and assessment attempts",
+      },
+    ],
+    hub: { title: "Supabase", detail: "Auth · PostgreSQL · one shared project", tool: tool("Supabase") },
+    note: "17 of the 23 SQL migrations in the app repository are mine.",
+  },
+  {
+    id: "maddy",
+    title: "Maddy & Cassy Rentals",
+    clients: [
+      {
+        slug: "maddy-cassy",
+        title: "Maddy & Cassy Rentals",
+        tool: tool("Next.js"),
+        does: "Rental catalog, bookings and admin tools",
+      },
+    ],
+    hub: { title: "Supabase", detail: "Inventory migrated from Firebase", tool: tool("Supabase") },
+  },
+];
+
+const showcaseFor = (id: string, projects: SkillProject[]): PracticeShowcase | undefined => {
+  if (id === "web") return { kind: "browser", shots: projects.map((project) => browserShot(project.slug)) };
+  if (id === "mobile") {
+    const detail = detailOf("ignis-safe-mobile");
+    if (!detail?.hero) return undefined;
+    return {
+      kind: "phones",
+      slug: detail.slug,
+      title: detail.title,
+      front: detail.hero,
+      back: detail.heroCompanions ?? [],
+      repoUrl: detail.links.repoUrl,
+    };
+  }
+  if (id === "database") return { kind: "diagram", systems: DATA_SYSTEMS };
+  return undefined;
+};
+
 /** Splits "A, B, and C." into topics, dropping any already shown as a tool logo. */
 const topicsOf = (description: string, tools: SkillEntry[]) =>
   description
@@ -181,6 +301,7 @@ export type PracticeArea = {
   tools: SkillEntry[];
   projects: SkillProject[];
   repos: { title: string; url: string }[];
+  showcase?: PracticeShowcase;
 };
 
 /** The eight knowledge areas, each joined to its tools and the projects that prove it. */
@@ -188,6 +309,7 @@ export const PRACTICE_AREAS: PracticeArea[] = PRACTICE_CONFIG.flatMap((config) =
   const knowledge = CORE_KNOWLEDGE.find((item) => item.title === config.title);
   if (!knowledge) return [];
   const tools = pick(config.tools);
+  const projects = config.evidence ? unionProjects(pick(config.evidence)) : [];
   return [
     {
       id: config.id,
@@ -197,10 +319,14 @@ export const PRACTICE_AREAS: PracticeArea[] = PRACTICE_CONFIG.flatMap((config) =
       description: knowledge.description,
       topics: topicsOf(knowledge.description, tools),
       tools,
-      projects: config.evidence ? unionProjects(pick(config.evidence)) : [],
+      projects,
       repos: config.repos
-        ? PROJECTS.flatMap((project) => (project.repoUrl ? [{ title: project.title, url: project.repoUrl }] : []))
+        ? PROJECTS.flatMap((project) => {
+            const url = detailOf(project.slug)?.links.repoUrl ?? project.repoUrl;
+            return url ? [{ title: project.title, url }] : [];
+          })
         : [],
+      showcase: showcaseFor(config.id, projects),
     },
   ];
 });

@@ -61,8 +61,8 @@ export const PROJECTS: Project[] = [
     description:
       "The web management platform of our IGNIS SAFE capstone with BFP Dasmariñas: personnel, attendance, reports and fire-safety learning content, plus a public portal.",
     technologies: ["React", "Vite", "Supabase"],
-    image: "/assets/projects/ignis-safe-website.svg",
-    imageAlt: "IGNIS SAFE website interface preview",
+    image: "/assets/projects/ignis-safe-website/ignis_safe_landing.png",
+    imageAlt: "IGNIS SAFE website home page: the BFP Dasmariñas City Fire Station portal",
     screenshots: [
       {
         src: "/assets/projects/ignis-safe-website/ignis_safe_landing.png",
@@ -83,8 +83,8 @@ export const PROJECTS: Project[] = [
     description:
       "A mobile fire-safety learning system with structured lessons, assessments, and interactive Unity-based simulations.",
     technologies: ["Flutter", "Dart", "Supabase", "Unity"],
-    image: "/assets/projects/ignis-safe-mobile.svg",
-    imageAlt: "IGNIS SAFE mobile application interface preview",
+    image: "/assets/projects/ignis-safe-mobile/LEARNING MATERIALS.jpg",
+    imageAlt: "IGNIS SAFE mobile Learning Materials screen with module progress and fire-safety modules",
     screenshots: [
       {
         src: "/assets/projects/ignis-safe-mobile/LEARNING MATERIALS.jpg",
@@ -111,7 +111,7 @@ export const PROJECTS: Project[] = [
   {
     id: "beautiverse",
     slug: "beautiverse",
-    category: "Web Application · Beauty & Commerce",
+    category: "Web Application · E-Commerce Prototype",
     title: "Beautiverse",
     description:
       "A student e-commerce prototype for beauty and makeup products, with customer, employee and admin roles for ordering and order management.",
@@ -123,7 +123,7 @@ export const PROJECTS: Project[] = [
   {
     id: "maddy-cassy",
     slug: "maddy-cassy",
-    category: "Web Application · Equipment Rental & Commerce",
+    category: "Web Application · Gadget Rental",
     title: "Maddy & Cassy Rentals",
     description:
       "A Next.js and Supabase rental platform for camera and mobile gear, handling bookings, manual GCash payment verification, and automatically generated invoices and rental agreements.",

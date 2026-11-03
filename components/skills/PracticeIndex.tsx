@@ -3,72 +3,31 @@
 import { useState } from "react";
 import Link from "next/link";
 import { ArrowUpRight, Plus } from "lucide-react";
+import PracticeShowcase from "./PracticeShowcase";
 import TechIcon from "./TechIcon";
 import type { PracticeArea } from "./skillsData";
 import styles from "./Skills.module.css";
 
 type PracticeIndexProps = {
   areas: PracticeArea[];
-  /** slug → preview image for the hover peek. */
-  images: Record<string, string>;
 };
 
 const pad = (value: number) => String(value).padStart(2, "0");
 
-/* Small drawings that give each build area its own silhouette: a browser, a phone, a table. */
-function Motif({ id }: { id: string }) {
-  if (id === "web") {
-    return (
-      <div className={`${styles.motif} ${styles.motifWeb}`} aria-hidden="true">
-        <span className={styles.motifBar}>
-          <i />
-          <i />
-          <i />
-        </span>
-        <span className={styles.motifGrid}>
-          <i />
-          <i />
-          <i />
-          <i />
-        </span>
-      </div>
-    );
-  }
-  if (id === "mobile") {
-    return (
-      <div className={`${styles.motif} ${styles.motifPhone}`} aria-hidden="true">
-        <span className={styles.motifNotch} />
-        <span className={styles.motifRows}>
-          <i />
-          <i />
-          <i />
-          <i />
-        </span>
-      </div>
-    );
-  }
-  return (
-    <div className={`${styles.motif} ${styles.motifTable}`} aria-hidden="true">
-      {Array.from({ length: 5 }, (_, row) => (
-        <span className={styles.motifRow} key={row}>
-          <i />
-          <i />
-          <i />
-        </span>
-      ))}
-    </div>
-  );
-}
-
 /**
  * The eight knowledge areas. The three build areas get large editorial
- * spreads with their tools and the projects that prove them; the five
- * supporting areas sit in an index whose rows open to show the detail.
+ * spreads with their tools, the projects that prove them and a real view of
+ * that work — pointing at a project in "Used in" brings it up in the visual.
+ * The five supporting areas sit in an index whose rows open to show the detail.
  */
-export default function PracticeIndex({ areas, images }: PracticeIndexProps) {
+export default function PracticeIndex({ areas }: PracticeIndexProps) {
   const build = areas.filter((area) => area.tier === "build");
   const support = areas.filter((area) => area.tier === "support");
   const [open, setOpen] = useState<string | null>(null);
+  // area id → project slug pointed at in that area's "Used in" list.
+  const [active, setActive] = useState<Record<string, string>>({});
+  const activate = (areaId: string, slug: string) =>
+    setActive((current) => (current[areaId] === slug ? current : { ...current, [areaId]: slug }));
 
   return (
     <>
@@ -109,7 +68,9 @@ export default function PracticeIndex({ areas, images }: PracticeIndexProps) {
                         <Link
                           className={styles.usedRow}
                           href={`/projects/${project.slug}`}
-                          data-peek-src={images[project.slug]}
+                          data-current={active[area.id] === project.slug ? "" : undefined}
+                          onPointerEnter={() => activate(area.id, project.slug)}
+                          onFocus={() => activate(area.id, project.slug)}
                         >
                           <span>{project.title}</span>
                           <ArrowUpRight size={16} strokeWidth={1.75} aria-hidden="true" />
@@ -121,7 +82,15 @@ export default function PracticeIndex({ areas, images }: PracticeIndexProps) {
               )}
             </div>
 
-            <Motif id={area.id} />
+            {area.showcase && (
+              <div className={styles.spreadVisual}>
+                <PracticeShowcase
+                  showcase={area.showcase}
+                  active={active[area.id]}
+                  onActivate={(slug) => activate(area.id, slug)}
+                />
+              </div>
+            )}
           </article>
         ))}
       </div>

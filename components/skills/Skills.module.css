@@ -603,10 +603,10 @@
 
 .hubItem {
   display: grid;
-  grid-template-columns: 28px minmax(0, 1fr) 16px;
+  grid-template-columns: 22px 64px minmax(0, 1fr) 16px;
   gap: 12px;
   align-items: center;
-  padding: 14px 16px;
+  padding: 10px 14px 10px 12px;
   border: 1px solid var(--color-border);
   border-radius: 16px;
   background: var(--color-card);
@@ -633,6 +633,40 @@
   letter-spacing: 0.1em;
 }
 
+/* Compact, in-flow preview of the real interface: it sits in its own column and never covers a label. */
+.hubThumb {
+  position: relative;
+  display: block;
+  width: 64px;
+  height: 40px;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: 7px;
+  background: var(--color-surface);
+}
+
+.hubThumb img {
+  object-fit: cover;
+  object-position: top center;
+  transition: transform 500ms var(--ease-out);
+}
+
+.hubItem:hover .hubThumb img,
+.hubItemLit .hubThumb img {
+  transform: scale(1.06);
+}
+
+/* Phone screenshots: a tall crop centred on the app's header and first cards. */
+.hubThumbPhone img {
+  object-position: center 18%;
+}
+
+/* ITSO exports carry their own browser bar; trim it like the practice showcase does. */
+.hubThumbCropped img {
+  top: -12% !important;
+  height: 112% !important;
+}
+
 .hubText {
   display: grid;
   gap: 2px;
@@ -646,11 +680,9 @@
 }
 
 .hubCategory {
-  overflow: hidden;
   color: var(--color-text-muted);
   font-size: 0.7rem;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  line-height: 1.4;
 }
 
 .hubArrow {
@@ -803,17 +835,26 @@
 
 .spread {
   display: grid;
-  grid-template-columns: clamp(64px, 9vw, 128px) minmax(0, 1.25fr) minmax(200px, 0.75fr);
-  grid-template-areas: "index body motif";
-  gap: 24px clamp(24px, 4vw, 64px);
-  align-items: start;
-  padding: clamp(32px, 4.4vw, 60px) 0;
+  grid-template-columns: clamp(56px, 7vw, 104px) minmax(0, 1fr) minmax(0, 1.12fr);
+  grid-template-areas: "index body visual";
+  gap: 28px clamp(24px, 4vw, 64px);
+  align-items: center;
+  padding: clamp(40px, 5vw, 72px) 0;
   border-bottom: 1px solid var(--color-border);
 }
 
 .spread:nth-child(even) {
-  grid-template-columns: clamp(64px, 9vw, 128px) minmax(200px, 0.75fr) minmax(0, 1.25fr);
-  grid-template-areas: "index motif body";
+  grid-template-columns: clamp(56px, 7vw, 104px) minmax(0, 1.12fr) minmax(0, 1fr);
+  grid-template-areas: "index visual body";
+}
+
+.spreadIndex {
+  align-self: start;
+}
+
+.spreadVisual {
+  grid-area: visual;
+  min-width: 0;
 }
 
 .spreadIndex {
@@ -966,153 +1007,387 @@
   transform: translate(3px, -3px);
 }
 
-/* Motifs: a browser, a phone and a table, drawn in the palette */
-
-.motif {
-  grid-area: motif;
-  justify-self: center;
-  width: 100%;
-  max-width: 300px;
+.usedRow[data-current] {
+  color: var(--color-primary);
 }
 
-.motif i {
-  display: block;
-  border-radius: 6px;
-  background: var(--color-soft-blush);
-  transition: transform 600ms var(--ease-out), background-color 400ms ease;
+/* Practice: real-work showcases ----------------------------------------------- */
+
+.showcase {
+  position: relative;
+  display: grid;
+  gap: 16px;
+  margin: 0;
 }
 
-.motifWeb {
-  aspect-ratio: 4 / 3;
+.window {
   overflow: hidden;
-  border: 1.5px solid var(--color-border);
-  border-radius: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
   background: var(--color-card);
+  box-shadow:
+    0 36px 80px -28px rgb(var(--rgb-shadow) / 0.38),
+    0 10px 26px rgb(var(--rgb-shadow-tint) / 0.1);
+  transition: transform 600ms var(--ease-out), box-shadow 600ms var(--ease-out);
 }
 
-.motifBar {
+.spread:hover .window {
+  transform: translateY(-4px);
+}
+
+.windowBar {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  height: 34px;
+  padding: 0 12px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+/* Balances the dots so the address sits in the true centre. */
+.windowBar::after {
+  width: 46px;
+  content: "";
+}
+
+.windowDots {
   display: flex;
   gap: 6px;
-  padding: 12px 14px;
-  border-bottom: 1.5px solid var(--color-border);
+  width: 46px;
 }
 
-.motifBar i {
-  width: 8px;
-  height: 8px;
+.windowDots i {
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
-  background: var(--color-secondary);
+  background: var(--color-soft-blush);
+  box-shadow: inset 0 0 0 1px rgb(var(--rgb-primary) / 0.25);
 }
 
-.motifGrid {
-  display: grid;
-  grid-template-columns: 1.4fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  gap: 10px;
-  height: calc(100% - 34px);
-  padding: 14px;
-}
-
-.motifGrid i:first-child {
-  grid-row: span 2;
-  background: rgb(var(--rgb-primary) / 0.22);
-}
-
-.spread:hover .motifGrid i:first-child {
-  transform: scale(0.96);
-}
-
-.spread:hover .motifGrid i:nth-child(2) {
-  transform: translateX(-6px);
-}
-
-.spread:hover .motifGrid i:nth-child(3) {
-  transform: translateY(6px);
-}
-
-.motifPhone {
-  position: relative;
-  max-width: 150px;
-  aspect-ratio: 9 / 18;
-  padding: 34px 12px 12px;
-  border: 1.5px solid var(--color-border);
-  border-radius: 30px;
-  background: var(--color-card);
-}
-
-.motifNotch {
-  position: absolute;
-  top: 12px;
-  left: 50%;
-  width: 40px;
-  height: 8px;
+.windowUrl {
+  display: inline-flex;
+  max-width: 100%;
+  align-items: center;
+  justify-self: center;
+  gap: 6px;
+  padding: 3px 12px;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
   border-radius: 999px;
-  background: var(--color-border);
-  transform: translateX(-50%);
-}
-
-.motifRows {
-  display: grid;
-  gap: 8px;
-}
-
-.motifRows i {
-  height: 34px;
-}
-
-.motifRows i:first-child {
-  height: 72px;
-  background: rgb(var(--rgb-primary) / 0.22);
-}
-
-.spread:hover .motifRows i:nth-child(2) {
-  transform: translateX(8px);
-}
-
-.spread:hover .motifRows i:nth-child(3) {
-  transform: translateX(-8px);
-}
-
-.motifTable {
-  display: grid;
-  gap: 6px;
-  padding: 14px;
-  border: 1.5px solid var(--color-border);
-  border-radius: 16px;
   background: var(--color-card);
+  color: var(--color-text-muted);
+  font-size: 0.68rem;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.motifRow {
+.windowUrl svg {
+  flex: none;
+  color: var(--color-primary);
+}
+
+.windowScreen {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--color-surface);
+}
+
+.shot {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transform: scale(1.02);
+  transition: opacity 520ms ease, transform 900ms var(--ease-out);
+}
+
+.shot[data-active] {
+  opacity: 1;
+  transform: none;
+}
+
+.shotImage {
+  object-fit: cover;
+  object-position: top center;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* Exports that include their own browser bar: shift it out of view (about a tenth of the frame). */
+.shotCropped {
+  top: -10%;
+}
+
+.stageCaption {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 20px;
+}
+
+.stageTabs {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.stageTab {
+  display: inline-grid;
+  min-width: 40px;
+  min-height: 40px;
+  place-items: center;
+  padding: 0 8px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: none;
+  color: var(--color-text-muted);
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: color 200ms ease, border-color 200ms ease, background-color 200ms ease;
+}
+
+.stageTab:hover {
+  color: var(--color-primary);
+}
+
+.stageTab[aria-pressed="true"] {
+  border-color: var(--color-primary);
+  background: var(--color-soft-blush);
+  color: var(--color-primary);
+}
+
+.stageMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 14px;
+  margin-left: auto;
+  color: var(--color-text-primary);
+  font-size: 0.84rem;
+}
+
+.stageMeta strong {
+  font-weight: 600;
+}
+
+.stageNote {
+  color: var(--color-text-muted);
+  font-size: 0.76rem;
+}
+
+.stageLinks {
+  display: inline-flex;
+  gap: 14px;
+}
+
+.stageLinks a {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  gap: 4px;
+  color: var(--color-primary);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: rgb(var(--rgb-primary) / 0.3);
+  text-underline-offset: 4px;
+  transition: text-decoration-color 200ms ease;
+}
+
+.stageLinks a:hover {
+  text-decoration-color: currentColor;
+}
+
+/* Phones: the app's real screens, fanned. Heights come from each screenshot's own ratio. */
+.phones {
+  position: relative;
   display: grid;
-  grid-template-columns: 0.5fr 1.2fr 1fr;
-  gap: 6px;
+  width: min(100%, 440px);
+  margin-inline: auto;
+  padding: 12px 0 8px;
+  place-items: center;
 }
 
-.motifRow i {
-  height: 22px;
+.phoneFront,
+.phoneBack {
+  grid-area: 1 / 1;
+  transition: transform 700ms var(--ease-out);
 }
 
-.motifRow i:first-child {
-  background: rgb(var(--rgb-primary) / 0.22);
+.phoneFront {
+  z-index: 2;
+  width: 40%;
 }
 
-.motifRow:first-child i {
-  height: 12px;
-  background: var(--color-border);
+.phoneBack {
+  z-index: 1;
+  width: 32%;
+  opacity: 0.94;
 }
 
-.spread:hover .motifRow:nth-child(3) i {
-  background: rgb(var(--rgb-primary) / 0.4);
+.phoneLeft {
+  transform: translateX(-74%) rotate(-7deg);
 }
 
-.spread:hover .motifRow:nth-child(3) {
-  animation: rowPing 1.2s var(--ease-out) infinite alternate;
+.phoneRight {
+  transform: translateX(74%) rotate(7deg);
 }
 
-@keyframes rowPing {
+.spread:hover .phoneLeft {
+  transform: translateX(-82%) rotate(-9deg);
+}
+
+.spread:hover .phoneRight {
+  transform: translateX(82%) rotate(9deg);
+}
+
+.spread:hover .phoneFront {
+  transform: translateY(-6px);
+}
+
+.phones + .stageCaption .stageMeta {
+  margin-inline: auto;
+  justify-content: center;
+}
+
+/* Data diagram: apps on the left, their Supabase project on the right. */
+.dataStage {
+  gap: 22px;
+}
+
+.system {
+  display: grid;
+  gap: 10px;
+}
+
+.system + .system {
+  padding-top: 20px;
+  border-top: 1px dashed var(--color-border);
+}
+
+.systemTitle {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.systemFlow {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(36px, 0.3fr) minmax(0, 1fr);
+  align-items: stretch;
+}
+
+.clients {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.client,
+.hubNode {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-card);
+  transition: border-color 240ms ease, box-shadow 300ms ease, transform 380ms var(--ease-out);
+}
+
+.client[data-lit] {
+  border-color: var(--color-primary);
+  box-shadow: 0 10px 26px -14px rgb(var(--rgb-shadow-tint) / 0.6);
+  transform: translateX(4px);
+}
+
+.hubNode {
+  align-self: center;
+  border-color: rgb(var(--rgb-primary) / 0.45);
+  background: var(--color-soft-blush);
+}
+
+.clientIcon {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 10px;
+  background: var(--color-white);
+}
+
+.clientIcon img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+.clientText {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.clientText strong {
+  color: var(--color-text-primary);
+  font-size: 0.84rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.clientText span {
+  color: var(--color-text-muted);
+  font-size: 0.72rem;
+  line-height: 1.45;
+}
+
+.flowWires {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.flowWires path {
+  fill: none;
+  stroke: var(--color-primary);
+  stroke-dasharray: 4 5;
+  stroke-opacity: 0.55;
+  stroke-width: 1.5;
+  animation: flow 1.6s linear infinite;
+}
+
+@keyframes flow {
   to {
-    transform: translateX(6px);
+    stroke-dashoffset: -18;
   }
+}
+
+.systemNote,
+.dataCaption {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.74rem;
+  line-height: 1.5;
+}
+
+.systemNote {
+  color: var(--color-text-primary);
+}
+
+.dataCaption {
+  font-style: italic;
 }
 
 /* Practice: supporting index --------------------------------------------------- */
@@ -1321,32 +1596,6 @@
   color: var(--color-primary);
 }
 
-/* Hover peek: project preview that follows the pointer */
-
-.peek {
-  position: fixed;
-  z-index: 60;
-  top: 0;
-  left: 0;
-  width: 240px;
-  aspect-ratio: 16 / 10;
-  overflow: hidden;
-  border: 1px solid var(--color-border);
-  border-radius: 14px;
-  background: var(--color-card);
-  box-shadow: var(--shadow-soft);
-  opacity: 0;
-  pointer-events: none;
-  transform: scale(0.92);
-}
-
-.peek img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: top;
-}
-
 /* Still learning ----------------------------------------------------------------- */
 
 /* Layout only — the look comes from the global .ui-btn system. */
@@ -1500,22 +1749,63 @@
     height: 34px;
   }
 
+  /* Stacked: number, the real work, then the detail — the screens stay the first thing seen. */
   .spread,
   .spread:nth-child(even) {
-    grid-template-columns: minmax(0, 1fr) minmax(120px, 0.5fr);
+    grid-template-columns: minmax(0, 1fr);
     grid-template-areas:
-      "index motif"
-      "body body";
-    align-items: end;
+      "index"
+      "visual"
+      "body";
+    gap: 22px;
   }
 
-  .motif {
-    justify-self: end;
-    max-width: 180px;
+  .spreadIndex {
+    font-size: 3rem;
   }
 
-  .motifPhone {
-    max-width: 96px;
+  .hubList {
+    max-width: 560px;
+  }
+}
+
+@media (max-width: 640px) {
+  /* Diagram stacks: apps, a downward connector, then the database. */
+  .systemFlow {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+
+  .flowWires {
+    display: none;
+  }
+
+  .hubNode {
+    position: relative;
+    align-self: stretch;
+    margin-top: 28px;
+  }
+
+  .hubNode::before {
+    position: absolute;
+    top: -28px;
+    left: 30px;
+    height: 28px;
+    border-left: 1.5px dashed var(--color-primary);
+    content: "";
+    opacity: 0.6;
+  }
+
+  .phoneLeft {
+    transform: translateX(-62%) rotate(-6deg);
+  }
+
+  .phoneRight {
+    transform: translateX(62%) rotate(6deg);
+  }
+
+  .stageMeta {
+    margin-left: 0;
   }
 }
 
@@ -1589,13 +1879,22 @@
     stroke-dashoffset: 0;
   }
 
-  .peek {
-    display: none;
-  }
 }
 
 /* ---------- Dark theme ---------- */
 
 :global(html[data-theme="dark"]) .readoutIcon {
   background: var(--color-soft-blush);
+}
+
+:global(html[data-theme="dark"]) .clientIcon {
+  background: var(--color-soft-blush);
+}
+
+:global(html[data-theme="dark"]) .wires path:not(.wireLit) {
+  stroke: rgb(var(--rgb-secondary) / 0.3);
+}
+
+:global(html[data-theme="dark"]) .window {
+  box-shadow: 0 36px 80px -28px rgb(0 0 0 / 0.7);
 }

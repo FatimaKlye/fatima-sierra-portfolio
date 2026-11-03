@@ -25,8 +25,6 @@ const CAROUSEL_CERTIFICATES = [
   ...CERTIFICATES.filter((certificate) => !certificate.featured),
 ];
 
-const PROJECT_IMAGES = Object.fromEntries(SKILL_PROJECTS.map((project) => [project.slug, project.image]));
-
 export default function SkillsPage() {
   return (
     <EditorialMotion>
@@ -61,11 +59,11 @@ export default function SkillsPage() {
                 </h2>
               </div>
               <p className={styles.headNote} data-reveal>
-                Three areas I build in, and five practices that keep the work usable, tested and easy to hand
-                over.
+                Three areas I build in, each shown with real screens from the projects, and five practices that
+                keep the work usable, tested and easy to hand over.
               </p>
             </header>
-            <PracticeIndex areas={PRACTICE_AREAS} images={PROJECT_IMAGES} />
+            <PracticeIndex areas={PRACTICE_AREAS} />
           </div>
         </section>
 
